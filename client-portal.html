@@ -527,53 +527,53 @@
 
     <div class="stepper">
       <!-- Step 1 -->
-      <div class="step-item active" id="nav-step-1">
-        <div class="step-line"></div>
-        <div class="step-icon">1</div>
+      <div class="step-item active" id="nav-step-1" onclick="goToStep(1)" style="cursor: pointer;">
+        
+        <div class="step-icon" style="width:28px;height:28px;background:#f1f5f9;color:#64748b;border-radius:6px;display:flex;align-items:center;justify-content:center;margin-right:12px;border:1px solid #e2e8f0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg></div>
         <div class="step-content">
           <div class="step-title">Company & Legal</div>
           <div class="step-desc">Establish identity & compliance</div>
         </div>
       </div>
       <!-- Step 2 -->
-      <div class="step-item" id="nav-step-2">
-        <div class="step-line"></div>
-        <div class="step-icon">2</div>
+      <div class="step-item" id="nav-step-2" onclick="goToStep(2)" style="cursor: pointer;">
+        
+        <div class="step-icon" style="width:28px;height:28px;background:#f1f5f9;color:#64748b;border-radius:6px;display:flex;align-items:center;justify-content:center;margin-right:12px;border:1px solid #e2e8f0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg></div>
         <div class="step-content">
           <div class="step-title">Core Financial Data</div>
           <div class="step-desc">Foundation for validation</div>
         </div>
       </div>
       <!-- Step 3 -->
-      <div class="step-item" id="nav-step-3">
-        <div class="step-line"></div>
-        <div class="step-icon">3</div>
+      <div class="step-item" id="nav-step-3" onclick="goToStep(3)" style="cursor: pointer;">
+        
+        <div class="step-icon" style="width:28px;height:28px;background:#f1f5f9;color:#64748b;border-radius:6px;display:flex;align-items:center;justify-content:center;margin-right:12px;border:1px solid #e2e8f0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg></div>
         <div class="step-content">
           <div class="step-title">Banking & Treasury</div>
           <div class="step-desc">Cash & transaction proof</div>
         </div>
       </div>
       <!-- Step 4 -->
-      <div class="step-item" id="nav-step-4">
-        <div class="step-line"></div>
-        <div class="step-icon">4</div>
+      <div class="step-item" id="nav-step-4" onclick="goToStep(4)" style="cursor: pointer;">
+        
+        <div class="step-icon" style="width:28px;height:28px;background:#f1f5f9;color:#64748b;border-radius:6px;display:flex;align-items:center;justify-content:center;margin-right:12px;border:1px solid #e2e8f0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg></div>
         <div class="step-content">
           <div class="step-title">Revenue & Tax</div>
           <div class="step-desc">Compliance & reporting</div>
         </div>
       </div>
       <!-- Step 5 -->
-      <div class="step-item" id="nav-step-5">
-        <div class="step-line"></div>
-        <div class="step-icon">5</div>
+      <div class="step-item" id="nav-step-5" onclick="goToStep(5)" style="cursor: pointer;">
+        
+        <div class="step-icon" style="width:28px;height:28px;background:#f1f5f9;color:#64748b;border-radius:6px;display:flex;align-items:center;justify-content:center;margin-right:12px;border:1px solid #e2e8f0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg></div>
         <div class="step-content">
           <div class="step-title">Supporting Schedules</div>
           <div class="step-desc">Sub-ledger breakdown</div>
         </div>
       </div>
       <!-- Step 6 -->
-      <div class="step-item" id="nav-step-6">
-        <div class="step-icon">6</div>
+      <div class="step-item" id="nav-step-6" onclick="goToStep(6)" style="cursor: pointer;">
+        <div class="step-icon" style="width:28px;height:28px;background:#f1f5f9;color:#64748b;border-radius:6px;display:flex;align-items:center;justify-content:center;margin-right:12px;border:1px solid #e2e8f0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg></div>
         <div class="step-content">
           <div class="step-title">Smart Integration</div>
           <div class="step-desc">Optional real-time link</div>
@@ -584,13 +584,30 @@
 
   <!-- Main Content -->
   <main class="main">
+    <!-- Global Alert Banner -->
+    <div id="global-ping-alert" style="display:none; position:sticky; top:0; z-index:50; background:#fff1f2; border:1px solid #fecdd3; border-left:4px solid #e11d48; padding:16px 20px; border-radius:8px; margin-bottom:24px; box-shadow:0 6px 16px -4px rgba(225,29,72,0.15); animation: fadeIn 0.4s ease;">
+      <div style="display:flex; gap:12px; align-items:flex-start;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e11d48" stroke-width="2" style="flex-shrink:0; margin-top:2px;">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <div style="flex:1;">
+          <h4 style="color:#be123c; font-size:15px; font-weight:700; margin-bottom:4px;">Audit Manager Urgent Reminder</h4>
+          <p id="global-ping-msg" style="color:#9f1239; font-size:14px; line-height:1.5;">Please upload your financial documents urgently.</p>
+        </div>
+        <button onclick="document.getElementById('global-ping-alert').style.display='none'" style="background:none; border:none; cursor:pointer; color:#e11d48; padding:4px; opacity:0.8; transition:opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+    </div>
     <div class="header-banner">
       <div>
         <h1>Data Ingestion & AI Validation</h1>
         <p>To enable our AI-driven financial validation and reconciliation process, we require the following documents. Our system will automatically validate and reconcile the data, reducing manual effort and ensuring accuracy. Incomplete or inconsistent data will be flagged automatically.</p>
       </div>
       <div class="timer-widget" id="timer-widget">
-        <div class="timer-icon" id="timer-icon-container">
+        <div class="timer-icon" id="timer-icon-container" style="background:#fee2e2; color:#dc2626;">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="10"></circle>
             <polyline points="12 6 12 12 16 14"></polyline>
@@ -598,7 +615,7 @@
         </div>
         <div class="timer-info">
           <h4>Submission Deadline</h4>
-          <div class="timer-countdown" id="timer-countdown">5 Days Left</div>
+          <div class="timer-countdown" id="timer-countdown" style="color:#dc2626; font-weight:700;">2 Days Left</div>
         </div>
       </div>
     </div>
@@ -814,10 +831,10 @@
       <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
     </div>
     <h2>Data Ingestion Complete</h2>
-    <p>All documents and integrations have been securely captured. Our AI agent is now validating the Trial Balance, matching Bank statements to GL, and verifying tax compliance.</p>
+    <p>All documents and integrations have been securely captured. Our automated system is now validating the Trial Balance, matching Bank statements to GL, and verifying tax compliance.</p>
     <div style="margin-top:32px; display:inline-flex; align-items:center; gap:8px; font-size:14px; font-weight:600; color:var(--primary);">
       <span class="spinner" style="border-top-color:var(--primary); width:14px; height:14px; border-width:2px; border-color:rgba(37,99,235,0.2)"></span>
-      Agent Analysis in Progress...
+      Automated Analysis in Progress...
     </div>
   </div>
 
@@ -825,25 +842,14 @@
     let currentStep = 1;
     const totalSteps = 6;
 
-    function changeStep(dir) {
-      const newStep = currentStep + dir;
-      if (newStep < 1 || newStep > totalSteps) {
-        if (newStep > totalSteps) {
-          finishIngestion();
-        }
-        return;
-      }
+    function goToStep(step) {
+      if (step < 1 || step > totalSteps) return;
 
       // Hide current
       document.getElementById('panel-' + currentStep).classList.remove('active');
       document.getElementById('nav-step-' + currentStep).classList.remove('active');
-      if (dir > 0) {
-        document.getElementById('nav-step-' + currentStep).classList.add('completed');
-      } else {
-        document.getElementById('nav-step-' + newStep).classList.remove('completed');
-      }
 
-      currentStep = newStep;
+      currentStep = step;
 
       // Show new
       document.getElementById('panel-' + currentStep).classList.add('active');
@@ -854,14 +860,12 @@
       
       const nextBtn = document.getElementById('btn-next');
       if (currentStep === totalSteps) {
-        nextBtn.innerHTML = 'Submit & Run AI Agent';
+        nextBtn.innerHTML = 'Submit & Generate Audit Draft';
         nextBtn.className = 'btn btn-success'; // turn green
       } else {
-        nextBtn.innerHTML = 'Next Step';
+        nextBtn.innerHTML = 'Next Section';
         nextBtn.className = 'btn btn-primary';
       }
-
-      updateTimerDisplay(currentStep);
 
       // Notify Audit Manager dashboard
       if (window.opener && !window.opener.closed) {
@@ -869,39 +873,18 @@
       }
     }
 
-    function updateTimerDisplay(step) {
-      const timerEl = document.getElementById('timer-countdown');
-      const iconContainer = document.getElementById('timer-icon-container');
-      
-      // Calculate days based on step: Step 1 -> 5 days, Step 5/6 -> 1 day
-      let daysLeft = 6 - step;
-      if (daysLeft < 1) daysLeft = 1;
-      
-      timerEl.innerText = daysLeft + (daysLeft === 1 ? ' Day Left' : ' Days Left');
-      
-      // Color transition from yellow to red
-      if (daysLeft >= 4) {
-        timerEl.style.color = '#d97706'; // yellow/orange
-        iconContainer.style.background = '#fef3c7';
-        iconContainer.style.color = '#d97706';
-      } else if (daysLeft >= 2) {
-        timerEl.style.color = '#ea580c'; // orange
-        iconContainer.style.background = '#ffedd5';
-        iconContainer.style.color = '#ea580c';
+    function changeStep(dir) {
+      const newStep = currentStep + dir;
+      if (newStep > totalSteps) {
+        finishIngestion();
       } else {
-        timerEl.style.color = '#dc2626'; // red
-        iconContainer.style.background = '#fee2e2';
-        iconContainer.style.color = '#dc2626';
-        
-        // Add a slight pulsing effect for urgency
-        if (!timerEl.style.animation) {
-          timerEl.animate([
-            { transform: 'scale(1)' },
-            { transform: 'scale(1.05)' },
-            { transform: 'scale(1)' }
-          ], { duration: 1000, iterations: Infinity });
-        }
+        goToStep(newStep);
       }
+    }
+
+    function updateTimerDisplay(step) {
+      // Intentionally left empty as the submission deadline should be completely fixed
+      // and not change based on user interactions/steps navigated.
     }
 
     function showToast(message) {
@@ -925,8 +908,12 @@
     }
 
     window.addEventListener("message", (event) => {
-      if (event.data === "ping_client") {
-        showToast('<strong style="display:block;margin-bottom:4px;">Audit Manager Reminder</strong> Please hurry up and finish the document upload process.');
+      if (typeof event.data === 'object' && event.data.type === "ping_client_advanced") {
+        document.getElementById('global-ping-msg').innerHTML = `Kindly finish the document upload process. You only have <strong>${event.data.days}</strong> to avoid delays in compliance.`;
+        document.getElementById('global-ping-alert').style.display = 'block';
+      } else if (event.data === "ping_client") {
+        document.getElementById('global-ping-msg').innerHTML = 'Please hurry up and finish the document upload process.';
+        document.getElementById('global-ping-alert').style.display = 'block';
       }
     });
 
@@ -967,3 +954,5 @@
   </script>
 </body>
 </html>
+
+

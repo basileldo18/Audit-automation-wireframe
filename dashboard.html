@@ -257,40 +257,64 @@
       }
     }
 
-    /* --- Contextual Transition Overlay --- */
-    #interstitial {
-      position: fixed;
-      inset: 0;
-      background: var(--bg-body);
-      z-index: 200;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    /* --- Cinematic Overlays (Global) --- */
+    @keyframes pulse-glow {
+      0%, 100% { opacity: 0.15; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.02); }
     }
-
-    #interstitial .msg-card {
-      background: white;
-      border: 1px solid var(--border-color);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-      padding: 50px;
-      border-radius: 16px;
-      text-align: center;
-      max-width: 520px;
-      transform: translateY(20px);
-      transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    .cinematic-overlay {
+      position: fixed; inset: 0; display: none;
+      flex-direction: column; align-items: center; justify-content: center;
+      padding: 40px; opacity: 0; pointer-events: none; transition: opacity 0.8s ease;
+      background: radial-gradient(circle at center, #0B1120 0%, #000000 80%);
+      font-family: 'Inter', system-ui, sans-serif;
     }
-
-    #interstitial.show {
-      opacity: 1;
-      pointer-events: all;
+    .cinematic-overlay.show, .cinematic-overlay.fade-in {
+      opacity: 1; pointer-events: all;
     }
-
-    #interstitial.show .msg-card {
-      transform: translateY(0);
+    .cinematic-brand {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 70px; opacity: 0.4;
+    }
+    .cinematic-brand div {
+      width: 32px; height: 32px; background: rgba(255,255,255,0.05); border-radius: 8px; display: grid; place-items: center;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .cinematic-brand span {
+      font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.6); letter-spacing: 3.5px; text-transform: uppercase;
+    }
+    .cinematic-badge {
+      display: inline-flex; align-items: center; gap: 12px;
+      border-radius: 50px; padding: 6px 20px 6px 6px; margin-bottom: 36px;
+      opacity: 0; transform: translateY(10px);
+      transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      backdrop-filter: blur(10px); border: 1px solid transparent;
+    }
+    .cinematic-badge-icon {
+      width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
+    }
+    .cinematic-badge span {
+      font-size: 13px; font-weight: 500; letter-spacing: 0.5px;
+    }
+    .cinematic-text-main {
+      font-size: 26px; font-weight: 300; color: rgba(255,255,255,0.95); line-height: 1.6;
+      letter-spacing: -0.2px; min-height: 90px; text-shadow: 0 0 40px rgba(255,255,255,0.15);
+    }
+    .cinematic-text-sub {
+      font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.4);
+      letter-spacing: 2.5px; text-transform: uppercase; opacity: 0; transition: opacity 0.8s ease;
+    }
+    .cinematic-progress-container {
+      margin-top: 64px; width: 260px; height: 2px; background: rgba(255,255,255,0.05);
+      border-radius: 2px; overflow: hidden; position: relative; box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
+    }
+    .cinematic-progress-bar {
+      height: 100%; width: 0%; background: #ffffff; transition: width 5s cubic-bezier(0.25, 1, 0.5, 1);
+      box-shadow: 0 0 10px rgba(255,255,255,0.8);
+    }
+    .cinematic-click-hint {
+      margin-top: 60px; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.3);
+      letter-spacing: 3px; text-transform: uppercase; opacity: 0;
+      transition: opacity 0.8s ease; animation: pulse-glow 3s infinite ease-in-out;
     }
 
     /* --- Client KYC Step Dots --- */
@@ -858,27 +882,42 @@
   </div>
 
   <!-- Interstitial Presentation Overlay -->
-  <div id="interstitial">
-    <div class="msg-card">
-      <div
-        style="width:64px; height:64px; background:var(--success-bg); border-radius:50%; display:grid; place-items:center; color:var(--success); margin: 0 auto 24px;">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
-          stroke-linecap="round" stroke-linejoin="round">
+  <div id="interstitial" class="cinematic-overlay" style="z-index: 3000;">
+    <!-- Branding -->
+    <div class="cinematic-brand">
+      <div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <span>Audit Offshore &mdash; Secure Workflow</span>
+    </div>
+
+    <!-- Status badge -->
+    <div id="interstitial-badge" class="cinematic-badge" style="background: rgba(37,99,235,0.1); border-color: rgba(37,99,235,0.3);">
+      <div class="cinematic-badge-icon" style="background: rgba(37,99,235,0.2);">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="20 6 9 17 4 12"></polyline>
         </svg>
       </div>
-      <h2 style="font-size:22px; font-weight:600; color:var(--text-main); margin-bottom: 12px;">Lead Request Finalized
-      </h2>
-      <p style="font-size:15px; color:var(--text-secondary); line-height:1.6;">
-        The system is now automatically sending an encrypted link for the <strong style="color:var(--text-main)">Secure
-          KYC and CDD submission forms</strong> directly to the client's email and WhatsApp.
-      </p>
-      <div
-        style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border-color); font-size:13px; color:var(--text-secondary); display:flex; align-items:center; justify-content:center; gap:8px;">
-        <span class="spinner blue"></span>
-        Simulating user clicking the link...
-      </div>
+      <span style="color: #60a5fa;">Lead Captured &amp; Verified</span>
     </div>
+
+    <!-- Primary typewriter text -->
+    <div style="max-width:640px; text-align:center; margin-bottom:24px;">
+      <p id="interstitial-text" class="cinematic-text-main"></p>
+    </div>
+
+    <!-- Secondary line -->
+    <div style="max-width:440px; text-align:center; min-height:28px;">
+      <p id="interstitial-text-2" class="cinematic-text-sub"></p>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="cinematic-progress-container">
+      <div id="interstitial-progress" class="cinematic-progress-bar"></div>
+    </div>
+
+    <!-- Click to continue hint -->
+    <div id="interstitial-click-hint" class="cinematic-click-hint">Click anywhere to continue &rsaquo;</div>
   </div>
 
   <!-- Phase 2: Client-side KYC Questionnaire -->
@@ -954,77 +993,119 @@
   </div>
 
 
-  <!-- Phase 3: KYC Transition Overlay -->
-  <div id="kyc-success-overlay" class="overlay-container hidden" style="z-index: 4500;">
-    <div class="modal-card" style="max-width: 480px; text-align: center; padding: 48px;">
-      <div
-        style="width: 64px; height: 64px; background: #f0fdf4; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px;">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="3"
-          stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="20 6 9 17 4 12"></polyline>
-        </svg>
+  <!-- Phase 3: KYC Cinematic Transition Overlay -->
+  <div id="kyc-success-overlay" class="cinematic-overlay" style="z-index: 4500;">
+    <!-- Branding line -->
+    <div class="cinematic-brand">
+      <div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
       </div>
-      <h2 style="font-size: 22px; font-weight: 700; color: #0f172a; margin-bottom: 12px;">KYC & CDD Details Captured
-      </h2>
-      <p style="font-size: 15px; color: #475569; line-height: 1.6; margin-bottom: 32px;">
-        All corporate documents and identity verifications have been processed. The encrypted data is now being
-        submitted to the <strong>Audit Manager Dashboard</strong>.
-      </p>
-      <div
-        style="display: flex; align-items: center; justify-content: center; gap: 12px; color: #2563eb; font-weight: 600; font-size: 14px;">
-        <span class="spinner blue"></span>
-        Finalizing handshake...
-      </div>
+      <span>Audit Offshore &mdash; Secure Workflow</span>
     </div>
+
+    <!-- Status badge: KYC Verified -->
+    <div id="kyc-badge" class="cinematic-badge" style="background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.3);">
+      <div class="cinematic-badge-icon" style="background: rgba(16,185,129,0.2);">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      </div>
+      <span style="color: #10b981;">KYC &amp; CDD Submission Complete</span>
+    </div>
+
+    <!-- Primary typewriter message -->
+    <div style="max-width: 640px; text-align: center; margin-bottom: 24px;">
+      <p id="kyc-cinematic-text" class="cinematic-text-main"></p>
+    </div>
+
+    <!-- Secondary line: view shifting -->
+    <div style="max-width: 440px; text-align: center; min-height: 28px;">
+      <p id="kyc-cinematic-text-2" class="cinematic-text-sub"></p>
+    </div>
+
+    <!-- Progress line -->
+    <div class="cinematic-progress-container">
+      <div id="kyc-progress-bar" class="cinematic-progress-bar"></div>
+    </div>
+
+    <!-- Click to continue hint -->
+    <div id="kyc-click-hint" class="cinematic-click-hint">Click anywhere to continue &rsaquo;</div>
   </div>
 
   <!-- Phase 4: Partner Handover Overlay -->
-  <div id="partner-handover-overlay" class="overlay-container hidden" style="z-index: 5500;">
-    <div class="modal-card" style="max-width: 500px; text-align: center; padding: 48px;">
-      <div
-        style="width: 64px; height: 64px; background: #eff6ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px;">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"
-          stroke-linecap="round" stroke-linejoin="round">
-          <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-          <circle cx="9" cy="7" r="4"></circle>
-          <polyline points="16 11 18 13 22 9"></polyline>
+  <div id="partner-handover-overlay" class="cinematic-overlay" style="z-index: 5500;">
+    <!-- Branding -->
+    <div class="cinematic-brand">
+      <div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <span>Audit Offshore &mdash; Secure Workflow</span>
+    </div>
+
+    <!-- Status badge -->
+    <div id="partner-badge" class="cinematic-badge" style="background: rgba(147,51,234,0.1); border-color: rgba(147,51,234,0.3);">
+      <div class="cinematic-badge-icon" style="background: rgba(147,51,234,0.2);">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><polyline points="16 11 18 13 22 9"></polyline>
         </svg>
       </div>
-      <h2 style="font-size: 22px; font-weight: 700; color: #0f172a; margin-bottom: 12px;">Proposal Ready for Review</h2>
-      <p style="font-size: 15px; color: #475569; line-height: 1.6; margin-bottom: 32px;">
-        Agentic analysis is complete. Handing over the finalized document package to the <strong>Administrative Partner
-          Portal</strong> for review and dispatch.
-      </p>
-      <div
-        style="display: flex; align-items: center; justify-content: center; gap: 12px; color: #7c3aed; font-weight: 600; font-size: 14px;">
-        <span class="spinner" style="border-top-color:#7c3aed;"></span>
-        Switching to Partner View...
-      </div>
+      <span style="color: #a855f7;">Automated Analysis Complete</span>
     </div>
+
+    <!-- Primary typewriter text -->
+    <div style="max-width:640px; text-align:center; margin-bottom:24px;">
+      <p id="partner-cinematic-text" class="cinematic-text-main"></p>
+    </div>
+
+    <!-- Secondary text -->
+    <div style="max-width:440px; text-align:center; min-height:28px;">
+      <p id="partner-cinematic-text-2" class="cinematic-text-sub"></p>
+    </div>
+
+    <!-- Progress line -->
+    <div class="cinematic-progress-container">
+      <div id="partner-progress-bar" class="cinematic-progress-bar"></div>
+    </div>
+
+    <!-- Click to continue hint -->
+    <div id="partner-click-hint" class="cinematic-click-hint">Click anywhere to continue &rsaquo;</div>
   </div>
 
   <!-- Phase 5: Return to Manager Overlay -->
-  <div id="manager-handover-overlay" class="overlay-container hidden" style="z-index: 5500;">
-    <div class="modal-card" style="max-width: 500px; text-align: center; padding: 48px;">
-      <div
-        style="width: 64px; height: 64px; background: #f0fdf4; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px;">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"
-          stroke-linecap="round" stroke-linejoin="round">
+  <div id="manager-handover-overlay" class="cinematic-overlay" style="z-index: 5500;">
+    <!-- Branding -->
+    <div class="cinematic-brand">
+      <div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <span>Audit Offshore &mdash; Secure Workflow</span>
+    </div>
+
+    <!-- Status badge -->
+    <div id="manager-handover-badge" class="cinematic-badge" style="background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.3);">
+      <div class="cinematic-badge-icon" style="background: rgba(34,197,94,0.2);">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="20 6 9 17 4 12"></polyline>
         </svg>
       </div>
-      <h2 style="font-size: 22px; font-weight: 700; color: #0f172a; margin-bottom: 12px;">Partner Verification Complete
-      </h2>
-      <p style="font-size: 15px; color: #475569; line-height: 1.6; margin-bottom: 32px;">
-        Proposal reviewed and verified. Routing back to the <strong>Global Audit Manager</strong> for final client
-        dispatch.
-      </p>
-      <div
-        style="display: flex; align-items: center; justify-content: center; gap: 12px; color: #16a34a; font-weight: 600; font-size: 14px;">
-        <span class="spinner" style="border-top-color:#16a34a;"></span>
-        Switching to Manager Dashboard...
-      </div>
+      <span style="color: #22c55e;">Partner Verification Complete</span>
     </div>
+
+    <!-- Primary typewriter text -->
+    <div style="max-width:640px; text-align:center; margin-bottom:24px;">
+      <p id="manager-cinematic-text" class="cinematic-text-main"></p>
+    </div>
+
+    <!-- Secondary text -->
+    <div style="max-width:440px; text-align:center; min-height:28px;">
+      <p id="manager-cinematic-text-2" class="cinematic-text-sub"></p>
+    </div>
+
+    <!-- Progress line -->
+    <div class="cinematic-progress-container">
+      <div id="manager-progress-bar" class="cinematic-progress-bar"></div>
+    </div>
+
+    <!-- Click to continue hint -->
+    <div id="manager-click-hint" class="cinematic-click-hint">Click anywhere to continue &rsaquo;</div>
   </div>
 
   <!-- Phase 6: Client Onboarding Dispatch Overlay -->
@@ -1144,7 +1225,7 @@
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
                       </svg>
-                      Generate AI Strategy
+                      Generate Audit Strategy
                    </button>
                 </td>
               </tr>
@@ -1205,8 +1286,8 @@
                   </div>
                 </td>
                 <td>
-                   <button class="btn" style="width:auto; padding:6px 14px; margin:0; font-size:12px; background:#10b981; display:flex; align-items:center; gap:6px; border-radius:16px; min-height:0; font-weight:600;" onclick="alert('Starting AI Strategy for Veritas Health...')">
-                      Generate AI Strategy
+                   <button class="btn" style="width:auto; padding:6px 14px; margin:0; font-size:12px; background:#10b981; display:flex; align-items:center; gap:6px; border-radius:16px; min-height:0; font-weight:600;" onclick="alert('Starting Audit Strategy for Veritas Health...')">
+                      Generate Audit Strategy
                    </button>
                 </td>
               </tr>
@@ -1238,8 +1319,8 @@
                   </div>
                 </td>
                 <td>
-                   <button class="btn" style="width:auto; padding:6px 14px; margin:0; font-size:12px; background:#10b981; display:flex; align-items:center; gap:6px; border-radius:16px; min-height:0; font-weight:600;" onclick="alert('Starting AI Strategy for Meridian Energy...')">
-                      Generate AI Strategy
+                   <button class="btn" style="width:auto; padding:6px 14px; margin:0; font-size:12px; background:#10b981; display:flex; align-items:center; gap:6px; border-radius:16px; min-height:0; font-weight:600;" onclick="alert('Starting Audit Strategy for Meridian Energy...')">
+                      Generate Audit Strategy
                    </button>
                 </td>
               </tr>
@@ -1281,10 +1362,10 @@
                 <td style="width: 300px;">
                   <div style="display:flex; flex-direction:column; gap:6px;">
                     <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:600; color:#475569;">
-                      <span>Step 4/6 Completed</span>
-                      <span style="color:#059669;">66%</span>
+                      <span id="progress-label-1">Section 4/6 Viewed</span>
+                      <span id="progress-percent-1" style="color:#059669;">66%</span>
                     </div>
-                    <div style="display:flex; gap:4px; width:100%;">
+                    <div id="progress-bars-1" style="display:flex; gap:4px; width:100%;">
                       <div style="flex:1; height:6px; background:#10b981; border-radius:3px;"></div>
                       <div style="flex:1; height:6px; background:#10b981; border-radius:3px;"></div>
                       <div style="flex:1; height:6px; background:#10b981; border-radius:3px;"></div>
@@ -1292,7 +1373,7 @@
                       <div style="flex:1; height:6px; background:#e2e8f0; border-radius:3px;"></div>
                       <div style="flex:1; height:6px; background:#e2e8f0; border-radius:3px;"></div>
                     </div>
-                    <div style="font-size:11px; color:#475569; margin-top:2px;">Currently uploading: <strong>Supporting Schedules</strong></div>
+                    <div id="progress-name-1" style="font-size:11px; color:#475569; margin-top:2px;">Currently uploading: <strong>Supporting Schedules</strong></div>
                   </div>
                 </td>
                 <td>
@@ -1497,7 +1578,7 @@
             <polyline points="12 16 16 12 12 8"></polyline>
             <line x1="8" y1="12" x2="16" y2="12"></line>
           </svg>
-          Generate AI Strategy & Rating
+          Generate Audit Strategy & Rating
         </button>
 
         <button id="side-panel-send-link-btn" class="btn"
@@ -1531,7 +1612,7 @@
             </svg>
           </div>
           <div>
-            <h3 style="font-weight:600; font-size:16px;">AI Analyser</h3>
+            <h3 style="font-weight:600; font-size:16px;">System Evaluation</h3>
             <p style="font-size:13px; color:#475569;">Audit Offshore Ltd. Profile Evaluation</p>
           </div>
         </div>
@@ -1546,12 +1627,12 @@
       <div class="scroll-light"
         style="padding: 32px; display:flex; flex-direction:column; gap:20px; max-height: 70vh; overflow-y:auto;">
 
-        <!-- Stage 1 (Classification Agent) -->
+        <!-- Stage 1 (Data Classification) -->
         <div id="ai-stage-1" style="display:flex; gap:16px; align-items:flex-start;">
           <div class="ai-spin-box" id="ai-icon-1"><span class="spinner"
               style="display:block; border-color:rgba(37,99,235,0.2); border-top-color:#2563eb;"></span></div>
           <div>
-            <h4 style="font-size:14px; font-weight:600; color:#0f172a; margin-bottom:4px;">Classification Agent</h4>
+            <h4 style="font-size:14px; font-weight:600; color:#0f172a; margin-bottom:4px;">Data Classification</h4>
             <p id="ai-text-1" style="font-size:13px; color:#475569; line-height:1.6; font-family:monospace;">Waiting to
               initialize...</p>
           </div>
@@ -1562,7 +1643,7 @@
           <div class="ai-spin-box" id="ai-icon-2"><span class="spinner"
               style="display:block; border-color:rgba(37,99,235,0.2); border-top-color:#2563eb;"></span></div>
           <div>
-            <h4 style="font-size:14px; font-weight:600; color:#0f172a; margin-bottom:4px;">Complexity & Scope Agent</h4>
+            <h4 style="font-size:14px; font-weight:600; color:#0f172a; margin-bottom:4px;">Complexity & Scope Analysis</h4>
             <p id="ai-text-2" style="font-size:13px; color:#475569; line-height:1.6; font-family:monospace;">Waiting for
               classification handoff...</p>
           </div>
@@ -1612,7 +1693,7 @@
           <div class="ai-spin-box" id="ai-icon-3"><span class="spinner"
               style="display:block; border-color:rgba(147,51,234,0.2); border-top-color:#9333ea;"></span></div>
           <div>
-            <h4 style="font-size:14px; font-weight:600; color:#0f172a; margin-bottom:4px;">Proposal Drafting Agent</h4>
+            <h4 style="font-size:14px; font-weight:600; color:#0f172a; margin-bottom:4px;">Proposal Generation</h4>
             <p id="ai-text-3" style="font-size:13px; color:#475569; line-height:1.6; font-family:monospace;">Waiting for
               partner trigger...</p>
           </div>
@@ -1643,10 +1724,16 @@
     }
 
     async function startAutoFill() {
-      await new Promise(r => setTimeout(r, 600));
+      await new Promise(r => document.getElementById('fieldName').addEventListener('click', r, { once: true }));
       await simulateTyping('fieldName', 'Audit offshore');
+
+      await new Promise(r => document.getElementById('fieldCompany').addEventListener('click', r, { once: true }));
       await simulateTyping('fieldCompany', 'Audit Offshore Ltd.');
+
+      await new Promise(r => document.getElementById('fieldEmail').addEventListener('click', r, { once: true }));
       await simulateTyping('fieldEmail', 'info@auditoffshore.com');
+
+      await new Promise(r => document.getElementById('fieldPhone').addEventListener('click', r, { once: true }));
       await simulateTyping('fieldPhone', '+1 (800) 555-1234');
     }
 
@@ -1662,20 +1749,70 @@
       intro.classList.add('fade-out');
 
 
-      // 2. Interstitial Success -> Send KYC
-      setTimeout(async () => {
+      // 2. Cinematic black interstitial
+      setTimeout(() => {
         intro.style.display = 'none';
         const interstitial = document.getElementById('interstitial');
+        interstitial.style.display = 'flex';
         interstitial.classList.add('show');
 
-        await new Promise(r => setTimeout(r, 4000));
-        interstitial.classList.remove('show');
-
-        // 3. User filling 3-step KYC
+        // Reveal badge
         setTimeout(() => {
-          interstitial.style.display = 'none';
-          runClientKYC();
-        }, 800);
+          const badge = document.getElementById('interstitial-badge');
+          badge.style.opacity = '1';
+          badge.style.transform = 'translateY(0)';
+        }, 400);
+
+        // Start progress bar
+        setTimeout(() => {
+          document.getElementById('interstitial-progress').style.width = '100%';
+        }, 150);
+
+        // Typewriter Line 1
+        const msg1 = `The system is now automatically sending an encrypted link for the Secure KYC and CDD submission forms directly to the client’s email and WhatsApp.`;
+        const el1 = document.getElementById('interstitial-text');
+        el1.textContent = '';
+        let i = 0;
+        let clickReady = false;
+        const type1 = setInterval(() => {
+          el1.textContent += msg1[i++];
+          if (i >= msg1.length) {
+            clearInterval(type1);
+            // Typewriter Line 2
+            setTimeout(() => {
+              const el2 = document.getElementById('interstitial-text-2');
+              el2.style.opacity = '1';
+              const msg2 = 'Simulating client clicking the link...';
+              let j = 0;
+              const type2 = setInterval(() => {
+                el2.textContent += msg2[j++];
+                if (j >= msg2.length) {
+                  clearInterval(type2);
+                  // Show click hint and enable click
+                  setTimeout(() => {
+                    document.getElementById('interstitial-click-hint').style.opacity = '1';
+                    interstitial.style.cursor = 'pointer';
+                    clickReady = true;
+                  }, 400);
+                }
+              }, 45);
+            }, 600);
+          }
+        }, 24);
+
+        // Persistent click handler — only fires when ready, then removes itself
+        const advanceToKYC = () => {
+          if (!clickReady) return;
+          interstitial.removeEventListener('click', advanceToKYC);
+          interstitial.style.cursor = 'default';
+          interstitial.classList.remove('show');
+          setTimeout(() => {
+            interstitial.style.display = 'none';
+            runClientKYC();
+          }, 700);
+        };
+        interstitial.addEventListener('click', advanceToKYC);
+
 
       }, 500);
     }
@@ -1687,9 +1824,14 @@
 
       await new Promise(r => setTimeout(r, 800));
 
-      // Step 1 Fill
+      // Step 1: Wait for individual clicks
+      await new Promise(r => document.getElementById('k_entity').addEventListener('click', r, { once: true }));
       await simulateTyping('k_entity', 'Private Limited Company (LLC)');
+
+      await new Promise(r => document.getElementById('k_country').addEventListener('click', r, { once: true }));
       await simulateTyping('k_country', 'United Kingdom');
+
+      await new Promise(r => document.getElementById('k_reg').addEventListener('click', r, { once: true }));
       await simulateTyping('k_reg', 'CRN-884920');
 
       await new Promise(r => setTimeout(r, 500));
@@ -1705,10 +1847,17 @@
 
       await new Promise(r => setTimeout(r, 800));
 
-      // Step 2 Fill
+      // Step 2: Wait for individual clicks
+      await new Promise(r => document.getElementById('k_industry').addEventListener('click', r, { once: true }));
       await simulateTyping('k_industry', 'SaaS Technology / B2B Web');
+
+      await new Promise(r => document.getElementById('k_subs').addEventListener('click', r, { once: true }));
       await simulateTyping('k_subs', 'Financial Services Tech');
+
+      await new Promise(r => document.getElementById('k_emp').addEventListener('click', r, { once: true }));
       await simulateTyping('k_emp', '11 - 50 Employees');
+
+      await new Promise(r => document.getElementById('k_ops').addEventListener('click', r, { once: true }));
       await simulateTyping('k_ops', 'Providing offshore digital auditing solutions.');
 
       await new Promise(r => setTimeout(r, 500));
@@ -1725,9 +1874,14 @@
 
       await new Promise(r => setTimeout(r, 800));
 
-      // Step 3 Fill
+      // Step 3: Wait for individual clicks
+      await new Promise(r => document.getElementById('k_rev').addEventListener('click', r, { once: true }));
       await simulateTyping('k_rev', '£1,500,000 - £5,000,000');
+
+      await new Promise(r => document.getElementById('k_curr').addEventListener('click', r, { once: true }));
       await simulateTyping('k_curr', 'GBP & USD');
+
+      await new Promise(r => document.getElementById('k_bank').addEventListener('click', r, { once: true }));
       await simulateTyping('k_bank', 'Barclays Corporate');
 
       await new Promise(r => setTimeout(r, 500));
@@ -1735,39 +1889,114 @@
       submit3.classList.add('loading');
       await new Promise(r => setTimeout(r, 1200));
 
-      // KYC finished, transitioning to Intermediate Success
+      // KYC finished — fade out KYC layer
       kycLayer.classList.remove('fade-in');
       kycLayer.classList.add('fade-out');
 
       setTimeout(() => {
         kycLayer.style.display = 'none';
 
-        // Show KYC Success Overlay
+        // Show cinematic full-screen black overlay
         const successOv = document.getElementById('kyc-success-overlay');
         successOv.classList.remove('hidden');
-        successOv.classList.add('fade-in');
+        successOv.style.display = 'flex';
+        successOv.classList.add('show');
 
+        // Fade in the black screen
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            successOv.style.opacity = '1';
+          });
+        });
+
+        // Start progress bar
         setTimeout(() => {
-          successOv.classList.remove('fade-in');
-          successOv.classList.add('fade-out');
+          document.getElementById('kyc-progress-bar').style.width = '100%';
+        }, 100);
 
+        // Reveal KYC badge after 400ms
+        setTimeout(() => {
+          const badge = document.getElementById('kyc-badge');
+          badge.style.opacity = '1';
+          badge.style.transform = 'translateY(0)';
+        }, 400);
+
+        // Typewriter — Line 1: KYC completion context
+        const msg1 = 'The client has successfully completed the KYC and CDD submission. All identity verifications and corporate documents have been securely captured.';
+        const el1 = document.getElementById('kyc-cinematic-text');
+        el1.textContent = '';
+        let i = 0;
+        const type1 = setInterval(() => {
+          el1.textContent += msg1[i++];
+          if (i >= msg1.length) {
+            clearInterval(type1);
+
+            // Typewriter — Line 2
+            setTimeout(() => {
+              const el2 = document.getElementById('kyc-cinematic-text-2');
+              el2.style.opacity = '1';
+              const msg2 = 'Switching to Audit Manager Dashboard...';
+              let j = 0;
+              const type2 = setInterval(() => {
+                el2.textContent += msg2[j++];
+                if (j >= msg2.length) {
+                  clearInterval(type2);
+                  // Show click hint and enable click
+                  setTimeout(() => {
+                    document.getElementById('kyc-click-hint').style.opacity = '1';
+                    successOv.style.cursor = 'pointer';
+                    kycClickReady = true;
+                  }, 400);
+                }
+              }, 45);
+            }, 700);
+          }
+        }, 24);
+
+        // After typewriter completes, show click hint and wait for click
+        const advanceToDashboardFn = () => {
+          successOv.style.opacity = '0';
           setTimeout(() => {
-            successOv.classList.add('hidden');
             successOv.style.display = 'none';
+            successOv.classList.add('hidden');
 
-            // Now show DASHBOARD
             const dashboard = document.getElementById('dashboard');
             dashboard.classList.add('fade-in');
 
             setTimeout(() => {
               document.getElementById('targetRow').classList.remove('hidden');
-              // Automatically pull open side panel
               setTimeout(() => {
                 document.getElementById('sidePanel').classList.add('open');
               }, 600);
             }, 500);
-          }, 600);
-        }, 3500); // Show transition Message for 3.5s
+          }, 700);
+        };
+
+        let kycClickReady = false;
+        // Persistent click handler — only fires when ready, removes itself after
+        const advanceToDashboard = () => {
+          if (!kycClickReady) return;
+          successOv.removeEventListener('click', advanceToDashboard);
+          successOv.style.cursor = 'default';
+          successOv.classList.remove('show');
+          successOv.style.opacity = '0';
+          setTimeout(() => {
+            successOv.style.display = 'none';
+            successOv.classList.add('hidden');
+
+            const dashboard = document.getElementById('dashboard');
+            dashboard.classList.add('fade-in');
+
+            setTimeout(() => {
+              document.getElementById('targetRow').classList.remove('hidden');
+              setTimeout(() => {
+                document.getElementById('sidePanel').classList.add('open');
+              }, 600);
+            }, 500);
+          }, 700);
+        };
+        successOv.addEventListener('click', advanceToDashboard);
+
       }, 600);
     }
 
@@ -1831,7 +2060,7 @@
       text2.innerHTML = "Generating resource footprint & timeline predictions...";
       await new Promise(r => setTimeout(r, 1800));
 
-      text2.innerHTML = "Agent consensus reached. Building final scorecard.";
+      text2.innerHTML = "Analysis complete. Building final scorecard.";
       icon2.innerHTML = checkSvg;
       icon2.style.background = '#dcfce7'; icon2.style.borderColor = '#16a34a'; icon2.style.color = '#15803d';
 
@@ -1868,7 +2097,7 @@
       if (mini5) mini5.style.background = '#2563eb'; // Active blue for partner review phase
 
       document.getElementById('ai-actions').style.display = 'none';
-      await triggerProposalAgent("> Original Agent parameters locked. Initiating draft...");
+      await triggerProposalAgent("> Original analysis parameters locked. Initiating draft...");
     }
 
     let regenerateCount = 0;
@@ -1993,22 +2222,79 @@
       // Show Handover Overlay
       const handoverOv = document.getElementById('partner-handover-overlay');
       handoverOv.classList.remove('hidden');
-      handoverOv.classList.add('fade-in');
+      handoverOv.style.display = 'flex';
+      handoverOv.classList.add('show');
 
+      // Fade in the black screen
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          handoverOv.style.opacity = '1';
+        });
+      });
+
+      // Start progress bar
       setTimeout(() => {
-        handoverOv.classList.remove('fade-in');
-        handoverOv.classList.add('fade-out');
+        document.getElementById('partner-progress-bar').style.width = '100%';
+      }, 100);
 
+      // Reveal badge after 400ms
+      setTimeout(() => {
+        const badge = document.getElementById('partner-badge');
+        badge.style.opacity = '1';
+        badge.style.transform = 'translateY(0)';
+      }, 400);
+
+      // Typewriter — Line 1
+      const msg1 = 'Automated analysis is complete. Handing over the finalized document package to the Administrative Partner Portal for review and dispatch.';
+      const el1 = document.getElementById('partner-cinematic-text');
+      el1.textContent = '';
+      let i = 0;
+      let partnerClickReady = false;
+      const type1 = setInterval(() => {
+        el1.textContent += msg1[i++];
+        if (i >= msg1.length) {
+          clearInterval(type1);
+
+          // Typewriter — Line 2
+          setTimeout(() => {
+            const el2 = document.getElementById('partner-cinematic-text-2');
+            el2.style.opacity = '1';
+            const msg2 = 'Switching to Partner View...';
+            let j = 0;
+            const type2 = setInterval(() => {
+              el2.textContent += msg2[j++];
+              if (j >= msg2.length) {
+                clearInterval(type2);
+                // Show click hint and enable click
+                setTimeout(() => {
+                  document.getElementById('partner-click-hint').style.opacity = '1';
+                  handoverOv.style.cursor = 'pointer';
+                  partnerClickReady = true;
+                }, 400);
+              }
+            }, 45);
+          }, 700);
+        }
+      }, 24);
+
+      // Persistent click handler
+      const advanceToPartner = () => {
+        if (!partnerClickReady) return;
+        handoverOv.removeEventListener('click', advanceToPartner);
+        handoverOv.style.cursor = 'default';
+        handoverOv.classList.remove('show');
+        handoverOv.style.opacity = '0';
         setTimeout(() => {
-          handoverOv.classList.add('hidden');
           handoverOv.style.display = 'none';
+          handoverOv.classList.add('hidden');
 
           // Show partner dashboard
           const pv = document.getElementById('partner-dashboard');
           pv.classList.remove('hidden');
           pv.classList.add('fade-in');
-        }, 600);
-      }, 3500); // 3.5s transition
+        }, 700);
+      };
+      handoverOv.addEventListener('click', advanceToPartner);
     }
 
     function showPartnerClientData(clientName) {
@@ -2535,12 +2821,42 @@ PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
   </div>
 
   <!-- Client Handover Overlay -->
-  <div id="client-handover-overlay" class="overlay-container hidden" style="z-index: 9000; background: #0f172a;">
-    <div style="text-align:center; color:white; max-width:500px;">
-      <div class="spinner blue" style="width:48px; height:48px; border-width:4px; margin-bottom:24px; border-top-color:white;"></div>
-      <h2 id="client-handover-title" style="font-size:24px; font-weight:700; margin-bottom:12px;">Redirecting to Client Portal</h2>
-      <p id="client-handover-msg" style="color:#94a3b8; font-size:16px; line-height:1.6;">Securely authenticating as <strong style="color:white;">Managing Director</strong> at Audit Offshore Ltd.</p>
+  <div id="client-handover-overlay" class="cinematic-overlay hidden" style="z-index: 9000;">
+    <!-- Branding -->
+    <div class="cinematic-brand">
+      <div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <span>Audit Offshore &mdash; Secure Workflow</span>
     </div>
+
+    <!-- Status badge -->
+    <div id="client-handover-badge" class="cinematic-badge">
+      <div id="client-handover-badge-icon" class="cinematic-badge-icon">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+      <span id="client-handover-badge-text">Transitioning Session</span>
+    </div>
+
+    <!-- Primary typewriter text -->
+    <div style="max-width:640px; text-align:center; margin-bottom:24px;">
+      <p id="client-handover-title" class="cinematic-text-main"></p>
+    </div>
+
+    <!-- Secondary text -->
+    <div style="max-width:440px; text-align:center; min-height:28px;">
+      <p id="client-handover-msg" class="cinematic-text-sub"></p>
+    </div>
+
+    <!-- Progress line -->
+    <div class="cinematic-progress-container">
+      <div id="client-handover-progress" class="cinematic-progress-bar"></div>
+    </div>
+
+    <!-- Click to continue hint -->
+    <div id="client-handover-click-hint" class="cinematic-click-hint">Click anywhere to continue &rsaquo;</div>
   </div>
 
   <!-- Client Approve/Sign Modal -->
@@ -3213,10 +3529,8 @@ PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
         document.getElementById('partner-reject-overlay').classList.add('hidden');
       }
 
-      // Show handover overlay
+      // Handover overlay setup
       const handoverOverlay = document.getElementById('manager-handover-overlay');
-      handoverOverlay.classList.remove('hidden');
-      handoverOverlay.classList.add('fade-in');
 
       // Update Stepper
       const step5 = document.getElementById('step5');
@@ -3291,17 +3605,100 @@ PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
       row.removeAttribute("onclick");
       row.style.cursor = 'default';
 
-      // Switch views back to dashboard
+      // Show cinematic black screen
+      handoverOverlay.classList.remove('hidden');
+      handoverOverlay.style.display = 'flex';
+      handoverOverlay.classList.add('show');
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          handoverOverlay.style.opacity = '1';
+        });
+      });
+
+      // Start progress bar
       setTimeout(() => {
-        document.getElementById('partner-dashboard').classList.add('hidden');
-        document.getElementById('partner-dashboard').classList.remove('fade-in');
-        handoverOverlay.classList.remove('fade-in');
-        handoverOverlay.classList.add('fade-out');
+        document.getElementById('manager-progress-bar').style.width = '100%';
+      }, 100);
+
+      // Dynamics for approved vs rejected
+      const badgeText = document.querySelector('#manager-handover-badge span');
+      const badgeSvg = document.querySelector('#manager-handover-badge svg');
+      const badgeContainer = document.getElementById('manager-handover-badge');
+
+      if (rejected) {
+        badgeText.innerText = "Partner Review Rejected";
+        badgeText.style.color = "#ef4444";
+        badgeContainer.style.background = "rgba(239,68,68,0.12)";
+        badgeContainer.style.borderColor = "rgba(239,68,68,0.3)";
+        badgeContainer.children[0].style.background = "rgba(239,68,68,0.15)";
+        badgeSvg.innerHTML = `<path d="M18 6L6 18M6 6l12 12"></path>`;
+        badgeSvg.setAttribute('stroke', '#ef4444');
+      } else {
+        badgeText.innerText = "Partner Verification Complete";
+        badgeText.style.color = "#22c55e";
+        badgeContainer.style.background = "rgba(34,197,94,0.12)";
+        badgeContainer.style.borderColor = "rgba(34,197,94,0.3)";
+        badgeContainer.children[0].style.background = "rgba(34,197,94,0.15)";
+        badgeSvg.innerHTML = `<polyline points="20 6 9 17 4 12"></polyline>`;
+        badgeSvg.setAttribute('stroke', '#22c55e');
+      }
+
+      // Reveal badge after 400ms
+      setTimeout(() => {
+        badgeContainer.style.opacity = '1';
+        badgeContainer.style.transform = 'translateY(0)';
+      }, 400);
+
+      const msg1 = rejected ? 
+        'Proposal review complete. The document has been rejected by the Partner and returned to the Global Audit Manager for revision.' : 
+        'Proposal reviewed and verified. Routing back to the Global Audit Manager for final client dispatch.';
+      
+      const el1 = document.getElementById('manager-cinematic-text');
+      el1.textContent = '';
+      let i = 0;
+      let managerClickReady = false;
+      const type1 = setInterval(() => {
+        el1.textContent += msg1[i++];
+        if (i >= msg1.length) {
+          clearInterval(type1);
+
+          setTimeout(() => {
+            const el2 = document.getElementById('manager-cinematic-text-2');
+            el2.style.opacity = '1';
+            const msg2 = 'Switching to Manager Dashboard...';
+            let j = 0;
+            const type2 = setInterval(() => {
+              el2.textContent += msg2[j++];
+              if (j >= msg2.length) {
+                clearInterval(type2);
+                setTimeout(() => {
+                  document.getElementById('manager-click-hint').style.opacity = '1';
+                  handoverOverlay.style.cursor = 'pointer';
+                  managerClickReady = true;
+                }, 400);
+              }
+            }, 45);
+          }, 700);
+        }
+      }, 24);
+
+      // Persistent click handler
+      const advanceToManager = () => {
+        if (!managerClickReady) return;
+        handoverOverlay.removeEventListener('click', advanceToManager);
+        handoverOverlay.style.cursor = 'default';
+        handoverOverlay.classList.remove('show');
+        handoverOverlay.style.opacity = '0';
         setTimeout(() => {
+          handoverOverlay.style.display = 'none';
           handoverOverlay.classList.add('hidden');
-          handoverOverlay.classList.remove('fade-out');
-        }, 600);
-      }, 2500);
+          // Hide partner dashboard immediately now that it's behind black screen
+          document.getElementById('partner-dashboard').classList.add('hidden');
+          document.getElementById('partner-dashboard').classList.remove('fade-in');
+        }, 700);
+      };
+      handoverOverlay.addEventListener('click', advanceToManager);
     }
 
     function openManagerReviewModal(e) {
@@ -3347,25 +3744,115 @@ PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
       // Hide delivery modal
       document.getElementById('delivery-overlay').classList.add('hidden');
       
-      // Show handover
       const handover = document.getElementById('client-handover-overlay');
       handover.classList.remove('hidden');
-      handover.classList.add('fade-in');
+      handover.style.display = 'flex';
+      handover.classList.add('show');
 
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          handover.style.opacity = '1';
+        });
+      });
+
+      // Reset components
+      const pb = document.getElementById('client-handover-progress');
+      pb.style.width = '0%';
+      
+      const badge = document.getElementById('client-handover-badge');
+      const badgeText = document.getElementById('client-handover-badge-text');
+      const badgeIconContainer = document.getElementById('client-handover-badge-icon');
+      
+      badge.style.opacity = '0';
+      badge.style.transform = 'translateY(10px)';
+      badge.style.background = "rgba(34,197,94,0.12)";
+      badge.style.borderColor = "rgba(34,197,94,0.3)";
+      
+      badgeText.innerText = "Secure Delivery Initiated";
+      badgeText.style.color = "#22c55e";
+      
+      if(badgeIconContainer) {
+        badgeIconContainer.style.background = "rgba(34,197,94,0.2)";
+        badgeIconContainer.querySelector('svg').setAttribute('stroke', '#22c55e');
+      }
+
+      const el1 = document.getElementById('client-handover-title');
+      const el2 = document.getElementById('client-handover-msg');
+      const hint = document.getElementById('client-handover-click-hint');
+      
+      el1.textContent = '';
+      el2.textContent = '';
+      el2.style.opacity = '0';
+      hint.style.opacity = '0';
+
+      let clickReady = false;
+
+      // Start sequence
       setTimeout(() => {
-        handover.classList.remove('fade-in');
-        handover.classList.add('fade-out');
+        // Step 1: Progress bar
+        pb.style.width = '100%';
         
-        // Sync values
-        const proposalText = document.getElementById('inline-proposal-text').value;
-        document.getElementById('client-proposal-text').value = proposalText;
+        // Step 2: Badge arrival
+        setTimeout(() => {
+          badge.style.opacity = '1';
+          badge.style.transform = 'translateY(0)';
+          
+          // Step 3: Typewriter title
+          setTimeout(() => {
+            const msg1 = "Secure engagement documents have been dispatched to the client portal for review.";
+            let i = 0;
+            const type1 = setInterval(() => {
+              el1.textContent += msg1[i++];
+              if (i >= msg1.length) {
+                clearInterval(type1);
+                
+                // Step 4: Subtext fade or type
+                setTimeout(() => {
+                  el2.style.opacity = '1';
+                  const msg2 = "Switching to Client Interface...";
+                  let j = 0;
+                  const type2 = setInterval(() => {
+                    el2.textContent += msg2[j++];
+                    if(j >= msg2.length) {
+                      clearInterval(type2);
+                      
+                      // Step 5: Final hint
+                      setTimeout(() => {
+                        hint.style.opacity = '1';
+                        handover.style.cursor = 'pointer';
+                        clickReady = true;
+                      }, 500);
+                    }
+                  }, 30);
+                }, 600);
+              }
+            }, 25);
+          }, 600);
+        }, 400);
+      }, 300);
+
+      const advance = () => {
+        if (!clickReady) return;
+        handover.removeEventListener('click', advance);
+        handover.style.cursor = 'default';
+        handover.style.opacity = '0';
         
         setTimeout(() => {
+          handover.classList.remove('show');
           handover.classList.add('hidden');
+          handover.style.display = 'none';
+
+          // Data Transfer
+          const proposalText = document.getElementById('inline-proposal-text').value;
+          document.getElementById('client-proposal-text').value = proposalText;
+          
+          // View Switch
+          document.getElementById('dashboard').style.display = 'none';
           document.getElementById('client-dashboard').classList.remove('hidden');
-          document.getElementById('dashboard').style.display = 'none'; // Completely hide manager dashboard
-        }, 600);
-      }, 3000);
+        }, 800);
+      };
+
+      handover.addEventListener('click', advance);
     }
 
     async function toggleClientEdit() {
@@ -3461,29 +3948,126 @@ PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
       document.getElementById('client-reject-overlay').classList.add('hidden');
       document.getElementById('client-sign-overlay').classList.add('hidden');
 
-      // Show Switching Animation (Handover)
       const handover = document.getElementById('client-handover-overlay');
-      const title = document.getElementById('client-handover-title');
-      const msg = document.getElementById('client-handover-msg');
-      
-      title.innerText = "Synchronizing Feedback with Audit Manager";
-      msg.innerHTML = `Transmitting client decision: <strong style="color:white;">${status}</strong>. Updating engagement lifecycle logs...`;
-      
       handover.classList.remove('hidden');
-      handover.classList.add('fade-in');
+      handover.style.display = 'flex';
+      handover.classList.add('show');
 
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          handover.style.opacity = '1';
+        });
+      });
+
+      // Reset components
+      const pb = document.getElementById('client-handover-progress');
+      pb.style.width = '0%';
+      
+      const badge = document.getElementById('client-handover-badge');
+      const badgeText = document.getElementById('client-handover-badge-text');
+      const badgeIconContainer = document.getElementById('client-handover-badge-icon');
+      
+      const isApproved = status === 'Approved';
+
+      // Reset badge styles
+      badge.style.opacity = '0';
+      badge.style.transform = 'translateY(10px)';
+      
+      if (isApproved) {
+        badgeText.innerText = "Client Authorized";
+        badgeText.style.color = "#22c55e";
+        badge.style.background = "rgba(34,197,94,0.12)";
+        badge.style.borderColor = "rgba(34,197,94,0.3)";
+        if(badgeIconContainer) {
+          badgeIconContainer.style.background = "rgba(34,197,94,0.2)";
+          const svg = badgeIconContainer.querySelector('svg');
+          svg.innerHTML = `<polyline points="20 6 9 17 4 12"></polyline>`;
+          svg.setAttribute('stroke', '#22c55e');
+        }
+      } else {
+        badgeText.innerText = "Client Revisions Requested";
+        badgeText.style.color = "#ef4444";
+        badge.style.background = "rgba(239,68,68,0.12)";
+        badge.style.borderColor = "rgba(239,68,68,0.3)";
+        if(badgeIconContainer) {
+          badgeIconContainer.style.background = "rgba(239,68,68,0.2)";
+          const svg = badgeIconContainer.querySelector('svg');
+          svg.innerHTML = `<path d="M18 6L6 18M6 6l12 12"></path>`;
+          svg.setAttribute('stroke', '#ef4444');
+        }
+      }
+
+      const el1 = document.getElementById('client-handover-title');
+      const el2 = document.getElementById('client-handover-msg');
+      const hint = document.getElementById('client-handover-click-hint');
+      
+      el1.textContent = '';
+      el2.textContent = '';
+      el2.style.opacity = '0';
+      hint.style.opacity = '0';
+
+      let clickReady = false;
+
+      // Start sequence
       setTimeout(() => {
-        handover.classList.remove('fade-in');
-        handover.classList.add('fade-out');
+        pb.style.width = '100%';
         
         setTimeout(() => {
-          handover.classList.add('hidden');
-          document.getElementById('client-dashboard').classList.add('hidden');
-          document.getElementById('dashboard').style.display = 'grid'; // Return to grid layout
+          badge.style.opacity = '1';
+          badge.style.transform = 'translateY(0)';
           
+          setTimeout(() => {
+            const msg1 = isApproved ? 
+              'Client has successfully signed the proposal. Transmitting final decision logs back to the global audit network.' :
+              `Client decision recorded: ${status}. Propagating updates to the global audit network.`;
+
+            let i = 0;
+            const type1 = setInterval(() => {
+              el1.textContent += msg1[i++];
+              if (i >= msg1.length) {
+                clearInterval(type1);
+                
+                setTimeout(() => {
+                  el2.style.opacity = '1';
+                  const msg2 = 'Switching to Manager Dashboard...';
+                  let j = 0;
+                  const type2 = setInterval(() => {
+                    el2.textContent += msg2[j++];
+                    if(j >= msg2.length) {
+                      clearInterval(type2);
+                      
+                      setTimeout(() => {
+                        hint.style.opacity = '1';
+                        handover.style.cursor = 'pointer';
+                        clickReady = true;
+                      }, 500);
+                    }
+                  }, 30);
+                }, 600);
+              }
+            }, 25);
+          }, 600);
+        }, 400);
+      }, 300);
+
+      const advance = () => {
+        if (!clickReady) return;
+        handover.removeEventListener('click', advance);
+        handover.style.cursor = 'default';
+        handover.style.opacity = '0';
+        
+        setTimeout(() => {
+          handover.classList.remove('show');
+          handover.classList.add('hidden');
+          handover.style.display = 'none';
+
+          document.getElementById('client-dashboard').classList.add('hidden');
+          document.getElementById('dashboard').style.display = 'grid'; // Return to manager grid layout
           updateManagerDashboardWithClientStatus(status);
-        }, 600);
-      }, 2500);
+        }, 800);
+      };
+
+      handover.addEventListener('click', advance);
     }
 
     function updateManagerDashboardWithClientStatus(status) {
@@ -3600,48 +4184,75 @@ PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
         updateIngestionTrackerToComplete();
       }
       if (event.data && event.data.type === "step_updated") {
-        updateDashboardDeadline(event.data.step);
+        updateLiveProgress(event.data.step);
       }
     });
 
-    function updateDashboardDeadline(step) {
-      const timerRow1 = document.getElementById('timer-row1');
-      if (!timerRow1) return;
+    const sectionNames = [
+      "Company & Legal",
+      "Core Financial Data",
+      "Banking & Treasury",
+      "Revenue & Tax",
+      "Supporting Schedules",
+      "Smart Integration"
+    ];
 
-      let daysLeft = 6 - step;
-      if (daysLeft < 1) daysLeft = 1;
-
-      timerRow1.innerText = daysLeft + (daysLeft === 1 ? ' Day Left' : ' Days Left');
-
-      // Update color based on urgency
-      if (daysLeft >= 4) {
-        timerRow1.style.color = '#d97706'; // yellow
-      } else if (daysLeft >= 2) {
-        timerRow1.style.color = '#ea580c'; // orange
-      } else {
-        timerRow1.style.color = '#dc2626'; // red
+    function updateLiveProgress(step) {
+      if (step < 1 || step > 6) return;
+      
+      const percent = Math.round((step / 6) * 100);
+      const sectionName = sectionNames[step - 1];
+      
+      const progressLabel = document.getElementById("progress-label-1");
+      const progressPercent = document.getElementById("progress-percent-1");
+      const progressName = document.getElementById("progress-name-1");
+      const progressBars = document.getElementById("progress-bars-1");
+      
+      if (progressLabel) progressLabel.innerText = `Section ${step}/6 Active`;
+      if (progressPercent) progressPercent.innerText = `${percent}%`;
+      if (progressName) progressName.innerHTML = `Currently reviewing: <strong>${sectionName}</strong>`;
+      
+      if (progressBars) {
+         Array.from(progressBars.children).forEach((bar, index) => {
+           if (index < step) {
+             bar.style.background = "#10b981"; // green
+           } else {
+             bar.style.background = "#e2e8f0"; // grey
+           }
+         });
       }
     }
 
     function pingClient(rowId) {
-      if (clientPortalWindow && !clientPortalWindow.closed) {
-        clientPortalWindow.postMessage("ping_client", "*");
-        
-        // Show local feedback that ping was sent
-        const btn = event.currentTarget;
-        const originalHtml = btn.innerHTML;
-        btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Pinged!`;
-        btn.style.background = "#dcfce7";
-        btn.style.color = "#166534";
-        
-        setTimeout(() => {
-          btn.innerHTML = originalHtml;
-          btn.style.background = "#fef3c7";
-          btn.style.color = "#92400e";
-        }, 2000);
+      if (!clientPortalWindow || clientPortalWindow.closed) {
+        clientPortalWindow = window.open('client-portal.html', '_blank');
       } else {
-        alert("Client portal session is not active or has been closed.");
+        clientPortalWindow.focus();
       }
+
+      // Show local feedback that ping was sent
+      const btn = event.currentTarget;
+      const originalHtml = btn.innerHTML;
+      btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Pinged!`;
+      btn.style.background = "#dcfce7";
+      btn.style.color = "#166534";
+      
+      setTimeout(() => {
+        btn.innerHTML = originalHtml;
+        btn.style.background = "#fef3c7";
+        btn.style.color = "#92400e";
+      }, 2000);
+
+      // Get days left
+      const timerRowId = rowId === 'row1' ? 'timer-row1' : 'timer-row2';
+      const timerRow = document.getElementById(timerRowId);
+      const daysLeft = timerRow ? timerRow.innerText.toLowerCase() : "a few days left";
+
+      setTimeout(() => {
+        if (clientPortalWindow && !clientPortalWindow.closed) {
+          clientPortalWindow.postMessage({ type: "ping_client_advanced", days: daysLeft }, "*");
+        }
+      }, 1000);
     }
 
     // Fallback if portal redirects
@@ -3690,7 +4301,7 @@ PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
               <div style="display:flex; flex-direction:column; gap:4px;">
                 <span style="color:#15803d; background:#f0fdf4; padding:4px 10px; border-radius:16px; font-weight:600; font-size:12px; display:inline-flex; align-items:center; gap:6px; border:1px solid #bbf7d0; width:fit-content;">
                   <div style="width:6px;height:6px;background:#10b981;border-radius:50%"></div>
-                  AI Validation Complete
+                  Automated Validation Complete
                 </span>
               </div>
               <button class="btn" style="width:auto; padding:8px 16px; margin:0; font-size:12px; background:#2563eb; display:flex; align-items:center; gap:6px; border-radius:16px; min-height:0; font-weight:600;" onclick="alert('Audit Package successfully dispatched to partner portal.')">
@@ -3747,3 +4358,4 @@ PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
 </body>
 
 </html>
+
