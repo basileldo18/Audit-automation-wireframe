@@ -1,0 +1,8 @@
+{
+  "name": "audit-automation",
+  "version": "1.0.0",
+  "description": "Audit Automation Wireframes",
+  "scripts": {
+    "start": "npx serve ."
+  }
+}

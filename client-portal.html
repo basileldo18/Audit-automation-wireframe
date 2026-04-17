@@ -157,6 +157,10 @@
       color: white;
       margin-bottom: 32px;
       box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 24px;
     }
 
     .header-banner h1 {
@@ -274,8 +278,16 @@
       display: flex;
       justify-content: space-between;
       margin-top: auto;
-      padding-top: 24px;
+      padding: 24px 0;
       border-top: 1px solid var(--border-color);
+      position: sticky;
+      bottom: -40px; /* Offset the main padding */
+      background: var(--bg-color);
+      z-index: 100;
+      margin-left: -40px;
+      margin-right: -40px;
+      padding-left: 40px;
+      padding-right: 40px;
     }
 
     .btn {
@@ -408,44 +420,63 @@
 
     /* Timer Widget */
     .timer-widget {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      background: white;
-      border: 1px solid var(--border-color);
-      padding: 16px 20px;
-      border-radius: 12px;
-      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+      position: relative;
+      flex-shrink: 0;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      padding: 12px 24px 12px 14px;
+      border-radius: 50px;
+      box-shadow: 0 10px 30px -5px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.04), inset 0 0 0 1px rgba(255,255,255,0.5);
       display: flex;
       align-items: center;
-      gap: 12px;
-      z-index: 500;
-      transition: all 0.3s ease;
+      gap: 16px;
+      z-index: 10;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .timer-widget:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 35px -5px rgba(0,0,0,0.12), 0 8px 12px -4px rgba(0,0,0,0.06), inset 0 0 0 1px rgba(255,255,255,0.8);
     }
     
     .timer-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
       background: #fef3c7;
       color: #d97706;
       display: grid;
       place-items: center;
+      box-shadow: 0 4px 12px -2px rgba(217, 119, 6, 0.25);
+      transition: all 0.3s ease;
+    }
+
+    .timer-info {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-right: 8px;
     }
 
     .timer-info h4 {
-      font-size: 12px;
-      color: var(--text-muted);
+      font-size: 11px;
+      color: #64748b;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 4px;
+      letter-spacing: 0.8px;
+      margin-bottom: 2px;
+      font-weight: 700;
     }
 
     .timer-info .timer-countdown {
-      font-size: 18px;
-      font-weight: 700;
+      font-size: 16px;
+      font-weight: 800;
       color: #d97706;
       transition: color 0.3s ease;
+      font-feature-settings: "tnum";
+      font-variant-numeric: tabular-nums;
+      line-height: 1.2;
     }
 
     /* Toast container */
@@ -554,8 +585,22 @@
   <!-- Main Content -->
   <main class="main">
     <div class="header-banner">
-      <h1>Data Ingestion & AI Validation</h1>
-      <p>To enable our AI-driven financial validation and reconciliation process, we require the following documents. Our system will automatically validate and reconcile the data, reducing manual effort and ensuring accuracy. Incomplete or inconsistent data will be flagged automatically.</p>
+      <div>
+        <h1>Data Ingestion & AI Validation</h1>
+        <p>To enable our AI-driven financial validation and reconciliation process, we require the following documents. Our system will automatically validate and reconcile the data, reducing manual effort and ensuring accuracy. Incomplete or inconsistent data will be flagged automatically.</p>
+      </div>
+      <div class="timer-widget" id="timer-widget">
+        <div class="timer-icon" id="timer-icon-container">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+        </div>
+        <div class="timer-info">
+          <h4>Submission Deadline</h4>
+          <div class="timer-countdown" id="timer-countdown">5 Days Left</div>
+        </div>
+      </div>
     </div>
 
     <!-- Step 1 Panel -->
@@ -760,18 +805,7 @@
     </div>
   </main>
 
-  <div class="timer-widget" id="timer-widget">
-    <div class="timer-icon" id="timer-icon-container">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="12" r="10"></circle>
-        <polyline points="12 6 12 12 16 14"></polyline>
-      </svg>
-    </div>
-    <div class="timer-info">
-      <h4>Submission Deadline</h4>
-      <div class="timer-countdown" id="timer-countdown">5 Days Left</div>
-    </div>
-  </div>
+
 
   <div class="toast-container" id="toast-container"></div>
 
