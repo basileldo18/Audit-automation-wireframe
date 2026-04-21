@@ -3,956 +3,999 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Financial Data Ingestion - Audit Offshore</title>
+  <title>Secure Document Center - Audit Offshore</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-    
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
     :root {
-      --primary: #2563eb;
-      --primary-hover: #1d4ed8;
-      --success: #10b981;
-      --bg-color: #f8fafc;
+      --primary: #0f172a;
+      --accent: #2563eb;
+      --success: #059669;
+      --warning: #d97706;
+      --bg-body: #f1f5f9;
+      --bg-surface: #ffffff;
       --text-main: #0f172a;
       --text-muted: #64748b;
       --border-color: #e2e8f0;
-      --card-bg: #ffffff;
+      --sidebar-width: 310px;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Inter', sans-serif;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
 
     body {
-      background-color: var(--bg-color);
+      background-color: var(--bg-body);
       color: var(--text-main);
       display: flex;
+      flex-direction: column;
       height: 100vh;
       overflow: hidden;
     }
 
-    /* Sidebar Stepper */
-    .sidebar {
-      width: 320px;
-      background: var(--card-bg);
-      border-right: 1px solid var(--border-color);
-      padding: 40px 24px;
+    /* ── Top Nav ── */
+    .top-nav {
+      height: 64px;
+      background: var(--primary);
+      color: white;
       display: flex;
-      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 100;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
       flex-shrink: 0;
     }
+    .brand-section { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 18px; }
+    .session-info  { display: flex; align-items: center; gap: 24px; }
 
-    .brand {
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 40px;
+    .timer-pill {
+      background: rgba(255,255,255,0.1);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(255,255,255,0.2);
+      transition: all 0.3s;
+      cursor: help;
+    }
+    .timer-pill:hover {
+      transform: scale(1.06);
+      background: rgba(239,68,68,0.1);
+      border-color: rgba(239,68,68,0.4);
+    }
+    .timer-value { font-weight: 800; color: #ef4444; }
+
+    .user-profile {
       display: flex;
       align-items: center;
       gap: 12px;
-      color: var(--primary);
+      font-size: 13px;
+      padding-left: 20px;
+      border-left: 1px solid rgba(255,255,255,0.2);
     }
 
-    .stepper {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      position: relative;
-    }
-
-    .step-item {
-      display: flex;
-      gap: 16px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .step-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: #f1f5f9;
-      border: 2px solid var(--border-color);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 600;
-      color: var(--text-muted);
-      font-size: 14px;
-      flex-shrink: 0;
-      transition: all 0.3s ease;
-      position: relative;
-      background: white;
-    }
-
-    .step-content {
-      padding-top: 6px;
-    }
-
-    .step-title {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text-muted);
-      margin-bottom: 4px;
-      transition: color 0.3s ease;
-    }
-
-    .step-desc {
-      font-size: 12px;
-      color: #94a3b8;
-      line-height: 1.4;
-    }
-
-    /* Step states */
-    .step-item.active .step-icon {
-      border-color: var(--primary);
-      background: var(--primary);
-      color: white;
-      box-shadow: 0 0 0 4px rgba(37,99,235,0.1);
-    }
-    .step-item.active .step-title {
-      color: var(--text-main);
-    }
-    
-    .step-item.completed .step-icon {
-      border-color: var(--success);
-      background: var(--success);
-      color: white;
-    }
-    .step-item.completed .step-title {
-      color: var(--text-main);
-    }
-
-    /* Connecting lines */
-    .step-line {
-      position: absolute;
-      left: 15px;
-      top: 32px;
-      bottom: -24px;
-      width: 2px;
-      background: var(--border-color);
-      z-index: 0;
-    }
-    .step-item:last-child .step-line {
+    /* ── Global ping alert ── */
+    #global-ping-alert {
       display: none;
-    }
-    .step-item.completed .step-line {
-      background: var(--success);
+      background: #fef3c7;
+      border-bottom: 2px solid #f59e0b;
+      padding: 10px 24px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #92400e;
+      flex-shrink: 0;
+      z-index: 99;
     }
 
-    /* Main Content */
-    .main {
-      flex: 1;
+    /* ── Layout ── */
+    .layout-wrapper { display: flex; flex: 1; overflow: hidden; }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border-color);
       display: flex;
       flex-direction: column;
-      overflow-y: auto;
-      padding: 40px;
+      padding: 24px;
+      flex-shrink: 0;
     }
-
-    .header-banner {
-      background: linear-gradient(135deg, #1e293b, #0f172a);
-      border-radius: 16px;
-      padding: 32px;
-      color: white;
+    .progress-summary {
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 20px;
       margin-bottom: 32px;
-      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 24px;
+      border: 1px solid var(--border-color);
     }
-
-    .header-banner h1 {
-      font-size: 24px;
+    .progress-summary h3 {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
       margin-bottom: 12px;
     }
+    .progress-stat { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+    .progress-bar-bg { height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: var(--success); width: 0%; transition: width 0.5s ease; }
 
-    .header-banner p {
-      font-size: 14px;
-      color: #cbd5e1;
-      line-height: 1.6;
-      max-width: 800px;
-    }
-
-    .step-panel {
-      display: none;
-      animation: fadeIn 0.4s ease forwards;
-    }
-
-    .step-panel.active {
-      display: block;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .panel-header {
-      margin-bottom: 24px;
-    }
-
-    .panel-title {
-      font-size: 20px;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-
-    .panel-subtitle {
-      font-size: 14px;
+    .nav-links { display: flex; flex-direction: column; gap: 4px; }
+    .nav-link {
+      padding: 12px 16px;
+      border-radius: 8px;
       color: var(--text-muted);
-    }
-
-    .upload-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 20px;
-      margin-bottom: 32px;
-    }
-
-    .upload-card {
-      background: var(--card-bg);
-      border: 1px dashed #cbd5e1;
-      border-radius: 12px;
-      padding: 24px;
-      text-align: center;
-      transition: all 0.2s ease;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
       cursor: pointer;
-      position: relative;
     }
+    .nav-link:hover { background: #f1f5f9; color: var(--text-main); }
+    .nav-link.active { background: #eff6ff; color: var(--accent); font-weight: 600; }
 
-    .upload-card:hover {
-      border-color: var(--primary);
-      background: #f8fafc;
-    }
+    /* ── Main Content ── */
+    .main-content { flex: 1; overflow-y: auto; padding: 40px; scroll-behavior: smooth; }
 
-    .upload-card.uploaded {
-      border-color: var(--success);
-      border-style: solid;
-      background: #f0fdf4;
-    }
-
-    .upload-icon {
-      width: 48px;
-      height: 48px;
-      background: #f1f5f9;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 16px;
-      color: var(--primary);
-      transition: all 0.2s ease;
-    }
-
-    .upload-card.uploaded .upload-icon {
-      background: #dcfce7;
-      color: var(--success);
-    }
-
-    .upload-card h4 {
-      font-size: 14px;
-      margin-bottom: 8px;
-      color: var(--text-main);
-    }
-
-    .upload-card p {
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
-    .upload-status {
-      display: none;
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      color: var(--success);
-    }
-
-    .upload-card.uploaded .upload-status {
-      display: block;
-    }
-
-    .nav-buttons {
+    .section-group { margin-bottom: 48px; }
+    .section-header {
+      margin-bottom: 24px;
+      border-bottom: 2px solid var(--primary);
+      padding-bottom: 8px;
       display: flex;
       justify-content: space-between;
-      margin-top: auto;
-      padding: 24px 0;
-      border-top: 1px solid var(--border-color);
-      position: sticky;
-      bottom: -40px; /* Offset the main padding */
-      background: var(--bg-color);
-      z-index: 100;
-      margin-left: -40px;
-      margin-right: -40px;
-      padding-left: 40px;
-      padding-right: 40px;
+      align-items: flex-end;
+    }
+    .section-header h2 { font-size: 22px; font-weight: 700; }
+
+    /* ── Document Table ── */
+    .document-table {
+      width: 100%;
+      background: var(--bg-surface);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+      border-collapse: collapse;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .document-table tr { border-bottom: 1px solid var(--border-color); }
+    .document-table tr:last-child { border-bottom: none; }
+    .document-table th {
+      background: #f8fafc;
+      padding: 12px 20px;
+      text-align: left;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+    }
+    .document-table td { padding: 16px 20px; font-size: 14px; vertical-align: middle; }
+
+    .doc-name { font-weight: 600; color: var(--text-main); }
+    .doc-meta { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .status-missing  { background: #fef2f2; color: #ef4444; }
+    .status-uploaded { background: #ecfdf5; color: #059669; }
+
+    .filename-view {
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      color: var(--accent);
+      background: #eff6ff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-top: 4px;
+      display: none;
     }
 
-    .btn {
-      padding: 12px 24px;
-      border-radius: 8px;
-      font-size: 14px;
+    .btn-upload {
+      background: white;
+      border: 1px solid var(--border-color);
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
       font-weight: 600;
       cursor: pointer;
-      border: none;
-      transition: all 0.2s ease;
+      transition: all 0.2s;
       display: inline-flex;
       align-items: center;
       gap: 8px;
     }
+    .btn-upload:hover { background: #f1f5f9; border-color: var(--accent); color: var(--accent); }
 
-    .btn-outline {
+    /* ── ERP Cards ── */
+    .erp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .erp-card {
       background: white;
-      border: 1px solid var(--border-color);
-      color: var(--text-main);
-    }
-
-    .btn-outline:hover {
-      background: #f1f5f9;
-    }
-
-    .btn-primary {
-      background: var(--primary);
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background: var(--primary-hover);
-    }
-    
-    .btn-success {
-      background: var(--success);
-      color: white;
-    }
-
-    .btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    /* Integration Card */
-    .integration-card {
-      display: flex;
-      align-items: center;
-      padding: 20px;
       border: 1px solid var(--border-color);
       border-radius: 12px;
-      background: white;
-      margin-bottom: 16px;
-      gap: 20px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
-    .integration-logo {
-      width: 50px;
-      height: 50px;
-      background: #f1f5f9;
-      border-radius: 8px;
-      display: grid;
-      place-items: center;
-      font-weight: 700;
-      color: #64748b;
-    }
-    .integration-content {
-      flex: 1;
-    }
-    .integration-content h4 {
-      font-size: 16px;
-      margin-bottom: 4px;
-    }
-    .integration-content p {
-      font-size: 13px;
-      color: var(--text-muted);
-    }
-    .connect-btn {
-      padding: 8px 16px;
-      border-radius: 20px;
-      border: 1px solid var(--primary);
-      color: var(--primary);
-      background: white;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    .connect-btn:hover {
-      background: #eff6ff;
+    .erp-logo {
+      width: 40px; height: 40px; border-radius: 8px;
+      display: grid; place-items: center; font-weight: 800; font-size: 13px;
     }
 
-    .hidden {
-      display: none !important;
+    /* ── Declaration Footer ── */
+    .declaration-footer {
+      flex-shrink: 0;
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-color);
+      padding: 24px 40px;
+      display: none;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+      z-index: 100;
     }
-    
-    .spinner {
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(255,255,255,0.3);
-      border-radius: 50%;
-      border-top-color: white;
-      animation: spin 1s ease-in-out infinite;
+    .declaration-footer.visible {
+      display: flex;
+      animation: slideUpFade 0.5s cubic-bezier(0.16,1,0.3,1) forwards;
     }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    @keyframes slideUpFade {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
-    
+    .declaration-checklist { display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--text-muted); }
+    .declaration-checklist input[type=checkbox] { width: 16px; height: 16px; cursor: pointer; accent-color: var(--accent); }
+
+    .btn-submit {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .btn-submit:disabled { background: #cbd5e1; cursor: not-allowed; }
+    .btn-submit:not(:disabled):hover { background: var(--primary); transform: translateY(-1px); }
+
+    /* ── Toast ── */
+    .toast-container { position: fixed; bottom: 100px; right: 24px; z-index: 9999; }
+    .toast {
+      background: #0f172a; color: white;
+      padding: 14px 18px; border-radius: 8px; margin-bottom: 10px;
+      font-size: 13px; display: flex; align-items: center; gap: 10px;
+      animation: slideInRight 0.3s ease;
+    }
+    @keyframes slideInRight {
+      from { transform: translateX(120%); opacity: 0; }
+      to   { transform: translateX(0);    opacity: 1; }
+    }
+
+    /* ── Approval Modal ── */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15,23,42,0.65);
+      backdrop-filter: blur(5px);
+      z-index: 3000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-backdrop.open { display: flex; }
+
+    .approval-modal {
+      background: #fff;
+      border-radius: 18px;
+      width: 540px;
+      max-width: 95vw;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.25);
+      overflow: hidden;
+      animation: popIn 0.4s cubic-bezier(0.16,1,0.3,1);
+    }
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.92) translateY(30px); }
+      to   { opacity: 1; transform: scale(1)    translateY(0);     }
+    }
+
+    /* Modal step bar */
+    .modal-step-bar {
+      display: flex;
+      align-items: flex-start;
+      padding: 28px 32px 0;
+      position: relative;
+    }
+    .modal-step-bar::after {
+      content: '';
+      position: absolute;
+      top: 42px;
+      left: calc(32px + 16px);
+      right: calc(32px + 16px);
+      height: 2px;
+      background: #e2e8f0;
+      z-index: 0;
+    }
+    .ms-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; position: relative; z-index: 1; }
+    .ms-circle {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: #e2e8f0; color: #94a3b8;
+      font-size: 13px; font-weight: 700;
+      display: grid; place-items: center;
+      transition: all 0.3s ease;
+    }
+    .ms-circle.active { background: var(--accent); color: white; box-shadow: 0 0 0 5px rgba(37,99,235,0.15); }
+    .ms-circle.done   { background: var(--success); color: white; }
+    .ms-label { font-size: 11px; color: var(--text-muted); font-weight: 500; white-space: nowrap; }
+    .ms-label.active { color: var(--accent); font-weight: 700; }
+    .ms-label.done   { color: var(--success); }
+
+    /* Modal body */
+    .modal-body { padding: 28px 32px 32px; }
+    .modal-body h3 { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+    .modal-desc { font-size: 13px; color: var(--text-muted); margin-bottom: 22px; line-height: 1.6; }
+
+    .summary-box {
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      padding: 6px 0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .summary-row:last-child { border-bottom: none; }
+    .summary-row span:first-child { color: var(--text-muted); }
+    .summary-row span:last-child  { font-weight: 600; color: var(--text-main); }
+
+    .warn-box {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #78350f;
+    }
+
+    .modal-field { margin-bottom: 18px; }
+    .modal-field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 7px; color: var(--text-main); }
+    .modal-field textarea,
+    .modal-field input[type=text] {
+      width: 100%;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      resize: none;
+      transition: border-color 0.2s;
+      color: var(--text-main);
+    }
+    .modal-field input.sig-input {
+      font-family: 'Georgia', serif;
+      font-style: italic;
+      font-size: 19px;
+      color: #1e3a8a;
+      letter-spacing: 0.5px;
+    }
+    .modal-field textarea:focus,
+    .modal-field input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+
+    .modal-actions { display: flex; gap: 12px; margin-top: 4px; }
+    .btn-mback {
+      flex: 1; padding: 12px; border: 1px solid var(--border-color);
+      border-radius: 8px; background: white; font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .btn-mback:hover { background: #f1f5f9; }
+    .btn-mnext {
+      flex: 2; padding: 12px; border: none;
+      border-radius: 8px; background: var(--accent); color: white;
+      font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-mnext:hover:not(:disabled) { background: #1d4ed8; }
+    .btn-mnext.green { background: var(--success); }
+    .btn-mnext.green:hover:not(:disabled) { background: #047857; }
+    .btn-mnext:disabled { background: #cbd5e1; cursor: not-allowed; }
+
+    /* ── Success Overlay ── */
     .success-overlay {
       position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(255,255,255,0.95);
-      z-index: 1000;
-      display: flex;
+      inset: 0;
+      background: rgba(255,255,255,0.98);
+      z-index: 4000;
+      display: none;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
+      padding: 40px;
     }
-    .success-overlay h2 {
-      font-size: 28px;
-      margin-bottom: 16px;
-      color: var(--text-main);
-    }
-    .success-overlay p {
-      font-size: 16px;
-      color: var(--text-muted);
-      max-width: 500px;
-      line-height: 1.6;
-    }
-
-    /* Timer Widget */
-    .timer-widget {
-      position: relative;
-      flex-shrink: 0;
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(226, 232, 240, 0.8);
-      padding: 12px 24px 12px 14px;
-      border-radius: 50px;
-      box-shadow: 0 10px 30px -5px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.04), inset 0 0 0 1px rgba(255,255,255,0.5);
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      z-index: 10;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    
-    .timer-widget:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 15px 35px -5px rgba(0,0,0,0.12), 0 8px 12px -4px rgba(0,0,0,0.06), inset 0 0 0 1px rgba(255,255,255,0.8);
-    }
-    
-    .timer-icon {
-      width: 40px;
-      height: 40px;
+    .success-icon-ring {
+      width: 88px; height: 88px;
+      background: #ecfdf5;
       border-radius: 50%;
-      background: #fef3c7;
-      color: #d97706;
       display: grid;
       place-items: center;
-      box-shadow: 0 4px 12px -2px rgba(217, 119, 6, 0.25);
-      transition: all 0.3s ease;
+      color: var(--success);
+      margin-bottom: 32px;
+      animation: scaleIn 0.5s cubic-bezier(0.16,1,0.3,1);
     }
-
-    .timer-info {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding-right: 8px;
+    @keyframes scaleIn {
+      from { transform: scale(0.5); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
     }
-
-    .timer-info h4 {
-      font-size: 11px;
-      color: #64748b;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      margin-bottom: 2px;
+    .success-overlay h1 { font-size: 32px; font-weight: 700; margin-bottom: 16px; }
+    .success-overlay p  { max-width: 560px; color: var(--text-muted); font-size: 15px; line-height: 1.7; }
+    .spinner-row {
+      margin-top: 40px;
+      color: var(--accent);
       font-weight: 700;
-    }
-
-    .timer-info .timer-countdown {
-      font-size: 16px;
-      font-weight: 800;
-      color: #d97706;
-      transition: color 0.3s ease;
-      font-feature-settings: "tnum";
-      font-variant-numeric: tabular-nums;
-      line-height: 1.2;
-    }
-
-    /* Toast container */
-    .toast-container {
-      position: fixed;
-      bottom: 100px;
-      right: 24px;
-      z-index: 1000;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .toast {
-      background: #0f172a;
-      color: white;
-      padding: 16px 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       display: flex;
       align-items: center;
       gap: 12px;
       font-size: 14px;
-      animation: slideInRight 0.3s ease;
     }
-    
-    @keyframes slideInRight {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-    
-    @keyframes fadeOutDown {
-      from { transform: translateY(0); opacity: 1; }
-      to { transform: translateY(10px); opacity: 0; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spin-dot {
+      width: 18px; height: 18px;
+      border: 2.5px solid rgba(37,99,235,0.2);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
     }
   </style>
 </head>
 <body>
 
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <div class="brand">
-      <div style="width: 32px; height: 32px; background: var(--primary); border-radius: 8px; display: grid; place-items: center; color: white;">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+  <!-- Top Nav -->
+  <header class="top-nav">
+    <div class="brand-section">
+      <div style="width:32px;height:32px;background:rgba(255,255,255,0.1);border-radius:8px;display:grid;place-items:center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
       </div>
-      Client Portal
+      <div>Secure Audit Portal <span style="font-weight:400;color:#94a3b8;font-size:14px;margin-left:8px;">v2.4</span></div>
     </div>
-
-    <div class="stepper">
-      <!-- Step 1 -->
-      <div class="step-item active" id="nav-step-1" onclick="goToStep(1)" style="cursor: pointer;">
-        
-        <div class="step-icon" style="width:28px;height:28px;background:#f1f5f9;color:#64748b;border-radius:6px;display:flex;align-items:center;justify-content:center;margin-right:12px;border:1px solid #e2e8f0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg></div>
-        <div class="step-content">
-          <div class="step-title">Company & Legal</div>
-          <div class="step-desc">Establish identity & compliance</div>
-        </div>
+    <div class="session-info">
+      <div class="timer-pill" id="timer-widget">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span>Submission Deadline:</span>
+        <span class="timer-value">5 days</span>
       </div>
-      <!-- Step 2 -->
-      <div class="step-item" id="nav-step-2" onclick="goToStep(2)" style="cursor: pointer;">
-        
-        <div class="step-icon" style="width:28px;height:28px;background:#f1f5f9;color:#64748b;border-radius:6px;display:flex;align-items:center;justify-content:center;margin-right:12px;border:1px solid #e2e8f0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg></div>
-        <div class="step-content">
-          <div class="step-title">Core Financial Data</div>
-          <div class="step-desc">Foundation for validation</div>
+      <div class="user-profile">
+        <div style="text-align:right;">
+          <div style="font-weight:600;">Standard Client User</div>
+          <div style="color:#94a3b8;font-size:11px;">Audit Offshore Ltd (ID: AO-9910)</div>
         </div>
-      </div>
-      <!-- Step 3 -->
-      <div class="step-item" id="nav-step-3" onclick="goToStep(3)" style="cursor: pointer;">
-        
-        <div class="step-icon" style="width:28px;height:28px;background:#f1f5f9;color:#64748b;border-radius:6px;display:flex;align-items:center;justify-content:center;margin-right:12px;border:1px solid #e2e8f0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg></div>
-        <div class="step-content">
-          <div class="step-title">Banking & Treasury</div>
-          <div class="step-desc">Cash & transaction proof</div>
-        </div>
-      </div>
-      <!-- Step 4 -->
-      <div class="step-item" id="nav-step-4" onclick="goToStep(4)" style="cursor: pointer;">
-        
-        <div class="step-icon" style="width:28px;height:28px;background:#f1f5f9;color:#64748b;border-radius:6px;display:flex;align-items:center;justify-content:center;margin-right:12px;border:1px solid #e2e8f0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg></div>
-        <div class="step-content">
-          <div class="step-title">Revenue & Tax</div>
-          <div class="step-desc">Compliance & reporting</div>
-        </div>
-      </div>
-      <!-- Step 5 -->
-      <div class="step-item" id="nav-step-5" onclick="goToStep(5)" style="cursor: pointer;">
-        
-        <div class="step-icon" style="width:28px;height:28px;background:#f1f5f9;color:#64748b;border-radius:6px;display:flex;align-items:center;justify-content:center;margin-right:12px;border:1px solid #e2e8f0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg></div>
-        <div class="step-content">
-          <div class="step-title">Supporting Schedules</div>
-          <div class="step-desc">Sub-ledger breakdown</div>
-        </div>
-      </div>
-      <!-- Step 6 -->
-      <div class="step-item" id="nav-step-6" onclick="goToStep(6)" style="cursor: pointer;">
-        <div class="step-icon" style="width:28px;height:28px;background:#f1f5f9;color:#64748b;border-radius:6px;display:flex;align-items:center;justify-content:center;margin-right:12px;border:1px solid #e2e8f0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg></div>
-        <div class="step-content">
-          <div class="step-title">Smart Integration</div>
-          <div class="step-desc">Optional real-time link</div>
-        </div>
+        <div style="width:32px;height:32px;border-radius:50%;background:#334155;display:grid;place-items:center;font-size:12px;font-weight:700;">SC</div>
       </div>
     </div>
-  </aside>
+  </header>
 
-  <!-- Main Content -->
-  <main class="main">
-    <!-- Global Alert Banner -->
-    <div id="global-ping-alert" style="display:none; position:sticky; top:0; z-index:50; background:#fff1f2; border:1px solid #fecdd3; border-left:4px solid #e11d48; padding:16px 20px; border-radius:8px; margin-bottom:24px; box-shadow:0 6px 16px -4px rgba(225,29,72,0.15); animation: fadeIn 0.4s ease;">
-      <div style="display:flex; gap:12px; align-items:flex-start;">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e11d48" stroke-width="2" style="flex-shrink:0; margin-top:2px;">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="12" y1="8" x2="12" y2="12"></line>
-          <line x1="12" y1="16" x2="12.01" y2="16"></line>
-        </svg>
-        <div style="flex:1;">
-          <h4 style="color:#be123c; font-size:15px; font-weight:700; margin-bottom:4px;">Audit Manager Urgent Reminder</h4>
-          <p id="global-ping-msg" style="color:#9f1239; font-size:14px; line-height:1.5;">Please upload your financial documents urgently.</p>
-        </div>
-        <button onclick="document.getElementById('global-ping-alert').style.display='none'" style="background:none; border:none; cursor:pointer; color:#e11d48; padding:4px; opacity:0.8; transition:opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-        </button>
-      </div>
-    </div>
-    <div class="header-banner">
-      <div>
-        <h1>Data Ingestion & AI Validation</h1>
-        <p>To enable our AI-driven financial validation and reconciliation process, we require the following documents. Our system will automatically validate and reconcile the data, reducing manual effort and ensuring accuracy. Incomplete or inconsistent data will be flagged automatically.</p>
-      </div>
-      <div class="timer-widget" id="timer-widget">
-        <div class="timer-icon" id="timer-icon-container" style="background:#fee2e2; color:#dc2626;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"></circle>
-            <polyline points="12 6 12 12 16 14"></polyline>
-          </svg>
-        </div>
-        <div class="timer-info">
-          <h4>Submission Deadline</h4>
-          <div class="timer-countdown" id="timer-countdown" style="color:#dc2626; font-weight:700;">2 Days Left</div>
-        </div>
-      </div>
-    </div>
+  <!-- Global Alert -->
+  <div id="global-ping-alert">
+    <span id="global-ping-msg">Kindly finish the document upload process. You only have <strong>5 days</strong> to avoid delays in compliance.</span>
+  </div>
 
-    <!-- Step 1 Panel -->
-    <div class="step-panel active" id="panel-1">
-      <div class="panel-header">
-        <h2 class="panel-title">1. Company & Legal Documents</h2>
-        <p class="panel-subtitle">These establish the company’s identity and compliance. Required for validation checks (expiry, legal status).</p>
-      </div>
-      <div class="upload-grid">
-        <div class="upload-card" onclick="simulateUpload(this)">
-          <div class="upload-status"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-          <div class="upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg></div>
-          <h4>Commercial Registration (CR)</h4>
-          <p>Click to browse or drag file here</p>
-        </div>
-        <div class="upload-card" onclick="simulateUpload(this)">
-          <div class="upload-status"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-          <div class="upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg></div>
-          <h4>Tax Card / Tax Registration</h4>
-          <p>Click to browse or drag file here</p>
-        </div>
-        <div class="upload-card" onclick="simulateUpload(this)">
-          <div class="upload-status"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-          <div class="upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg></div>
-          <h4>VAT Registration Certificate</h4>
-          <p>Click to browse or drag file here</p>
-        </div>
-        <div class="upload-card" onclick="simulateUpload(this)">
-          <div class="upload-status"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-          <div class="upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg></div>
-          <h4>MOA / AOA</h4>
-          <p>Memorandum & Articles of Association</p>
-        </div>
-      </div>
-    </div>
+  <div class="layout-wrapper">
 
-    <!-- Step 2 Panel -->
-    <div class="step-panel" id="panel-2">
-      <div class="panel-header">
-        <h2 class="panel-title">2. Core Financial Data</h2>
-        <p class="panel-subtitle">This is the foundation. Our AI agent uses this to map accounts, reconcile balances, and validate structure.</p>
-      </div>
-      <div class="upload-grid">
-        <div class="upload-card" onclick="simulateUpload(this)">
-          <div class="upload-status"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-          <div class="upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg></div>
-          <h4>Trial Balance (Excel)</h4>
-          <p>Required format: .xlsx, .csv</p>
-        </div>
-        <div class="upload-card" onclick="simulateUpload(this)">
-          <div class="upload-status"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-          <div class="upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg></div>
-          <h4>General Ledger</h4>
-          <p>Full year transaction-level data</p>
-        </div>
-        <div class="upload-card" onclick="simulateUpload(this)">
-          <div class="upload-status"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-          <div class="upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg></div>
-          <h4>Financial Statements</h4>
-          <p>Draft P&L and Balance Sheet</p>
-        </div>
-        <div class="upload-card" onclick="simulateUpload(this)">
-          <div class="upload-status"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-          <div class="upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg></div>
-          <h4>Chart of Accounts (COA)</h4>
-          <p>Current mapping architecture</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Step 3 Panel -->
-    <div class="step-panel" id="panel-3">
-      <div class="panel-header">
-        <h2 class="panel-title">3. Banking & Treasury</h2>
-        <p class="panel-subtitle">Agent matches bank vs GL and identifies missing/unreconciled items automatically.</p>
-      </div>
-      <div class="upload-grid">
-        <div class="upload-card" onclick="simulateUpload(this)">
-          <div class="upload-status"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-          <div class="upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div>
-          <h4>Bank Statements</h4>
-          <p>All accounts, full 12 months</p>
-        </div>
-        <div class="upload-card" onclick="simulateUpload(this)">
-          <div class="upload-status"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-          <div class="upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div>
-          <h4>Bank Reconciliations (BRS)</h4>
-          <p>Year-end statements</p>
-        </div>
-        <div class="upload-card" onclick="simulateUpload(this)">
-          <div class="upload-status"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-          <div class="upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div>
-          <h4>Bank Confirmation Letters</h4>
-          <p>Official bank replies</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Step 4 Panel -->
-    <div class="step-panel" id="panel-4">
-      <div class="panel-header">
-        <h2 class="panel-title">4. Revenue & Tax</h2>
-        <p class="panel-subtitle">Agent matches revenue vs VAT filings, validates tax compliance, and flags misreporting.</p>
-      </div>
-      <div class="upload-grid">
-        <div class="upload-card" onclick="simulateUpload(this)">
-          <div class="upload-status"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-          <div class="upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></div>
-          <h4>Sales Ledger</h4>
-          <p>Revenue Report / E-Invoicing Data</p>
-        </div>
-        <div class="upload-card" onclick="simulateUpload(this)">
-          <div class="upload-status"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-          <div class="upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></div>
-          <h4>VAT Returns</h4>
-          <p>All quarters for the period</p>
-        </div>
-        <div class="upload-card" onclick="simulateUpload(this)">
-          <div class="upload-status"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-          <div class="upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></div>
-          <h4>Income Tax Returns</h4>
-          <p>Previous year / WHT docs</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Step 5 Panel -->
-    <div class="step-panel" id="panel-5">
-      <div class="panel-header">
-        <h2 class="panel-title">5. Supporting Schedules & Sub-Ledgers</h2>
-        <p class="panel-subtitle">Agent reconciles totals with Trial Balance, validates completeness, and flags inconsistencies.</p>
-      </div>
-      <div class="upload-grid">
-        <div class="upload-card" onclick="simulateUpload(this)">
-          <div class="upload-status"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-          <div class="upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="21" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="21" y1="18" x2="3" y2="18"></line></svg></div>
-          <h4>AR / AP Ageing</h4>
-          <p>Receivables & Payables breakdown</p>
-        </div>
-        <div class="upload-card" onclick="simulateUpload(this)">
-          <div class="upload-status"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-          <div class="upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="21" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="21" y1="18" x2="3" y2="18"></line></svg></div>
-          <h4>Fixed Asset Register</h4>
-          <p>Cost, depreciation, dates</p>
-        </div>
-        <div class="upload-card" onclick="simulateUpload(this)">
-          <div class="upload-status"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-          <div class="upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="21" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="21" y1="18" x2="3" y2="18"></line></svg></div>
-          <h4>Inventory Valuation</h4>
-          <p>Stock count & value</p>
-        </div>
-        <div class="upload-card" onclick="simulateUpload(this)">
-          <div class="upload-status"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-          <div class="upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="21" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="21" y1="18" x2="3" y2="18"></line></svg></div>
-          <h4>Payroll & WPS</h4>
-          <p>Salary reports and WPS files</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Step 6 Panel -->
-    <div class="step-panel" id="panel-6">
-      <div class="panel-header">
-        <h2 class="panel-title">6. Smart ERP Integration (Recommended)</h2>
-        <p class="panel-subtitle">Instead of manual uploads, provide read-only access to your ERP. Reduces back-and-forth and improves AI accuracy.</p>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="progress-summary">
+        <h3>Portal Completion</h3>
+        <div class="progress-stat" id="completion-counter">0 / 12</div>
+        <div class="progress-bar-bg"><div class="progress-bar-fill" id="completion-bar"></div></div>
+        <div id="pending-text" style="font-size:11px;color:var(--text-muted);margin-top:8px;">6 sections pending review</div>
       </div>
 
-      <div style="max-width: 600px;">
-        <div class="integration-card">
-          <div class="integration-logo" style="color:#0071e3; background:#e6f0fa;">ZH</div>
-          <div class="integration-content">
-            <h4>Zoho Books</h4>
-            <p>Connect securely via OAuth</p>
+      <nav class="nav-links">
+        <a class="nav-link active" onclick="scrollTo('sec-identity', event)">Section A: Identity &amp; Compliance</a>
+        <a class="nav-link" onclick="scrollTo('sec-financial', event)">Section B: Financial Foundation</a>
+        <a class="nav-link" onclick="scrollTo('sec-treasury', event)">Section C: Treasury &amp; Inbound</a>
+        <a class="nav-link" onclick="scrollTo('sec-tax', event)">Section D: Tax &amp; Compliance</a>
+        <a class="nav-link" onclick="scrollTo('sec-schedules', event)">Section E: Supporting Schedules</a>
+        <a class="nav-link" onclick="scrollTo('sec-erp', event)">Section F: Smart ERP Link</a>
+      </nav>
+
+      <div style="margin-top:auto;padding:20px;background:#eff6ff;border-radius:12px;border:1px solid #bfdbfe;">
+        <h4 style="font-size:13px;color:var(--accent);margin-bottom:8px;">Secure Box Support</h4>
+        <p style="font-size:11px;color:#64748b;line-height:1.5;">Need help with document types? Check our <a href="#" style="color:var(--accent);">Guidelines</a> or request a secure callback.</p>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content" id="scroll-container">
+
+      <!-- Section A -->
+      <section class="section-group" id="sec-identity">
+        <div class="section-header">
+          <div>
+            <h2>Section A: Identity &amp; Compliance</h2>
+            <p style="font-size:13px;color:var(--text-muted);margin-top:4px;">Mandatory legal entity documentation for auditor verification.</p>
           </div>
-          <button class="connect-btn" onclick="this.innerText='Connected'; this.style.background='#10b981'; this.style.color='white'; this.style.borderColor='#10b981';">Connect</button>
         </div>
+        <table class="document-table">
+          <thead>
+            <tr>
+              <th style="width:45%;">Required Document</th>
+              <th style="width:25%;">Verification Status</th>
+              <th style="width:30%;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><div class="doc-name">Commercial Registration (CR)</div><div class="doc-meta">Accepted: PDF, JPG | Max: 25MB</div></td>
+              <td><span class="status-badge status-missing" id="status-0">Missing</span><div class="filename-view" id="file-0"></div></td>
+              <td><button class="btn-upload" onclick="simulateUpload(0, 'CR_AuditOffshore_2024.pdf', this)">Upload &amp; Verify</button></td>
+            </tr>
+            <tr>
+              <td><div class="doc-name">Tax Registration / Card</div><div class="doc-meta">Accepted: PDF | Max: 25MB</div></td>
+              <td><span class="status-badge status-missing" id="status-1">Missing</span><div class="filename-view" id="file-1"></div></td>
+              <td><button class="btn-upload" onclick="simulateUpload(1, 'TaxReg_2024.pdf', this)">Upload &amp; Verify</button></td>
+            </tr>
+            <tr>
+              <td><div class="doc-name">VAT Registration Certificate</div><div class="doc-meta">Accepted: PDF | Max: 25MB</div></td>
+              <td><span class="status-badge status-missing" id="status-2">Missing</span><div class="filename-view" id="file-2"></div></td>
+              <td><button class="btn-upload" onclick="simulateUpload(2, 'VAT_Cert_Saudi.pdf', this)">Upload &amp; Verify</button></td>
+            </tr>
+            <tr>
+              <td><div class="doc-name">MOA / AOA (Articles)</div><div class="doc-meta">Accepted: PDF | Max: 50MB</div></td>
+              <td><span class="status-badge status-missing" id="status-3">Missing</span><div class="filename-view" id="file-3"></div></td>
+              <td><button class="btn-upload" onclick="simulateUpload(3, 'ArticlesOfAssoc_Signed.pdf', this)">Upload &amp; Verify</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
 
-        <div class="integration-card">
-          <div class="integration-logo" style="color:#13b5ea; background:#e0f7fa;">XR</div>
-          <div class="integration-content">
-            <h4>Xero</h4>
-            <p>Sync ledgers automatically</p>
+      <!-- Section B -->
+      <section class="section-group" id="sec-financial">
+        <div class="section-header">
+          <div>
+            <h2>Section B: Financial Foundation</h2>
+            <p style="font-size:13px;color:var(--text-muted);margin-top:4px;">Primary ledger data required for automated audit reconciliation.</p>
           </div>
-          <button class="connect-btn" onclick="this.innerText='Connected'; this.style.background='#10b981'; this.style.color='white'; this.style.borderColor='#10b981';">Connect</button>
         </div>
+        <table class="document-table">
+          <thead><tr><th style="width:45%;">Required Document</th><th style="width:25%;">Verification Status</th><th style="width:30%;">Action</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><div class="doc-name">Trial Balance (FYE 2024)</div><div class="doc-meta">Format: .xlsx (Standard Mapping)</div></td>
+              <td><span class="status-badge status-missing" id="status-4">Missing</span><div class="filename-view" id="file-4"></div></td>
+              <td><button class="btn-upload" onclick="simulateUpload(4, 'TrialBalance_Final_v2.xlsx', this)">Upload &amp; Map</button></td>
+            </tr>
+            <tr>
+              <td><div class="doc-name">General Ledger (GL) Export</div><div class="doc-meta">Full transactional data | Format: .csv</div></td>
+              <td><span class="status-badge status-missing" id="status-5">Missing</span><div class="filename-view" id="file-5"></div></td>
+              <td><button class="btn-upload" onclick="simulateUpload(5, 'GL_Export_Jan_Dec.csv', this)">Upload &amp; Analyze</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
 
-        <div class="integration-card">
-          <div class="integration-logo" style="color:#f5a623; background:#fff8e1;">SAP</div>
-          <div class="integration-content">
-            <h4>SAP Business One</h4>
-            <p>API Data ingestion</p>
+      <!-- Section C -->
+      <section class="section-group" id="sec-treasury">
+        <div class="section-header">
+          <div>
+            <h2>Section C: Treasury &amp; Inbound</h2>
+            <p style="font-size:13px;color:var(--text-muted);margin-top:4px;">Validation of cash positions and transaction proof.</p>
           </div>
-          <button class="connect-btn" onclick="this.innerText='Connected'; this.style.background='#10b981'; this.style.color='white'; this.style.borderColor='#10b981';">Connect</button>
         </div>
-      </div>
+        <table class="document-table">
+          <thead><tr><th style="width:45%;">Required Document</th><th style="width:25%;">Verification Status</th><th style="width:30%;">Action</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><div class="doc-name">Bank Statements (All Accounts)</div><div class="doc-meta">Full 12 months | Accepted: PDF</div></td>
+              <td><span class="status-badge status-missing" id="status-6">Missing</span><div class="filename-view" id="file-6"></div></td>
+              <td><button class="btn-upload" onclick="simulateUpload(6, 'Bank_Statements_Combined_2024.pdf', this)">Upload &amp; Verify</button></td>
+            </tr>
+            <tr>
+              <td><div class="doc-name">Bank Reconciliations (BRS)</div><div class="doc-meta">Year-end reconciliation | Format: Excel/PDF</div></td>
+              <td><span class="status-badge status-missing" id="status-7">Missing</span><div class="filename-view" id="file-7"></div></td>
+              <td><button class="btn-upload" onclick="simulateUpload(7, 'YearEnd_BRS_AuditReady.xlsx', this)">Upload &amp; Verify</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Section D -->
+      <section class="section-group" id="sec-tax">
+        <div class="section-header">
+          <div>
+            <h2>Section D: Tax &amp; Compliance</h2>
+            <p style="font-size:13px;color:var(--text-muted);margin-top:4px;">Official returns reconciled vs General Ledger revenue by our AI.</p>
+          </div>
+        </div>
+        <table class="document-table">
+          <thead><tr><th style="width:45%;">Required Document</th><th style="width:25%;">Verification Status</th><th style="width:30%;">Action</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><div class="doc-name">Sales Ledger / E-Invoices</div><div class="doc-meta">Full year revenue data | Format: .csv/Excel</div></td>
+              <td><span class="status-badge status-missing" id="status-8">Missing</span><div class="filename-view" id="file-8"></div></td>
+              <td><button class="btn-upload" onclick="simulateUpload(8, 'Sales_Ledger_2024_Export.xlsx', this)">Upload &amp; Ingest</button></td>
+            </tr>
+            <tr>
+              <td><div class="doc-name">VAT Returns (Q1 – Q4)</div><div class="doc-meta">Certified returns | Accepted: PDF</div></td>
+              <td><span class="status-badge status-missing" id="status-9">Missing</span><div class="filename-view" id="file-9"></div></td>
+              <td><button class="btn-upload" onclick="simulateUpload(9, 'VAT_Returns_Consolidated.pdf', this)">Upload &amp; Verify</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Section E -->
+      <section class="section-group" id="sec-schedules">
+        <div class="section-header">
+          <div>
+            <h2>Section E: Supporting Schedules</h2>
+            <p style="font-size:13px;color:var(--text-muted);margin-top:4px;">Detail breakdowns matching Trial Balance totals.</p>
+          </div>
+        </div>
+        <table class="document-table">
+          <thead><tr><th style="width:45%;">Required Document</th><th style="width:25%;">Verification Status</th><th style="width:30%;">Action</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><div class="doc-name">Fixed Asset Register</div><div class="doc-meta">Cost, Dept, NBV | Format: Excel</div></td>
+              <td><span class="status-badge status-missing" id="status-10">Missing</span><div class="filename-view" id="file-10"></div></td>
+              <td><button class="btn-upload" onclick="simulateUpload(10, 'FAR_Schedules_2024.xlsx', this)">Upload &amp; Verify</button></td>
+            </tr>
+            <tr>
+              <td><div class="doc-name">AR / AP Ageing Reports</div><div class="doc-meta">Receivables/Payables breakdown</div></td>
+              <td><span class="status-badge status-missing" id="status-11">Missing</span><div class="filename-view" id="file-11"></div></td>
+              <td><button class="btn-upload" onclick="simulateUpload(11, 'AR_AP_Ageing_Dec2024.pdf', this)">Upload &amp; Verify</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Section F -->
+      <section class="section-group" id="sec-erp">
+        <div class="section-header">
+          <div>
+            <h2>Section F: Smart ERP Link</h2>
+            <p style="font-size:13px;color:var(--text-muted);margin-top:4px;">Optional real-time data flow. Eliminates manual file requests.</p>
+          </div>
+        </div>
+        <div class="erp-grid">
+          <div class="erp-card">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div class="erp-logo" style="background:#e0f2fe;color:#0369a1;">ZB</div>
+              <div><div style="font-weight:600;font-size:14px;">Zoho Books</div><div style="font-size:12px;color:var(--text-muted);">Direct API Sync</div></div>
+            </div>
+            <button class="btn-upload" style="border-color:var(--accent);color:var(--accent);"
+              onclick="this.innerText='Linking…';setTimeout(()=>{this.innerText='✓ Linked';this.style.color='var(--success)';this.style.borderColor='var(--success)'},1100)">Connect ERP</button>
+          </div>
+          <div class="erp-card">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div class="erp-logo" style="background:#eff6ff;color:#2563eb;">XR</div>
+              <div><div style="font-weight:600;font-size:14px;">Xero</div><div style="font-size:12px;color:var(--text-muted);">OAuth 2.0 Ingestion</div></div>
+            </div>
+            <button class="btn-upload" style="border-color:var(--accent);color:var(--accent);"
+              onclick="this.innerText='Linking…';setTimeout(()=>{this.innerText='✓ Linked';this.style.color='var(--success)';this.style.borderColor='var(--success)'},1100)">Connect ERP</button>
+          </div>
+          <div class="erp-card">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div class="erp-logo" style="background:#fef3c7;color:#b45309;">SA</div>
+              <div><div style="font-weight:600;font-size:14px;">SAP S/4HANA</div><div style="font-size:12px;color:var(--text-muted);">RFC / BAPI Bridge</div></div>
+            </div>
+            <button class="btn-upload" style="border-color:var(--accent);color:var(--accent);"
+              onclick="this.innerText='Linking…';setTimeout(()=>{this.innerText='✓ Linked';this.style.color='var(--success)';this.style.borderColor='var(--success)'},1100)">Connect ERP</button>
+          </div>
+          <div class="erp-card">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div class="erp-logo" style="background:#f0fdf4;color:#15803d;">QK</div>
+              <div><div style="font-weight:600;font-size:14px;">QuickBooks</div><div style="font-size:12px;color:var(--text-muted);">Cloud Data Pipe</div></div>
+            </div>
+            <button class="btn-upload" style="border-color:var(--accent);color:var(--accent);"
+              onclick="this.innerText='Linking…';setTimeout(()=>{this.innerText='✓ Linked';this.style.color='var(--success)';this.style.borderColor='var(--success)'},1100)">Connect ERP</button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Declaration Footer -->
+  <footer class="declaration-footer" id="main-footer">
+    <div class="declaration-checklist">
+      <input type="checkbox" id="declare-check" onchange="toggleSubmit()">
+      <label for="declare-check">I confirm that all uploaded documents are authentic and final for the FY 2024 audit period.</label>
     </div>
+    <button class="btn-submit" id="submit-btn" disabled onclick="finishIngestion()">
+      Submit &amp; Generate Audit Draft
+    </button>
+  </footer>
 
-
-    <div class="nav-buttons">
-      <button class="btn btn-outline" id="btn-back" onclick="changeStep(-1)" disabled>Back</button>
-      <button class="btn btn-primary" id="btn-next" onclick="changeStep(1)">Next Step</button>
-    </div>
-  </main>
-
-
-
+  <!-- Toast -->
   <div class="toast-container" id="toast-container"></div>
 
-  <div id="success-overlay" class="success-overlay hidden">
-    <div style="width:64px; height:64px; background:#dcfce7; border-radius:50%; display:grid; place-items:center; color:#10b981; margin-bottom:24px;">
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+  <!-- ── 3-Step Approval Modal ── -->
+  <div class="modal-backdrop" id="approve-modal">
+    <div class="approval-modal">
+
+      <!-- Step Bar -->
+      <div class="modal-step-bar">
+        <div class="ms-item">
+          <div class="ms-circle active" id="mc-1">1</div>
+          <span class="ms-label active" id="ml-1">Review</span>
+        </div>
+        <div class="ms-item">
+          <div class="ms-circle" id="mc-2">2</div>
+          <span class="ms-label" id="ml-2">Declaration</span>
+        </div>
+        <div class="ms-item">
+          <div class="ms-circle" id="mc-3">3</div>
+          <span class="ms-label" id="ml-3">E-Sign</span>
+        </div>
+      </div>
+
+      <!-- Step 1: Portfolio Review -->
+      <div class="modal-body" id="ms-1">
+        <h3>Portfolio Review</h3>
+        <p class="modal-desc">Confirm your document summary before proceeding to secure submission.</p>
+        <div class="summary-box">
+          <div class="summary-row"><span>Client ID</span><span>AO-9910 — Audit Offshore Ltd</span></div>
+          <div class="summary-row"><span>Audit Period</span><span>FY 2024 (Jan – Dec)</span></div>
+          <div class="summary-row"><span>Documents Uploaded</span><span id="ms-docs-count">0 / 12</span></div>
+          <div class="summary-row"><span>Submission Channel</span><span>Encrypted Secure Box</span></div>
+          <div class="summary-row"><span>Declaration Signed</span><span style="color:var(--success);">✓ Confirmed</span></div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-mback" onclick="closeModal()">Cancel</button>
+          <button class="btn-mnext" onclick="toStep(2)">Continue →</button>
+        </div>
+      </div>
+
+      <!-- Step 2: ISA Declaration -->
+      <div class="modal-body" id="ms-2" style="display:none;">
+        <h3>Auditor Declaration</h3>
+        <p class="modal-desc">By proceeding you confirm all documents are authentic and final for the FY 2024 audit period.</p>
+        <div class="warn-box">
+          <strong>⚠ Important:</strong> All submitted documents form part of the official audit record under ISA standards. False documentation may result in qualified opinions and regulatory consequences.
+        </div>
+        <div class="modal-field">
+          <label>Additional Notes (Optional)</label>
+          <textarea id="ms-note" rows="3" placeholder="Everything looks good. Proceeding with the technical audit next week…"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-mback" onclick="toStep(1)">Back</button>
+          <button class="btn-mnext" onclick="toStep(3)">I Agree &amp; Continue →</button>
+        </div>
+      </div>
+
+      <!-- Step 3: E-Sign -->
+      <div class="modal-body" id="ms-3" style="display:none;">
+        <h3>Approve &amp; E-Sign</h3>
+        <p class="modal-desc">Type your full legal name below to provide your electronic signature and authorize this engagement.</p>
+        <div class="modal-field">
+          <label>Final Approval Note (Optional)</label>
+          <textarea id="ms-note2" rows="2" placeholder="Proceeding with formal audit engagement…"></textarea>
+        </div>
+        <div class="modal-field">
+          <label>Full Legal Name — Electronic Signature</label>
+          <input type="text" id="ms-sig" class="sig-input" placeholder="Type your full legal name" oninput="checkSig()">
+        </div>
+        <div class="modal-actions">
+          <button class="btn-mback" onclick="toStep(2)">Back</button>
+          <button class="btn-mnext green" id="btn-authorize" onclick="authorizeAndSend()" disabled>Authorize &amp; Send</button>
+        </div>
+      </div>
+
     </div>
-    <h2>Data Ingestion Complete</h2>
-    <p>All documents and integrations have been securely captured. Our automated system is now validating the Trial Balance, matching Bank statements to GL, and verifying tax compliance.</p>
-    <div style="margin-top:32px; display:inline-flex; align-items:center; gap:8px; font-size:14px; font-weight:600; color:var(--primary);">
-      <span class="spinner" style="border-top-color:var(--primary); width:14px; height:14px; border-width:2px; border-color:rgba(37,99,235,0.2)"></span>
+  </div>
+
+  <!-- Success Overlay -->
+  <div id="success-overlay" class="success-overlay">
+    <div class="success-icon-ring">
+      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+    </div>
+    <h1>Secure Submission Complete</h1>
+    <p>Your document portfolio <strong>AO-9910</strong> has been encrypted and transmitted to the Audit Manager. Our AI system is now validating your Trial Balance, matching Bank Statements to the GL, and verifying tax compliance.</p>
+    <p style="margin-top:16px;font-size:13px;color:#94a3b8;">A confirmation receipt has been sent to your registered email address.</p>
+    <div class="spinner-row">
+      <div class="spin-dot"></div>
       Automated Analysis in Progress...
     </div>
   </div>
 
   <script>
-    let currentStep = 1;
-    const totalSteps = 6;
+    let uploadedCount = 0;
+    const totalDocs = 12;
 
-    function goToStep(step) {
-      if (step < 1 || step > totalSteps) return;
+    /* ── Scroll spy ── */
+    function scrollTo(id, e) {
+      document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+      document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+      e.currentTarget.classList.add('active');
+    }
 
-      // Hide current
-      document.getElementById('panel-' + currentStep).classList.remove('active');
-      document.getElementById('nav-step-' + currentStep).classList.remove('active');
+    const scrollContainer = document.getElementById('scroll-container');
+    const sections = document.querySelectorAll('.section-group');
+    const navLinks = document.querySelectorAll('.nav-link');
 
-      currentStep = step;
+    scrollContainer.addEventListener('scroll', () => {
+      let currentId = '';
+      const containerTop = scrollContainer.getBoundingClientRect().top;
+      sections.forEach(sec => {
+        if (sec.getBoundingClientRect().top - containerTop <= 150) currentId = sec.id;
+      });
+      if (currentId) {
+        navLinks.forEach(l => {
+          const fn = l.getAttribute('onclick') || '';
+          l.classList.toggle('active', fn.includes(currentId));
+        });
+      }
+      const atBottom = scrollContainer.scrollHeight - scrollContainer.scrollTop <= scrollContainer.clientHeight + 10;
+      if (atBottom) {
+        navLinks.forEach(l => l.classList.toggle('active', (l.getAttribute('onclick') || '').includes('sec-erp')));
+      }
+    });
+    setTimeout(() => scrollContainer.dispatchEvent(new Event('scroll')), 100);
 
-      // Show new
-      document.getElementById('panel-' + currentStep).classList.add('active');
-      document.getElementById('nav-step-' + currentStep).classList.add('active');
+    /* ── Upload simulation ── */
+    function simulateUpload(id, filename, btn) {
+      const status  = document.getElementById('status-' + id);
+      const fileView = document.getElementById('file-' + id);
+      const isReplace = status.classList.contains('status-uploaded');
 
-      // Update buttons
-      document.getElementById('btn-back').disabled = (currentStep === 1);
-      
-      const nextBtn = document.getElementById('btn-next');
-      if (currentStep === totalSteps) {
-        nextBtn.innerHTML = 'Submit & Generate Audit Draft';
-        nextBtn.className = 'btn btn-success'; // turn green
+      btn.disabled = true;
+      btn.innerHTML = '<span style="color:var(--accent)">Ingesting…</span>';
+
+      setTimeout(() => {
+        status.innerText = 'Verified';
+        status.classList.remove('status-missing');
+        status.classList.add('status-uploaded');
+
+        fileView.innerText = isReplace ? filename.replace(/(\.[^.]+)$/, ' (v2)$1') : filename;
+        fileView.style.display = 'inline-block';
+
+        btn.innerHTML = 'Replace File';
+        btn.disabled = false;
+
+        if (!isReplace) {
+          uploadedCount++;
+          updateProgress();
+        }
+      }, 1000);
+    }
+
+    /* ── Progress ── */
+    function updateProgress() {
+      document.getElementById('completion-counter').innerText = `${uploadedCount} / ${totalDocs}`;
+      document.getElementById('completion-bar').style.width = ((uploadedCount / totalDocs) * 100) + '%';
+
+      // Show declaration footer after 4+ uploads
+      const footer = document.getElementById('main-footer');
+      if (uploadedCount >= 4 && !footer.classList.contains('visible')) {
+        footer.classList.add('visible');
+        showToast('Declaration footer unlocked — confirm and submit when ready.');
+      }
+
+      const pendingCount = Array.from(sections).filter(s => s.querySelectorAll('.status-missing').length > 0).length;
+      const pendingEl = document.getElementById('pending-text');
+      if (uploadedCount === totalDocs) {
+        pendingEl.innerText = 'All sections verified ✓';
+        pendingEl.style.color = 'var(--success)';
+        pendingEl.style.fontWeight = '600';
       } else {
-        nextBtn.innerHTML = 'Next Section';
-        nextBtn.className = 'btn btn-primary';
-      }
-
-      // Notify Audit Manager dashboard
-      if (window.opener && !window.opener.closed) {
-        window.opener.postMessage({ type: "step_updated", step: currentStep }, "*");
+        pendingEl.innerText = `${pendingCount} section${pendingCount !== 1 ? 's' : ''} pending review`;
+        pendingEl.style.color = 'var(--text-muted)';
+        pendingEl.style.fontWeight = '400';
       }
     }
 
-    function changeStep(dir) {
-      const newStep = currentStep + dir;
-      if (newStep > totalSteps) {
-        finishIngestion();
-      } else {
-        goToStep(newStep);
+    /* ── Toggle submit ── */
+    function toggleSubmit() {
+      const checked = document.getElementById('declare-check').checked;
+      document.getElementById('submit-btn').disabled = !checked;
+    }
+
+    /* ── finishIngestion: open 3-step modal ── */
+    function finishIngestion() {
+      // Populate step-1 summary
+      document.getElementById('ms-docs-count').innerText = `${uploadedCount} / ${totalDocs}`;
+      // Reset to step 1 clean
+      toStep(1);
+      document.getElementById('approve-modal').classList.add('open');
+    }
+
+    /* ── Modal helpers ── */
+    function closeModal() {
+      document.getElementById('approve-modal').classList.remove('open');
+    }
+
+    function toStep(step) {
+      [1, 2, 3].forEach(n => {
+        const body   = document.getElementById('ms-' + n);
+        const circle = document.getElementById('mc-' + n);
+        const label  = document.getElementById('ml-' + n);
+
+        body.style.display = 'none';
+        circle.classList.remove('active', 'done');
+        label.classList.remove('active', 'done');
+
+        if (n < step)  { circle.classList.add('done');   label.classList.add('done');   circle.textContent = '✓'; }
+        if (n === step){ circle.classList.add('active');  label.classList.add('active'); circle.textContent = n;   }
+        if (n > step)  { circle.textContent = n; }
+      });
+
+      document.getElementById('ms-' + step).style.display = 'block';
+
+      if (step === 3) {
+        document.getElementById('ms-sig').value = '';
+        document.getElementById('btn-authorize').disabled = true;
       }
     }
 
-    function updateTimerDisplay(step) {
-      // Intentionally left empty as the submission deadline should be completely fixed
-      // and not change based on user interactions/steps navigated.
+    /* ── E-sig validation ── */
+    function checkSig() {
+      const val = document.getElementById('ms-sig').value.trim();
+      document.getElementById('btn-authorize').disabled = val.length < 3;
     }
 
-    function showToast(message) {
+    /* ── Authorize & Send → show success overlay then redirect to dashboard ── */
+    function authorizeAndSend() {
+      // Hide the main portal content immediately for a "clean" departure
+      const portalContent = document.querySelector('.portal-container');
+      const nav = document.querySelector('nav');
+      if (portalContent) portalContent.style.opacity = '0';
+      if (nav) nav.style.opacity = '0';
+
+      // Show cinematic success overlay
+      const overlay = document.getElementById('success-overlay');
+      if (overlay) {
+        overlay.style.display = 'flex';
+        overlay.style.opacity = '1';
+        overlay.style.zIndex = '9999';
+      }
+
+      // Simulate secure transmission and encryption
+      setTimeout(() => {
+        // Redirect to dashboard with a specific flag
+        window.location.replace('dashboard.html?flow=documents_submitted');
+      }, 3500);
+    }
+
+    /* ── Toast ── */
+    function showToast(msg) {
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
       toast.className = 'toast';
       toast.innerHTML = `
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="12" y1="8" x2="12" y2="12"></line>
-          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
         </svg>
-        <div>${message}</div>
-      `;
+        <span>${msg}</span>`;
       container.appendChild(toast);
-      
-      setTimeout(() => {
-        toast.style.animation = 'fadeOutDown 0.3s ease forwards';
-        setTimeout(() => toast.remove(), 300);
-      }, 5000);
+      setTimeout(() => toast.remove(), 5000);
     }
 
-    window.addEventListener("message", (event) => {
-      if (typeof event.data === 'object' && event.data.type === "ping_client_advanced") {
-        document.getElementById('global-ping-msg').innerHTML = `Kindly finish the document upload process. You only have <strong>${event.data.days}</strong> to avoid delays in compliance.`;
+    /* ── Ping listener (from parent dashboard) ── */
+    window.addEventListener('message', e => {
+      if (typeof e.data === 'object' && e.data.type === 'ping_client_advanced') {
+        document.getElementById('global-ping-msg').innerHTML =
+          `Kindly finish the document upload process. You only have <strong>${e.data.days}</strong> to avoid delays in compliance.`;
         document.getElementById('global-ping-alert').style.display = 'block';
-      } else if (event.data === "ping_client") {
+      } else if (e.data === 'ping_client') {
         document.getElementById('global-ping-msg').innerHTML = 'Please hurry up and finish the document upload process.';
         document.getElementById('global-ping-alert').style.display = 'block';
       }
     });
-
-    function simulateUpload(card) {
-      if (card.classList.contains('uploaded')) return;
-      
-      const originalText = card.querySelector('p').innerText;
-      card.querySelector('p').innerHTML = `<span style="color:var(--primary); font-weight:600;">Uploading...</span>`;
-      
-      setTimeout(() => {
-        card.classList.add('uploaded');
-        card.querySelector('p').innerText = 'Verified & Secured';
-      }, 800);
-    }
-
-    function finishIngestion() {
-      const btn = document.getElementById('btn-next');
-      btn.innerHTML = `<span class="spinner" style="width:14px;height:14px;border-top-color:white;border-width:2px;border-color:rgba(255,255,255,0.3);margin-right:6px"></span> Submitting...`;
-      
-      // Hide timer on completion
-      document.getElementById('timer-widget').style.display = 'none';
-
-      setTimeout(() => {
-        document.getElementById('success-overlay').classList.remove('hidden');
-
-        // Close the portal and notify the dashboard
-        setTimeout(() => {
-          if (window.opener && !window.opener.closed) {
-            window.opener.postMessage("data_ingestion_complete", "*");
-            window.close();
-          } else {
-            window.location.href = "dashboard.html?data=received";
-          }
-        }, 3500);
-
-      }, 1200);
-    }
   </script>
 </body>
 </html>
-
-

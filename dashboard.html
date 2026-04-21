@@ -9,6 +9,117 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    /* Commenting System Styles */
+    .comment-popover {
+      position: absolute;
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      padding: 12px;
+      z-index: 5000;
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      width: 250px;
+    }
+
+    .comment-popover textarea {
+      width: 100%;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 8px;
+      font-size: 13px;
+      resize: none;
+      outline: none;
+    }
+
+    .comment-popover .popover-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .comment-popover .popover-btn {
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 4px;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-add-comment {
+      background: var(--primary);
+      color: white;
+    }
+
+    .comment-highlight {
+      background-color: rgba(255, 245, 157, 0.6);
+      border-bottom: 2px solid #fbc02d;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .comment-highlight:hover {
+      background-color: rgba(255, 245, 157, 0.9);
+    }
+
+    .comment-card-item {
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 12px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .comment-card-item:hover {
+        background: #f8fafc;
+        border-color: #2563eb;
+    }
+
+    /* Read-only controls for Manager and Client */
+    #manager-review-proposal-display .section-add-comment-btn,
+    #client-proposal-display .section-add-comment-btn {
+        display: none !important;
+    }
+
+    #manager-review-proposal-display .section-comment-indicator,
+    #client-proposal-display .section-comment-indicator {
+        pointer-events: none;
+        box-shadow: none;
+        border-color: #e9d5ff;
+    }
+
+    #manager-review-proposal-display [contenteditable="true"],
+    #client-proposal-display [contenteditable="true"] {
+        pointer-events: none;
+        user-select: text;
+    }
+
+    .comment-card-item .selected-text-preview {
+      font-style: italic;
+      color: var(--text-secondary);
+      border-left: 2px solid var(--border-color);
+      padding-left: 8px;
+      margin-bottom: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .proposal-content-area {
+      position: relative;
+    }
+
+    [contenteditable="true"]:focus {
+      outline: none;
+      background: #fcfcfc;
+    }
+
     :root {
       --bg-body: #f8fafc;
       --bg-surface: #ffffff;
@@ -86,6 +197,11 @@
       justify-content: center;
       z-index: 100;
       backdrop-filter: blur(4px);
+    }
+
+    #intro-overlay {
+      background: #ffffff;
+      backdrop-filter: none;
     }
 
     .modal-card {
@@ -259,62 +375,143 @@
 
     /* --- Cinematic Overlays (Global) --- */
     @keyframes pulse-glow {
-      0%, 100% { opacity: 0.15; transform: scale(1); }
-      50% { opacity: 0.7; transform: scale(1.02); }
+
+      0%,
+      100% {
+        opacity: 0.15;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.7;
+        transform: scale(1.02);
+      }
     }
+
     .cinematic-overlay {
-      position: fixed; inset: 0; display: none;
-      flex-direction: column; align-items: center; justify-content: center;
-      padding: 40px; opacity: 0; pointer-events: none; transition: opacity 0.8s ease;
+      position: fixed;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.8s ease;
       background: radial-gradient(circle at center, #0B1120 0%, #000000 80%);
       font-family: 'Inter', system-ui, sans-serif;
     }
-    .cinematic-overlay.show, .cinematic-overlay.fade-in {
-      opacity: 1; pointer-events: all;
+
+    .cinematic-overlay.show,
+    .cinematic-overlay.fade-in {
+      opacity: 1;
+      pointer-events: all;
     }
+
     .cinematic-brand {
-      display: flex; align-items: center; gap: 12px; margin-bottom: 70px; opacity: 0.4;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 70px;
+      opacity: 0.4;
     }
+
     .cinematic-brand div {
-      width: 32px; height: 32px; background: rgba(255,255,255,0.05); border-radius: 8px; display: grid; place-items: center;
-      border: 1px solid rgba(255,255,255,0.1);
+      width: 32px;
+      height: 32px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
+
     .cinematic-brand span {
-      font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.6); letter-spacing: 3.5px; text-transform: uppercase;
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.6);
+      letter-spacing: 3.5px;
+      text-transform: uppercase;
     }
+
     .cinematic-badge {
-      display: inline-flex; align-items: center; gap: 12px;
-      border-radius: 50px; padding: 6px 20px 6px 6px; margin-bottom: 36px;
-      opacity: 0; transform: translateY(10px);
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      border-radius: 50px;
+      padding: 6px 20px 6px 6px;
+      margin-bottom: 36px;
+      opacity: 0;
+      transform: translateY(10px);
       transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-      backdrop-filter: blur(10px); border: 1px solid transparent;
+      backdrop-filter: blur(10px);
+      border: 1px solid transparent;
     }
+
     .cinematic-badge-icon {
-      width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
     }
+
     .cinematic-badge span {
-      font-size: 13px; font-weight: 500; letter-spacing: 0.5px;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
     }
+
     .cinematic-text-main {
-      font-size: 26px; font-weight: 300; color: rgba(255,255,255,0.95); line-height: 1.6;
-      letter-spacing: -0.2px; min-height: 90px; text-shadow: 0 0 40px rgba(255,255,255,0.15);
+      font-size: 26px;
+      font-weight: 300;
+      color: rgba(255, 255, 255, 0.95);
+      line-height: 1.6;
+      letter-spacing: -0.2px;
+      min-height: 90px;
+      text-shadow: 0 0 40px rgba(255, 255, 255, 0.15);
     }
+
     .cinematic-text-sub {
-      font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.4);
-      letter-spacing: 2.5px; text-transform: uppercase; opacity: 0; transition: opacity 0.8s ease;
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.4);
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      opacity: 0;
+      transition: opacity 0.8s ease;
     }
+
     .cinematic-progress-container {
-      margin-top: 64px; width: 260px; height: 2px; background: rgba(255,255,255,0.05);
-      border-radius: 2px; overflow: hidden; position: relative; box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
+      margin-top: 64px;
+      width: 260px;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 2px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
     }
+
     .cinematic-progress-bar {
-      height: 100%; width: 0%; background: #ffffff; transition: width 5s cubic-bezier(0.25, 1, 0.5, 1);
-      box-shadow: 0 0 10px rgba(255,255,255,0.8);
+      height: 100%;
+      width: 0%;
+      background: #ffffff;
+      transition: width 5s cubic-bezier(0.25, 1, 0.5, 1);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
     }
+
     .cinematic-click-hint {
-      margin-top: 60px; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.3);
-      letter-spacing: 3px; text-transform: uppercase; opacity: 0;
-      transition: opacity 0.8s ease; animation: pulse-glow 3s infinite ease-in-out;
+      margin-top: 60px;
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.3);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      opacity: 0;
+      transition: opacity 0.8s ease;
+      animation: pulse-glow 3s infinite ease-in-out;
     }
 
     /* --- Client KYC Step Dots --- */
@@ -331,8 +528,67 @@
       transition: 0.3s;
     }
 
-    .step-dot.active {
-      background: var(--primary);
+    .comment-highlight {
+      background-color: rgba(255, 245, 157, 0.6);
+      border-bottom: 2px solid #f59e0b;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+    .comment-highlight:hover {
+      background-color: rgba(255, 235, 59, 0.8);
+    }
+    .section-comment-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: #eff6ff;
+      color: #2563eb;
+      border: 1px solid #dbeafe;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .section-comment-indicator:hover {
+      background: #dbeafe;
+    }
+    .comment-section-wrapper {
+      position: relative;
+      padding: 12px;
+      margin: -12px;
+      border: 1px solid transparent;
+      border-radius: 12px;
+      transition: all 0.2s;
+    }
+    .comment-section-wrapper:hover {
+      border-color: rgba(37, 99, 235, 0.1);
+      background: rgba(248, 250, 252, 0.4);
+    }
+    .section-add-comment-btn {
+      position: absolute;
+      right: 12px;
+      top: 12px;
+      opacity: 0;
+      transition: all 0.2s;
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      z-index: 10;
+    }
+    .comment-section-wrapper:hover .section-add-comment-btn {
+      opacity: 1;
     }
 
     /* --- Dashboard --- */
@@ -384,6 +640,47 @@
       color: #94a3b8;
       margin: 0 0 12px 12px;
       letter-spacing: 0.5px;
+    }
+
+    /* Pulse Glow Animation */
+    @keyframes pulse-glow {
+      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); transform: scale(1); }
+      70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); transform: scale(1.1); }
+      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); transform: scale(1); }
+    }
+
+    /* Toast Styles */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #1e293b;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 10000;
+      transform: translateY(100px);
+      transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .toast.show {
+      transform: translateY(0);
+    }
+    .toast-icon {
+      width: 24px;
+      height: 24px;
+      background: #10b981;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
     }
 
     .nav-item {
@@ -812,9 +1109,10 @@
     }
 
     .client-container {
-      max-width: 1200px;
+      max-width: 1600px;
+      width: 100%;
       margin: 40px auto;
-      padding: 0 20px;
+      padding: 0 40px;
     }
 
     .client-card {
@@ -855,6 +1153,33 @@
 
 <body>
 
+  <!-- Synchronous redirect blocker: hides lead-capture overlay instantly when returning from client portal -->
+  <script>
+    (function() {
+      var params = new URLSearchParams(window.location.search);
+      var flow = params.get('flow');
+      var data = params.get('data');
+      if (flow === 'documents_submitted' || data === 'received') {
+        // Inject CSS before any element paints
+        var style = document.createElement('style');
+        style.id = 'portal-return-blocker';
+        style.textContent = [
+          '#intro-overlay { display: none !important; }',
+          '.overlay-container { display: none !important; }',
+          '.cinematic-overlay { display: none !important; }',
+          '#interstitial { display: none !important; }',
+          '#client-reject-overlay { display: none !important; }',
+          '#delivery-overlay { display: none !important; }',
+          '#onboarding-dispatch-overlay { display: none !important; }',
+          '#manager-review-overlay { display: none !important; }',
+          '#client-handover-overlay { display: none !important; }',
+          '#dashboard { display: grid !important; opacity: 1 !important; }'
+        ].join(' ');
+        document.head.appendChild(style);
+      }
+    })();
+  </script>
+
   <!-- Phase 1: Lead Intake Overlay -->
   <div id="intro-overlay" class="overlay-container">
     <div class="modal-card">
@@ -886,15 +1211,19 @@
     <!-- Branding -->
     <div class="cinematic-brand">
       <div>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+        </svg>
       </div>
       <span>Audit Offshore &mdash; Secure Workflow</span>
     </div>
 
     <!-- Status badge -->
-    <div id="interstitial-badge" class="cinematic-badge" style="background: rgba(37,99,235,0.1); border-color: rgba(37,99,235,0.3);">
+    <div id="interstitial-badge" class="cinematic-badge"
+      style="background: rgba(37,99,235,0.1); border-color: rgba(37,99,235,0.3);">
       <div class="cinematic-badge-icon" style="background: rgba(37,99,235,0.2);">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
           <polyline points="20 6 9 17 4 12"></polyline>
         </svg>
       </div>
@@ -998,15 +1327,21 @@
     <!-- Branding line -->
     <div class="cinematic-brand">
       <div>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+        </svg>
       </div>
       <span>Audit Offshore &mdash; Secure Workflow</span>
     </div>
 
     <!-- Status badge: KYC Verified -->
-    <div id="kyc-badge" class="cinematic-badge" style="background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.3);">
+    <div id="kyc-badge" class="cinematic-badge"
+      style="background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.3);">
       <div class="cinematic-badge-icon" style="background: rgba(16,185,129,0.2);">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="3"
+          stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
       </div>
       <span style="color: #10b981;">KYC &amp; CDD Submission Complete</span>
     </div>
@@ -1035,16 +1370,22 @@
     <!-- Branding -->
     <div class="cinematic-brand">
       <div>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+        </svg>
       </div>
       <span>Audit Offshore &mdash; Secure Workflow</span>
     </div>
 
     <!-- Status badge -->
-    <div id="partner-badge" class="cinematic-badge" style="background: rgba(147,51,234,0.1); border-color: rgba(147,51,234,0.3);">
+    <div id="partner-badge" class="cinematic-badge"
+      style="background: rgba(147,51,234,0.1); border-color: rgba(147,51,234,0.3);">
       <div class="cinematic-badge-icon" style="background: rgba(147,51,234,0.2);">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><polyline points="16 11 18 13 22 9"></polyline>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <polyline points="16 11 18 13 22 9"></polyline>
         </svg>
       </div>
       <span style="color: #a855f7;">Automated Analysis Complete</span>
@@ -1074,15 +1415,19 @@
     <!-- Branding -->
     <div class="cinematic-brand">
       <div>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+        </svg>
       </div>
       <span>Audit Offshore &mdash; Secure Workflow</span>
     </div>
 
     <!-- Status badge -->
-    <div id="manager-handover-badge" class="cinematic-badge" style="background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.3);">
+    <div id="manager-handover-badge" class="cinematic-badge"
+      style="background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.3);">
       <div class="cinematic-badge-icon" style="background: rgba(34,197,94,0.2);">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
           <polyline points="20 6 9 17 4 12"></polyline>
         </svg>
       </div>
@@ -1121,7 +1466,8 @@
       </div>
       <h2 style="font-size: 22px; font-weight: 700; color: #0f172a; margin-bottom: 12px;">Link Sent Successfully</h2>
       <p style="font-size: 15px; color: #475569; line-height: 1.6; margin-bottom: 32px;">
-        The production onboarding link has been securely dispatched to the client. The client will now be directed to the Data Ingestion portal to upload financial documents.
+        The production onboarding link has been securely dispatched to the client. The client will now be directed to
+        the Data Ingestion portal to upload financial documents.
       </p>
       <div
         style="display: flex; align-items: center; justify-content: center; gap: 12px; color: #059669; font-weight: 600; font-size: 14px;">
@@ -1129,6 +1475,46 @@
         Opening Client Portal...
       </div>
     </div>
+  </div>
+
+  <!-- Phase 7: Data Ingestion Complete Overlay -->
+  <div id="ingestion-success-overlay" class="cinematic-overlay hidden" style="z-index: 9500; display: none;">
+    <div class="cinematic-brand">
+      <div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+        </svg>
+      </div>
+      <span>Audit Offshore &mdash; Secure Workflow</span>
+    </div>
+
+    <!-- Status badge -->
+    <div id="ingestion-badge" class="cinematic-badge"
+      style="background: rgba(37,99,235,0.1); border-color: rgba(37,99,235,0.3);">
+      <div class="cinematic-badge-icon" style="background: rgba(37,99,235,0.2);">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="17 8 12 3 7 8"></polyline>
+          <line x1="12" y1="3" x2="12" y2="15"></line>
+        </svg>
+      </div>
+      <span style="color: #3b82f6;">Data Ingestion Complete</span>
+    </div>
+
+    <div style="max-width:640px; text-align:center; margin-bottom:24px;">
+      <p id="ingestion-cinematic-text" class="cinematic-text-main"></p>
+    </div>
+
+    <div style="max-width:440px; text-align:center; min-height:28px;">
+      <p id="ingestion-cinematic-text-2" class="cinematic-text-sub"></p>
+    </div>
+
+    <div class="cinematic-progress-container">
+      <div id="ingestion-progress-bar" class="cinematic-progress-bar"></div>
+    </div>
+
+    <div id="ingestion-click-hint" class="cinematic-click-hint">Click anywhere to continue &rsaquo;</div>
   </div>
 
   <!-- Phase 3: Dashboard Overview -->
@@ -1142,19 +1528,20 @@
       </div>
       <div class="nav-menu">
         <div class="nav-label">Main Menu</div>
-        <div class="nav-item" onclick="switchDashboardView('overview', this)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2">
+        <div class="nav-item" onclick="switchDashboardView('overview', this)"><svg width="18" height="18"
+            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="3" y="3" width="7" height="7"></rect>
             <rect x="14" y="3" width="7" height="7"></rect>
             <rect x="14" y="14" width="7" height="7"></rect>
             <rect x="3" y="14" width="7" height="7"></rect>
           </svg>Overview</div>
-        <div class="nav-item active" id="nav-lead-ops" onclick="switchDashboardView('view-lead-ops', this)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2">
+        <div class="nav-item active" id="nav-lead-ops" onclick="switchDashboardView('view-lead-ops', this)"><svg
+            width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
             <circle cx="9" cy="7" r="4"></circle>
           </svg>Lead Operations</div>
-        <div class="nav-item" id="nav-doc-upload" onclick="switchDashboardView('view-doc-upload', this)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <div class="nav-item" id="nav-doc-upload" onclick="switchDashboardView('view-doc-upload', this)"><svg width="18"
+            height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
             <polyline points="14 2 14 8 20 8"></polyline>
             <line x1="16" y1="13" x2="8" y2="13"></line>
@@ -1221,12 +1608,16 @@
                   </div>
                 </td>
                 <td>
-                   <button class="btn" style="width:auto; padding:6px 14px; margin:0; font-size:12px; background:#10b981; display:flex; align-items:center; gap:6px; border-radius:16px; min-height:0; font-weight:600;" onclick="runAIAnalysis(event)">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
-                      </svg>
-                      Generate Audit Strategy
-                   </button>
+                  <button class="btn"
+                    style="width:auto; padding:6px 14px; margin:0; font-size:12px; background:#10b981; display:flex; align-items:center; gap:6px; border-radius:16px; min-height:0; font-weight:600;"
+                    onclick="runAIAnalysis(event)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path
+                        d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83">
+                      </path>
+                    </svg>
+                    Generate Audit Strategy
+                  </button>
                 </td>
               </tr>
               <tr>
@@ -1256,7 +1647,9 @@
                     <div style="width:16px; height:6px; background:#e2e8f0; border-radius:3px;"></div>
                   </div>
                 </td>
-                <td><button class="btn" style="opacity:0.6; pointer-events:none; font-size:11px; padding:6px 12px; border-radius:16px; min-height:0;">Awaiting KYC</button></td>
+                <td><button class="btn"
+                    style="opacity:0.6; pointer-events:none; font-size:11px; padding:6px 12px; border-radius:16px; min-height:0;">Awaiting
+                    KYC</button></td>
               </tr>
               <tr>
                 <td>
@@ -1275,7 +1668,7 @@
                   </span>
                 </td>
                 <td>
-                   <div style="display:flex; gap:4px; opacity:0.3;">
+                  <div style="display:flex; gap:4px; opacity:0.3;">
                     <div style="width:16px; height:6px; background:#10b981; border-radius:3px;"></div>
                     <div style="width:16px; height:6px; background:#10b981; border-radius:3px;"></div>
                     <div style="width:16px; height:6px; background:#e2e8f0; border-radius:3px;"></div>
@@ -1286,9 +1679,11 @@
                   </div>
                 </td>
                 <td>
-                   <button class="btn" style="width:auto; padding:6px 14px; margin:0; font-size:12px; background:#10b981; display:flex; align-items:center; gap:6px; border-radius:16px; min-height:0; font-weight:600;" onclick="alert('Starting Audit Strategy for Veritas Health...')">
-                      Generate Audit Strategy
-                   </button>
+                  <button class="btn"
+                    style="width:auto; padding:6px 14px; margin:0; font-size:12px; background:#10b981; display:flex; align-items:center; gap:6px; border-radius:16px; min-height:0; font-weight:600;"
+                    onclick="alert('Starting Audit Strategy for Veritas Health...')">
+                    Generate Audit Strategy
+                  </button>
                 </td>
               </tr>
               <tr>
@@ -1308,7 +1703,7 @@
                   </span>
                 </td>
                 <td>
-                   <div style="display:flex; gap:4px; opacity:0.3;">
+                  <div style="display:flex; gap:4px; opacity:0.3;">
                     <div style="width:16px; height:6px; background:#10b981; border-radius:3px;"></div>
                     <div style="width:16px; height:6px; background:#10b981; border-radius:3px;"></div>
                     <div style="width:16px; height:6px; background:#e2e8f0; border-radius:3px;"></div>
@@ -1319,9 +1714,11 @@
                   </div>
                 </td>
                 <td>
-                   <button class="btn" style="width:auto; padding:6px 14px; margin:0; font-size:12px; background:#10b981; display:flex; align-items:center; gap:6px; border-radius:16px; min-height:0; font-weight:600;" onclick="alert('Starting Audit Strategy for Meridian Energy...')">
-                      Generate Audit Strategy
-                   </button>
+                  <button class="btn"
+                    style="width:auto; padding:6px 14px; margin:0; font-size:12px; background:#10b981; display:flex; align-items:center; gap:6px; border-radius:16px; min-height:0; font-weight:600;"
+                    onclick="alert('Starting Audit Strategy for Meridian Energy...')">
+                    Generate Audit Strategy
+                  </button>
                 </td>
               </tr>
             </tbody>
@@ -1361,7 +1758,8 @@
                 <td>Audit Offshore Ltd.</td>
                 <td style="width: 300px;">
                   <div style="display:flex; flex-direction:column; gap:6px;">
-                    <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:600; color:#475569;">
+                    <div
+                      style="display:flex; justify-content:space-between; font-size:12px; font-weight:600; color:#475569;">
                       <span id="progress-label-1">Section 4/6 Viewed</span>
                       <span id="progress-percent-1" style="color:#059669;">66%</span>
                     </div>
@@ -1373,17 +1771,23 @@
                       <div style="flex:1; height:6px; background:#e2e8f0; border-radius:3px;"></div>
                       <div style="flex:1; height:6px; background:#e2e8f0; border-radius:3px;"></div>
                     </div>
-                    <div id="progress-name-1" style="font-size:11px; color:#475569; margin-top:2px;">Currently uploading: <strong>Supporting Schedules</strong></div>
+                    <div id="progress-name-1" style="font-size:11px; color:#475569; margin-top:2px;">Currently
+                      uploading: <strong>Supporting Schedules</strong></div>
                   </div>
                 </td>
                 <td>
                   <div style="display:flex; flex-direction:column; gap:4px;">
-                    <span style="color:#2563eb; background:#eff6ff; padding:4px 10px; border-radius:16px; font-weight:600; font-size:12px; display:inline-flex; align-items:center; gap:6px; border:1px solid #bfdbfe; width:fit-content;">
-                      <div class="spinner" style="width:8px; height:8px; border-width:2px; border-top-color:#2563eb; border-color:rgba(37,99,235,0.2);"></div>
+                    <span
+                      style="color:#2563eb; background:#eff6ff; padding:4px 10px; border-radius:16px; font-weight:600; font-size:12px; display:inline-flex; align-items:center; gap:6px; border:1px solid #bfdbfe; width:fit-content;">
+                      <div class="spinner"
+                        style="width:8px; height:8px; border-width:2px; border-top-color:#2563eb; border-color:rgba(37,99,235,0.2);">
+                      </div>
                       Validating Revenue & Tax
                     </span>
                     <span style="font-size:12px; color:#64748b; display:flex; align-items:center; gap:4px;">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
                       Banking & Treasury matched to GL
                     </span>
                   </div>
@@ -1391,11 +1795,20 @@
                 <td id="deadlineCell1">
                   <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
                     <div style="display:flex; align-items:center; gap:6px;">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                      </svg>
                       <span id="timer-row1" style="font-size:15px; font-weight:700; color:#ea580c;">2 Days Left</span>
                     </div>
-                    <button onclick="pingClient('row1')" style="display:inline-flex; align-items:center; gap:5px; background:#fef3c7; color:#92400e; border:1px solid #fde68a; border-radius:20px; padding:5px 12px; font-size:11px; font-weight:600; cursor:pointer; transition:all 0.2s;" onmouseover="this.style.background='#fde68a'" onmouseout="this.style.background='#fef3c7'">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                    <button onclick="pingClient('row1')"
+                      style="display:inline-flex; align-items:center; gap:5px; background:#fef3c7; color:#92400e; border:1px solid #fde68a; border-radius:20px; padding:5px 12px; font-size:11px; font-weight:600; cursor:pointer; transition:all 0.2s;"
+                      onmouseover="this.style.background='#fde68a'" onmouseout="this.style.background='#fef3c7'">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                      </svg>
                       Ping Client
                     </button>
                   </div>
@@ -1412,7 +1825,8 @@
                 <td>Nexus Global Tech, LLC</td>
                 <td style="width: 300px;">
                   <div style="display:flex; flex-direction:column; gap:6px;">
-                    <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:600; color:#475569;">
+                    <div
+                      style="display:flex; justify-content:space-between; font-size:12px; font-weight:600; color:#475569;">
                       <span>Step 1/6 Completed</span>
                       <span style="color:#2563eb;">16%</span>
                     </div>
@@ -1424,12 +1838,14 @@
                       <div style="flex:1; height:6px; background:#e2e8f0; border-radius:3px;"></div>
                       <div style="flex:1; height:6px; background:#e2e8f0; border-radius:3px;"></div>
                     </div>
-                    <div style="font-size:11px; color:#475569; margin-top:2px;">Currently uploading: <strong>Core Financial Data</strong></div>
+                    <div style="font-size:11px; color:#475569; margin-top:2px;">Currently uploading: <strong>Core
+                        Financial Data</strong></div>
                   </div>
                 </td>
                 <td>
                   <div style="display:flex; flex-direction:column; gap:4px;">
-                    <span style="color:#ca8a04; background:#fefce8; padding:4px 10px; border-radius:16px; font-weight:600; font-size:12px; display:inline-flex; align-items:center; gap:6px; border:1px solid #fef08a; width:fit-content;">
+                    <span
+                      style="color:#ca8a04; background:#fefce8; padding:4px 10px; border-radius:16px; font-weight:600; font-size:12px; display:inline-flex; align-items:center; gap:6px; border:1px solid #fef08a; width:fit-content;">
                       <div style="width:6px;height:6px;background:#eab308;border-radius:50%"></div>
                       Waiting for Trial Balance
                     </span>
@@ -1438,11 +1854,20 @@
                 <td id="deadlineCell2">
                   <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
                     <div style="display:flex; align-items:center; gap:6px;">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                      </svg>
                       <span id="timer-row2" style="font-size:15px; font-weight:700; color:#d97706;">5 Days Left</span>
                     </div>
-                    <button onclick="pingClient('row2')" style="display:inline-flex; align-items:center; gap:5px; background:#fef3c7; color:#92400e; border:1px solid #fde68a; border-radius:20px; padding:5px 12px; font-size:11px; font-weight:600; cursor:pointer; transition:all 0.2s;" onmouseover="this.style.background='#fde68a'" onmouseout="this.style.background='#fef3c7'">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                    <button onclick="pingClient('row2')"
+                      style="display:inline-flex; align-items:center; gap:5px; background:#fef3c7; color:#92400e; border:1px solid #fde68a; border-radius:20px; padding:5px 12px; font-size:11px; font-weight:600; cursor:pointer; transition:all 0.2s;"
+                      onmouseover="this.style.background='#fde68a'" onmouseout="this.style.background='#fef3c7'">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                      </svg>
                       Ping Client
                     </button>
                   </div>
@@ -1568,7 +1993,8 @@
       </div>
 
       <!-- Dynamic Action Footer -->
-      <div id="side-panel-footer" style="margin-top:32px; padding-top:24px; border-top:1px solid #e2e8f0; text-align:center;">
+      <div id="side-panel-footer"
+        style="margin-top:32px; padding-top:24px; border-top:1px solid #e2e8f0; text-align:center;">
         <button id="side-panel-ai-btn" class="btn"
           style="background:#2563eb; display:inline-flex; width:auto; border-radius: 20px; padding: 12px 24px; box-shadow: 0 4px 6px -1px rgba(37,99,235,0.2);"
           onclick="runAIAnalysis()">
@@ -1584,7 +2010,8 @@
         <button id="side-panel-send-link-btn" class="btn"
           style="display:none; background:#059669; width:auto; border-radius: 20px; padding: 12px 24px; box-shadow: 0 4px 6px -1px rgba(5,150,105,0.2);"
           onclick="sendOnboardingLink()">
-          <svg style="margin-right:8px" width="16" height="16" stroke="white" stroke-width="2" viewBox="0 0 24 24" fill="none">
+          <svg style="margin-right:8px" width="16" height="16" stroke="white" stroke-width="2" viewBox="0 0 24 24"
+            fill="none">
             <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
             <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
           </svg>
@@ -1643,7 +2070,8 @@
           <div class="ai-spin-box" id="ai-icon-2"><span class="spinner"
               style="display:block; border-color:rgba(37,99,235,0.2); border-top-color:#2563eb;"></span></div>
           <div>
-            <h4 style="font-size:14px; font-weight:600; color:#0f172a; margin-bottom:4px;">Complexity & Scope Analysis</h4>
+            <h4 style="font-size:14px; font-weight:600; color:#0f172a; margin-bottom:4px;">Complexity & Scope Analysis
+            </h4>
             <p id="ai-text-2" style="font-size:13px; color:#475569; line-height:1.6; font-family:monospace;">Waiting for
               classification handoff...</p>
           </div>
@@ -1738,38 +2166,33 @@
     }
 
     async function executeFlow() {
-      // 1. Initial Intake Form Proceed (triggered by button)
+      // Immediately fade out the lead form on click — zero artificial delay
       const intro = document.getElementById('intro-overlay');
       const btn = document.getElementById('submitBtn');
 
       btn.classList.add('loading');
       btn.disabled = true;
 
-      await new Promise(r => setTimeout(r, 800));
+      // Fade out intro instantly
       intro.classList.add('fade-out');
 
-
-      // 2. Cinematic black interstitial
+      // Show cinematic black interstitial after CSS fade-out (~300ms)
       setTimeout(() => {
         intro.style.display = 'none';
         const interstitial = document.getElementById('interstitial');
         interstitial.style.display = 'flex';
         interstitial.classList.add('show');
 
-        // Reveal badge
-        setTimeout(() => {
-          const badge = document.getElementById('interstitial-badge');
-          badge.style.opacity = '1';
-          badge.style.transform = 'translateY(0)';
-        }, 400);
+        // Reveal badge immediately
+        const badge = document.getElementById('interstitial-badge');
+        badge.style.opacity = '1';
+        badge.style.transform = 'translateY(0)';
 
-        // Start progress bar
-        setTimeout(() => {
-          document.getElementById('interstitial-progress').style.width = '100%';
-        }, 150);
+        // Start progress bar immediately
+        document.getElementById('interstitial-progress').style.width = '100%';
 
         // Typewriter Line 1
-        const msg1 = `The system is now automatically sending an encrypted link for the Secure KYC and CDD submission forms directly to the client’s email and WhatsApp.`;
+        const msg1 = `The system is now automatically sending an encrypted link for the Secure KYC and CDD submission forms directly to the client's email and WhatsApp.`;
         const el1 = document.getElementById('interstitial-text');
         el1.textContent = '';
         let i = 0;
@@ -1778,7 +2201,6 @@
           el1.textContent += msg1[i++];
           if (i >= msg1.length) {
             clearInterval(type1);
-            // Typewriter Line 2
             setTimeout(() => {
               const el2 = document.getElementById('interstitial-text-2');
               el2.style.opacity = '1';
@@ -1788,19 +2210,17 @@
                 el2.textContent += msg2[j++];
                 if (j >= msg2.length) {
                   clearInterval(type2);
-                  // Show click hint and enable click
                   setTimeout(() => {
                     document.getElementById('interstitial-click-hint').style.opacity = '1';
                     interstitial.style.cursor = 'pointer';
                     clickReady = true;
-                  }, 400);
+                  }, 200);
                 }
               }, 45);
-            }, 600);
+            }, 300);
           }
         }, 24);
 
-        // Persistent click handler — only fires when ready, then removes itself
         const advanceToKYC = () => {
           if (!clickReady) return;
           interstitial.removeEventListener('click', advanceToKYC);
@@ -1809,12 +2229,11 @@
           setTimeout(() => {
             interstitial.style.display = 'none';
             runClientKYC();
-          }, 700);
+          }, 400);
         };
         interstitial.addEventListener('click', advanceToKYC);
 
-
-      }, 500);
+      }, 300);
     }
 
     async function runClientKYC() {
@@ -2323,29 +2742,65 @@
       document.getElementById('pc-complexity-req').innerText = currentReqStr;
       document.getElementById('pc-complexity-score').innerHTML = `${currentScoreStr}<span style="font-size:14px; color:#64748b;">/10</span>`;
 
-      // Initialize inline proposal text
-      const fullProposalText = `PROPOSAL: AUDIT ENGAGEMENT
-----------------------------
-FOR: ${clientName}
+      // Initialize inline proposal text with structured HTML
+      const proposalHTML = `
+        <div class="proposal-document" style="padding: 40px; background: white; border: 1px solid #e2e8f0; border-radius: 4px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+          <div style="border-bottom: 2px solid #0f172a; padding-bottom: 24px; margin-bottom: 32px; display: flex; justify-content: space-between; align-items: flex-end;">
+            <div>
+              <h1 style="font-size: 24px; color: #0f172a; font-weight: 800; text-transform: uppercase; margin:0;">Service Proposal</h1>
+              <p style="color: #64748b; font-size: 13px; margin: 4px 0 0 0;">Tailored Compliance Engagement</p>
+            </div>
+            <div style="text-align: right; color: #475569; font-size: 11px; line-height: 1.6;">
+              <strong style="color:#0f172a;">Prepared For:</strong><br>
+              ${clientName}<br>
+              Date: October 24, 2026
+            </div>
+          </div>
 
-1. EXECUTIVE SYNOPSIS
-${currentReasonStr}
+          <div id="inline-proposal-body" style="font-size: 14px; color: #334155; line-height: 1.6; display: flex; flex-direction: column; gap: 32px;">
+            <div class="comment-section-wrapper" id="wrap-synopsis">
+              <button class="section-add-comment-btn" onclick="handleSectionClickEvent(event, 'wrap-synopsis')">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                Add Note
+              </button>
+              <section id="sec-synopsis">
+                <h3 style="font-size: 14px; color: #0f172a; font-weight:700; margin-bottom: 8px; text-transform:uppercase; letter-spacing:0.5px;">1. Executive Synopsis</h3>
+                <div class="editable-area" style="padding: 12px; background: #fcfcfc; border: 1px dashed #e2e8f0; border-radius: 6px; color: #475569;">${currentReasonStr}</div>
+              </section>
+            </div>
 
-2. SCOPE & PRICING JUSTIFICATION
-${currentReqStr}
+            <div class="comment-section-wrapper" id="wrap-scope">
+              <button class="section-add-comment-btn" onclick="handleSectionClickEvent(event, 'wrap-scope')">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                Add Note
+              </button>
+              <section id="sec-scope">
+                <h3 style="font-size: 14px; color: #0f172a; font-weight:700; margin-bottom: 8px; text-transform:uppercase; letter-spacing:0.5px;">2. Engagement Scope & Pricing</h3>
+                <div class="editable-area" style="padding: 12px; background: #fcfcfc; border: 1px dashed #e2e8f0; border-radius: 6px; color: #475569;">${currentReqStr}</div>
+              </section>
+            </div>
 
-3. PRELIMINARY SCHEDULE
-Week 1-2: Initial Document Discovery & Systems Access Integration
-Week 3: Technical Infrastructure Review & Penetration Testing
-Week 4: Financial Reconciliation (Dual Currency Ledgers)
-Week 5: Draft Reporting & Management Review
-Week 6: Delivery of Final Assurance Audit
+            <div class="comment-section-wrapper" id="wrap-timeline">
+              <button class="section-add-comment-btn" onclick="handleSectionClickEvent(event, 'wrap-timeline')">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                Add Note
+              </button>
+              <section id="sec-timeline">
+                <h3 style="font-size: 14px; color: #0f172a; font-weight:700; margin-bottom: 8px; text-transform:uppercase; letter-spacing:0.5px;">3. Project Timeline</h3>
+                <div style="display: grid; grid-template-columns: 80px 1fr; gap: 8px 16px; font-size: 13px; background: #fafafa; padding: 12px; border-radius: 6px;">
+                  <div style="font-weight: 700; color:#0f172a;">Week 1-2</div><div>Initial Discovery</div>
+                  <div style="font-weight: 700; color:#0f172a;">Week 3</div><div>Technical Review</div>
+                  <div style="font-weight: 700; color:#0f172a;">Week 4</div><div>Financial Reconciliation</div>
+                  <div style="font-weight: 700; color:#0f172a;">Week 5-6</div><div>Drafting & Delivery</div>
+                </div>
+              </section>
+            </div>
 
-----------------------------
-STATUS: AWAITING FINAL PARTNER REVIEW
-PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
+          </div>
+        </div>
+      `;
 
-      document.getElementById('inline-proposal-text').value = fullProposalText;
+      document.getElementById('inline-proposal-text').innerHTML = proposalHTML;
     }
 
     document.getElementById('targetRow').addEventListener('click', () => document.getElementById('sidePanel').classList.add('open'));
@@ -2681,8 +3136,8 @@ PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
                 Generated Service Proposal
               </h3>
               <div style="position:relative; flex-grow: 1; display: flex; flex-direction: column;">
-                <textarea id="inline-proposal-text" readonly
-                  style="width:100%; flex-grow: 1; min-height:650px; padding:24px; border:1px solid #e2e8f0; border-radius:8px; font-family:'Inter', monospace; font-size:13.5px; line-height:1.7; color:#334155; background:#f8fafc; resize:none; transition: all 0.2s;"></textarea>
+                <div id="inline-proposal-text" contenteditable="false"
+                  style="width:100%; flex-grow: 1; min-height:650px; padding:24px; border:1px solid #e2e8f0; border-radius:12px; font-family:'Inter', sans-serif; font-size:13.5px; line-height:1.7; color:#334155; background:#f1f5f9; overflow-y: auto; outline:none; transition: all 0.2s; box-shadow: inset 0 2px 4px 0 rgba(0,0,0,0.06);"></div>
                 <div style="margin-top:16px; display:flex; justify-content:flex-end;">
                   <button id="inline-edit-btn" class="btn" onclick="toggleInlineEdit()"
                     style="width:auto; padding:8px 24px; margin:0; background:#2563eb;">
@@ -2700,9 +3155,6 @@ PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
           <!-- Partner Action Bar -->
           <div
             style="display:flex; justify-content:flex-end; gap:16px; margin-top:24px; border-top:1px solid var(--border-color); padding-top:24px;">
-            <button id="btn-comment" class="btn"
-              style="background:var(--bg-body); color:var(--text-main); border:1px solid var(--border-color); margin:0; width:auto; padding:8px 24px;"
-              onclick="handleComment()">Add Note / Comment</button>
             <button id="btn-reject" class="btn" style="background:#ef4444; margin:0; width:auto; padding:8px 24px;"
               onclick="openRejectModal()">Reject</button>
             <button id="btn-approve" class="btn" style="background:#10b981; margin:0; width:auto; padding:8px 24px;"
@@ -2816,7 +3268,7 @@ PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
 
       <!-- Close Button -->
       <button id="dlv-close-btn" class="btn" style="display:none; background:#2563eb; margin:0;"
-        onclick="transitionToClientView()">View as Client — Access Portal</button>
+        onclick="transitionToClientView()">Send Proposal Link</button>
     </div>
   </div>
 
@@ -2825,7 +3277,9 @@ PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
     <!-- Branding -->
     <div class="cinematic-brand">
       <div>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+        </svg>
       </div>
       <span>Audit Offshore &mdash; Secure Workflow</span>
     </div>
@@ -2833,7 +3287,8 @@ PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
     <!-- Status badge -->
     <div id="client-handover-badge" class="cinematic-badge">
       <div id="client-handover-badge-icon" class="cinematic-badge-icon">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
           <polyline points="20 6 9 17 4 12"></polyline>
         </svg>
       </div>
@@ -2862,26 +3317,51 @@ PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
   <!-- Client Approve/Sign Modal -->
   <div id="client-sign-overlay" class="overlay-container hidden" style="z-index: 11000;">
     <div class="modal-card" style="max-width: 500px; padding: 36px;">
-       <h2 style="font-size: 20px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">Approve & E-Sign</h2>
-       <p style="font-size: 14px; color: #64748b; margin-bottom: 24px;">Please add any final notes and provide your electronic signature to authorize this engagement.</p>
-       
-       <div class="form-group full-width">
-         <label>Final Approval Note (Optional)</label>
-         <textarea id="client-approve-comment" placeholder="Everything looks good. Proceeding with the technical audit next week..." 
-           style="width:100%; min-height:80px; padding:12px; border:1px solid #e2e8f0; border-radius:8px; font-size:13px; font-family:inherit; resize:none; margin-bottom:16px;"></textarea>
-       </div>
+      <h2 style="font-size: 20px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">Approve & E-Sign</h2>
+      <p style="font-size: 14px; color: #64748b; margin-bottom: 24px;">Please add any final notes and provide your
+        electronic signature to authorize this engagement.</p>
 
-       <div class="form-group full-width">
-         <label>Full Legal Name (E-Signature)</label>
-         <input type="text" id="client-signature-input" placeholder="Alex Thompson" style="font-family: 'Brush Script MT', cursive; font-size: 20px; color: #2563eb;">
-       </div>
+      <div class="form-group full-width">
+        <label>Final Approval Note (Optional)</label>
+        <textarea id="client-approve-comment"
+          placeholder="Everything looks good. Proceeding with the technical audit next week..."
+          style="width:100%; min-height:80px; padding:12px; border:1px solid #e2e8f0; border-radius:8px; font-size:13px; font-family:inherit; resize:none; margin-bottom:16px;"></textarea>
+      </div>
 
-       <div style="display:flex; gap:12px; margin-top:24px;">
-         <button class="btn-outline" style="flex:1;" onclick="document.getElementById('client-sign-overlay').classList.add('hidden')">Back</button>
-         <button class="btn" style="flex:1; background:#10b981; margin:0;" onclick="handleClientSuccessAction('Approved')">Authorize & Send</button>
-       </div>
+      <div class="form-group full-width">
+        <label>Full Legal Name (E-Signature)</label>
+        <input type="text" id="client-signature-input" placeholder="Type your full legal name" oninput="checkDashboardSig()"
+          style="font-family: 'Brush Script MT', cursive; font-size: 20px; color: #2563eb;">
+      </div>
+
+      <div style="display:flex; gap:12px; margin-top:24px;">
+        <button class="btn-outline" style="flex:1;"
+          onclick="document.getElementById('client-sign-overlay').classList.add('hidden')">Back</button>
+        <button class="btn" id="db-btn-authorize" style="flex:1; background:#10b981; margin:0; opacity:0.5; cursor:not-allowed;"
+          onclick="authorizeAndSendDashboard(this)" disabled>Authorize & Send</button>
+      </div>
     </div>
   </div>
+
+  <script>
+    function checkDashboardSig() {
+      const val = document.getElementById('client-signature-input').value.trim();
+      const btn = document.getElementById('db-btn-authorize');
+      if (val.length >= 3) {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.style.cursor = 'pointer';
+      } else {
+        btn.disabled = true;
+        btn.style.opacity = '0.5';
+        btn.style.cursor = 'not-allowed';
+      }
+    }
+
+    function authorizeAndSendDashboard(btn) {
+      handleClientSuccessAction('Approved');
+    }
+  </script>
 
   <!-- Client Dashboard View -->
   <div id="client-dashboard" class="hidden" style="position:fixed; inset:0; overflow-y:auto; z-index:8000;">
@@ -2899,47 +3379,55 @@ PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
           <div style="font-size:13px; font-weight:600;">Alex Thompson</div>
           <div style="font-size:11px; color:#94a3b8;">Authorized Signatory</div>
         </div>
-        <div class="avatar" style="border:2px solid #3b82f6;"><img src="https://i.pravatar.cc/150?img=12" alt="Client" style="width:100%; height:100%;"></div>
+        <div class="avatar" style="border:2px solid #3b82f6;"><img src="https://i.pravatar.cc/150?img=12" alt="Client"
+            style="width:100%; height:100%;"></div>
       </div>
     </header>
 
     <div class="client-container">
       <div style="margin-bottom:32px;">
         <h1 style="font-size:28px; font-weight:800; color:#0f172a; margin-bottom:8px;">Review Service Proposal</h1>
-        <p style="color:#64748b;">Please review the generated proposal for your upcoming audit engagement. You can request edits or add comments before final approval.</p>
+        <p style="color:#64748b;">Please review the generated proposal for your upcoming audit engagement. You can
+          request edits or add comments before final approval.</p>
       </div>
 
-      <div style="display:grid; grid-template-columns: 1fr 350px; gap:32px; margin-bottom:100px;">
-        <!-- Left: Proposal Editor -->
-        <div class="client-card" style="padding:0; display:flex; flex-direction:column;">
-          <div style="padding:24px; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; background:#f8fafc;">
+      <div style="display:grid; grid-template-columns: 1fr 360px; gap:32px; margin-bottom:100px; align-items:start;">
+        <!-- Left: Proposal Document -->
+        <div class="client-card" style="padding:0; overflow:hidden;">
+          <!-- Doc Header Bar -->
+          <div style="padding:16px 24px; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; background:#0f172a;">
             <div style="display:flex; align-items:center; gap:10px;">
-               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2">
-                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                 <polyline points="14 2 14 8 20 8"></polyline>
-               </svg>
-               <span style="font-weight:700; color:#0f172a;">Audit_Offshore_Proposal_v1.pdf</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+              <span style="font-weight:700; color:white; font-size:14px;">Audit_Offshore_Proposal_v1.pdf</span>
             </div>
-            <button id="client-edit-btn" class="btn" onclick="toggleClientEdit()" style="width:auto; margin:0; padding:6px 16px; font-size:12px; background:#2563eb;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-              Enable Editing / Markup
-            </button>
+            <div style="display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.1); padding:4px 12px; border-radius:20px;">
+              <div style="width:6px; height:6px; background:#10b981; border-radius:50%;"></div>
+              <span style="font-size:11px; color:#94a3b8; font-weight:600;">Partner Reviewed</span>
+            </div>
           </div>
-          <textarea id="client-proposal-text" readonly 
-            style="width:100%; min-height:700px; padding:40px; border:none; border-radius:0; font-family:'Inter', sans-serif; font-size:14px; line-height:1.7; color:#334155; background:white; resize:none; outline:none;"></textarea>
+
+          <!-- Document Body -->
+          <div id="client-proposal-display" style="padding:48px; background:white; overflow-y:auto; max-height:75vh;" class="scroll-light">
+            <!-- Populated by prepareClientProposalView() -->
+          </div>
+
+          <!-- Hidden legacy textarea kept for JS compatibility -->
+          <textarea id="client-proposal-text" style="display:none;"></textarea>
         </div>
 
-        <!-- Right: Activity & Comments -->
-        <div style="display:flex; flex-direction:column; gap:24px;">
-          <div class="client-card" style="padding:24px;">
-            <h3 style="font-size:15px; font-weight:700; margin-bottom:16px;">Engagement Summary</h3>
-            <div style="display:flex; flex-direction:column; gap:12px;">
+        <!-- Right: Always-visible Partner Notes + Comments -->
+        <div style="display:flex; flex-direction:column; gap:20px; position:sticky; top:24px;">
+
+          <!-- Engagement Summary -->
+          <div class="client-card" style="padding:20px;">
+            <h3 style="font-size:13px; font-weight:700; margin-bottom:12px; text-transform:uppercase; letter-spacing:0.5px; color:#64748b;">Engagement Summary</h3>
+            <div style="display:flex; flex-direction:column; gap:10px;">
               <div style="display:flex; justify-content:space-between; font-size:13px;">
                 <span style="color:#64748b;">Complexity Score:</span>
                 <span id="client-complexity-badge" style="background:#fef3c7; color:#92400e; padding:2px 8px; border-radius:12px; font-weight:700;">7.8/10</span>
               </div>
               <div style="display:flex; justify-content:space-between; font-size:13px;">
-                <span style="color:#64748b;">Estimated Timeline:</span>
+                <span style="color:#64748b;">Timeline:</span>
                 <span style="font-weight:600;">6 Weeks</span>
               </div>
               <div style="display:flex; justify-content:space-between; font-size:13px;">
@@ -2949,16 +3437,34 @@ PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
             </div>
           </div>
 
-          <!-- Client Comments Replicated -->
-          <div class="client-card" style="padding:24px; position:relative;">
-            <h3 style="font-size:15px; font-weight:700; margin-bottom:16px;">Review Comments</h3>
-            <div id="client-comments-list" style="margin-bottom:20px; max-height:400px; overflow-y:auto;" class="scroll-light">
-               <div style="color:#94a3b8; font-size:13px; font-style:italic; text-align:center; padding:20px; border:1px dashed #cbd5e1; border-radius:8px;">No comments yet.</div>
+          <!-- Partner Annotations — Always visible -->
+          <div class="client-card" style="padding:20px; border-left:4px solid #7c3aed;">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:16px;">
+              <div style="width:28px; height:28px; background:#f3f0ff; border-radius:6px; display:flex; align-items:center; justify-content:center;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+              </div>
+              <div>
+                <div style="font-size:13px; font-weight:700; color:#0f172a;">Audit Partner Notes</div>
+                <div style="font-size:11px; color:#7c3aed;">Click any note to locate it in the document</div>
+              </div>
             </div>
-            <div style="display:flex; gap:8px;">
-              <textarea id="client-comment-input" placeholder="Add a comment..." style="flex:1; padding:10px; border:1px solid #e2e8f0; border-radius:8px; font-size:13px; resize:none;" rows="1"></textarea>
-              <button class="btn" style="width:auto; margin:0; padding:0 12px;" onclick="addClientComment()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <div id="client-comments-list" style="display:flex; flex-direction:column; gap:10px; max-height:360px; overflow-y:auto;" class="scroll-light">
+              <!-- Populated by prepareClientProposalView() -->
+              <div style="color:#94a3b8; font-size:13px; font-style:italic; text-align:center; padding:20px; border:1px dashed #ddd5fe; border-radius:8px; background:#faf5ff;">No partner notes on this proposal.</div>
+            </div>
+          </div>
+
+          <!-- Client's own comment box -->
+          <div class="client-card" style="padding:20px;">
+            <h3 style="font-size:13px; font-weight:700; margin-bottom:12px; text-transform:uppercase; letter-spacing:0.5px; color:#64748b;">Add Your Response</h3>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <textarea id="client-comment-input" placeholder="Type a question or response to the partner..."
+                style="width:100%; padding:10px 12px; border:1px solid #e2e8f0; border-radius:8px; font-size:13px; font-family:inherit; resize:none; outline:none;"
+                rows="2"
+                onfocus="this.style.borderColor='#2563eb';" onblur="this.style.borderColor='#e2e8f0';"></textarea>
+              <button class="btn" style="width:100%; margin:0; padding:10px; font-size:13px; font-weight:600; background:#2563eb; border-radius:8px;" onclick="addClientComment()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:6px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                Submit Response
               </button>
             </div>
           </div>
@@ -2968,12 +3474,17 @@ PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
 
     <div class="client-action-bar">
       <div style="display:flex; align-items:center; gap:12px; color:#64748b; font-size:13px;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        </svg>
         Secured with enterprise encryption
       </div>
       <div style="display:flex; gap:16px;">
-        <button class="btn client-btn-reject" style="width:auto; margin:0; padding:12px 28px; font-weight:600;" onclick="openClientRejectModal()">Reject Proposal</button>
-        <button class="btn" style="background:#10b981; width:auto; margin:0; padding:12px 32px; font-weight:700; font-size:15px;" onclick="document.getElementById('client-sign-overlay').classList.remove('hidden')">Approve & E-Sign</button>
+        <button class="btn client-btn-reject" style="width:auto; margin:0; padding:12px 28px; font-weight:600;"
+          onclick="openClientRejectModal()">Reject Proposal</button>
+        <button class="btn"
+          style="background:#10b981; width:auto; margin:0; padding:12px 32px; font-weight:700; font-size:15px;"
+          onclick="document.getElementById('client-sign-overlay').classList.remove('hidden')">Approve & E-Sign</button>
       </div>
     </div>
   </div>
@@ -2981,13 +3492,18 @@ PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
   <!-- Client Reject Modal -->
   <div id="client-reject-overlay" class="overlay-container hidden" style="z-index: 10000;">
     <div class="modal-card" style="max-width: 480px;">
-       <h2 style="font-size: 20px; font-weight: 700; color: #ef4444; margin-bottom: 8px;">Reject Proposal?</h2>
-       <p style="font-size: 14px; color: #64748b; margin-bottom: 24px;">Please state your primary objection or feedback for the audit team to review.</p>
-       <textarea id="client-reject-reason" placeholder="Technical scope for dual-currency reconciliation is insufficient..." style="width:100%; min-height:120px; padding:16px; border:1px solid #e2e8f0; border-radius:12px; font-size:14px; margin-bottom:24px; font-family:inherit;"></textarea>
-       <div style="display:flex; gap:12px;">
-         <button class="btn-outline" style="flex:1;" onclick="document.getElementById('client-reject-overlay').classList.add('hidden')">Back to Review</button>
-         <button class="btn" style="flex:1; background:#ef4444; margin:0;" onclick="handleClientSuccessAction('Rejected')">Confirm Rejection</button>
-       </div>
+      <h2 style="font-size: 20px; font-weight: 700; color: #ef4444; margin-bottom: 8px;">Reject Proposal?</h2>
+      <p style="font-size: 14px; color: #64748b; margin-bottom: 24px;">Please state your primary objection or feedback
+        for the audit team to review.</p>
+      <textarea id="client-reject-reason"
+        placeholder="Technical scope for dual-currency reconciliation is insufficient..."
+        style="width:100%; min-height:120px; padding:16px; border:1px solid #e2e8f0; border-radius:12px; font-size:14px; margin-bottom:24px; font-family:inherit;"></textarea>
+      <div style="display:flex; gap:12px;">
+        <button class="btn-outline" style="flex:1;"
+          onclick="document.getElementById('client-reject-overlay').classList.add('hidden')">Back to Review</button>
+        <button class="btn" style="flex:1; background:#ef4444; margin:0;"
+          onclick="handleClientSuccessAction('Rejected')">Confirm Rejection</button>
+      </div>
     </div>
   </div>
 
@@ -3042,27 +3558,37 @@ PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
         </button>
       </div>
 
-      <!-- Scrollable Content -->
-      <div class="scroll-light" style="padding: 32px; overflow-y: auto; flex-grow: 1; background: #fff;">
-        <h3
-          style="font-size:15px; font-weight:700; color:#0f172a; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-            <polyline points="14 2 14 8 20 8"></polyline>
-          </svg>
-          Generated Proposal Document
-        </h3>
-        <textarea id="manager-review-proposal-text" readonly
-          style="width:100%; min-height:400px; padding:20px; border:1px solid #e2e8f0; border-radius:8px; font-family:'Inter', monospace; font-size:13px; line-height:1.7; color:#334155; background:#f8fafc; resize:none; margin-bottom:32px;"></textarea>
+      <!-- Immersive Content Area -->
+      <div class="scroll-light" style="flex-grow: 1; background: #f1f5f9; display: flex; flex-direction: column; overflow-y: auto;">
+        
+        <!-- Document Sheet Area -->
+        <div style="padding: 60px 20px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center;">
+            <!-- Document Info Badge -->
+            <div style="width: 100%; max-width: 850px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding: 0 4px;">
+                <div style="display: flex; align-items: center; gap: 8px; color: #64748b; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    Proposal Document v1.2
+                </div>
+                <div style="font-size: 11px; color: #94a3b8; font-weight: 500;">Page 1 of 1</div>
+            </div>
 
-        <h3 id="manager-review-section-header"
-          style="font-size:15px; font-weight:700; color:#0f172a; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-          </svg>
-          Partner Internal Notes
-        </h3>
-        <div id="manager-review-comments"></div>
+            <!-- The Paper Sheet -->
+            <div id="manager-review-proposal-display" 
+                 style="width: 100%; max-width: 850px; background: #fff; padding: 80px 100px; border-radius: 2px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15), 0 0 1px 0 rgba(0,0,0,0.1); border: 1px solid #e2e8f0; position: relative;">
+            </div>
+        </div>
+
+        <!-- Annotations Shelf -->
+        <div style="max-width: 850px; width:100%; margin: 0 auto; padding: 0 20px 60px;">
+            <h3 id="manager-review-section-header"
+              style="font-size:14px; font-weight:800; color:#475569; margin-bottom:16px; display:flex; align-items:center; gap:8px; text-transform:uppercase; letter-spacing:1px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.5">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              </svg>
+              Internal Verification Logs
+            </h3>
+            <div id="manager-review-comments" style="display: grid; grid-template-columns: 1fr; gap: 12px;"></div>
+        </div>
       </div>
 
       <!-- Footer Action -->
@@ -3143,48 +3669,60 @@ PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
           <div
             style="font-size: 15px; color: #334155; line-height: 1.7; display: flex; flex-direction: column; gap: 32px;">
 
-            <div>
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                <h3 style="font-size: 16px; color: #0f172a; font-weight:700;">1. Executive Synopsis</h3>
-                <span style="font-size:11px; color:#94a3b8; text-transform:uppercase;">Editable Section</span>
+            <div class="comment-section-wrapper" id="pdf-wrap-synopsis">
+              <button class="section-add-comment-btn" onclick="handleSectionClickEvent(event, 'pdf-wrap-synopsis')">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                Add Note
+              </button>
+              <div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                  <h3 style="font-size: 16px; color: #0f172a; font-weight:700;">1. Executive Synopsis</h3>
+                  <span style="font-size:11px; color:#94a3b8; text-transform:uppercase;">Editable Section</span>
+                </div>
+                <div id="pdf-synopsis" contenteditable="true"
+                  style="width:100%; min-height:120px; padding:16px; border:1px solid #e2e8f0; border-radius:8px; font-family:inherit; font-size:14px; line-height:1.6; color:#475569; background:#fcfcfc; transition: border-color 0.2s, box-shadow 0.2s; overflow-y: auto;"
+                  oninput="document.getElementById('save-status').innerHTML='<span style=\'color:#f59e0b\'>Saving...</span>'; setTimeout(() => document.getElementById('save-status').innerHTML='<div style=\'width:6px; height:6px; background:#10b981; border-radius:50%;\'></div> Draft Saved', 800);"
+                  onfocus="this.style.borderColor='#2563eb'; this.style.boxShadow='0 0 0 3px rgba(37,99,235,0.1)';"
+                  onblur="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';"></div>
               </div>
-              <textarea id="pdf-synopsis"
-                style="width:100%; min-height:120px; padding:16px; border:1px solid #e2e8f0; border-radius:8px; font-family:inherit; font-size:14px; line-height:1.6; color:#475569; resize:vertical; background:#fcfcfc; transition: border-color 0.2s, box-shadow 0.2s;"
-                oninput="document.getElementById('save-status').innerHTML='<span style=\'color:#f59e0b\'>Saving...</span>'; setTimeout(() => document.getElementById('save-status').innerHTML='<div style=\'width:6px; height:6px; background:#10b981; border-radius:50%;\'></div> Draft Saved', 800);"
-                onfocus="this.style.borderColor='#2563eb'; this.style.boxShadow='0 0 0 3px rgba(37,99,235,0.1)';"
-                onblur="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';"></textarea>
             </div>
 
-            <div>
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                <h3 style="font-size: 16px; color: #0f172a; font-weight:700;">2. Engagement Scope & Pricing
-                  Justification</h3>
-                <span style="font-size:11px; color:#94a3b8; text-transform:uppercase;">Editable Section</span>
+            <div class="comment-section-wrapper" id="pdf-wrap-scope">
+              <button class="section-add-comment-btn" onclick="handleSectionClickEvent(event, 'pdf-wrap-scope')">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                Add Note
+              </button>
+              <div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                  <h3 style="font-size: 16px; color: #0f172a; font-weight:700;">2. Engagement Scope & Pricing
+                    Justification</h3>
+                  <span style="font-size:11px; color:#94a3b8; text-transform:uppercase;">Editable Section</span>
+                </div>
+                <div id="pdf-req" contenteditable="true"
+                  style="width:100%; min-height:140px; padding:16px; border:1px solid #e2e8f0; border-radius:8px; font-family:inherit; font-size:14px; line-height:1.6; color:#475569; background:#fcfcfc; transition: border-color 0.2s, box-shadow 0.2s; overflow-y: auto;"
+                  oninput="document.getElementById('save-status').innerHTML='<span style=\'color:#f59e0b\'>Saving...</span>'; setTimeout(() => document.getElementById('save-status').innerHTML='<div style=\'width:6px; height:6px; background:#10b981; border-radius:50%;\'></div> Draft Saved', 800);"
+                  onfocus="this.style.borderColor='#2563eb'; this.style.boxShadow='0 0 0 3px rgba(37,99,235,0.1)';"
+                  onblur="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';"></div>
               </div>
-              <textarea id="pdf-req"
-                style="width:100%; min-height:140px; padding:16px; border:1px solid #e2e8f0; border-radius:8px; font-family:inherit; font-size:14px; line-height:1.6; color:#475569; resize:vertical; background:#fcfcfc; transition: border-color 0.2s, box-shadow 0.2s;"
-                oninput="document.getElementById('save-status').innerHTML='<span style=\'color:#f59e0b\'>Saving...</span>'; setTimeout(() => document.getElementById('save-status').innerHTML='<div style=\'width:6px; height:6px; background:#10b981; border-radius:50%;\'></div> Draft Saved', 800);"
-                onfocus="this.style.borderColor='#2563eb'; this.style.boxShadow='0 0 0 3px rgba(37,99,235,0.1)';"
-                onblur="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';"></textarea>
             </div>
 
-            <div>
-              <h3 style="font-size: 16px; color: #0f172a; margin-bottom: 12px; font-weight:700;">3. Project Timeline &
-                Milestones</h3>
-              <div
-                style="display: grid; grid-template-columns: 100px 1fr; gap: 12px 24px; border-top: 1px solid #f1f5f9; padding-top: 20px; font-size:14px;">
-                <div style="font-weight: 700; color:#0f172a;">Week 1-2</div>
-                <div>Initial Document Discovery & Systems Access Integration</div>
-                <div style="font-weight: 700; color:#0f172a;">Week 3</div>
-                <div>Technical Infrastructure Review & Penetration Testing</div>
-                <div style="font-weight: 700; color:#0f172a;">Week 4</div>
-                <div>Financial Reconciliation (Dual Currency Ledgers)</div>
-                <div style="font-weight: 700; color:#0f172a;">Week 5</div>
-                <div>Draft Reporting & Management Review</div>
-                <div style="font-weight: 700; color:#0f172a;">Week 6</div>
-                <div>Delivery of Final Assurance Audit</div>
+            <div class="comment-section-wrapper" id="pdf-wrap-timeline">
+              <button class="section-add-comment-btn" onclick="handleSectionClickEvent(event, 'pdf-wrap-timeline')">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                Add Note
+              </button>
+              <div id="pdf-timeline">
+                <h3 style="font-size: 16px; color: #0f172a; margin-bottom: 12px; font-weight:700;">3. Project Timeline & Milestones</h3>
+                <div style="display: grid; grid-template-columns: 100px 1fr; gap: 12px 24px; border-top: 1px solid #f1f5f9; padding-top: 20px; font-size:14px;">
+                  <div style="font-weight: 700; color:#0f172a;">Week 1-2</div><div>Initial Document Discovery & Systems Access Integration</div>
+                  <div style="font-weight: 700; color:#0f172a;">Week 3</div><div>Technical Infrastructure Review & Penetration Testing</div>
+                  <div style="font-weight: 700; color:#0f172a;">Week 4</div><div>Financial Reconciliation (Dual Currency Ledgers)</div>
+                  <div style="font-weight: 700; color:#0f172a;">Week 5</div><div>Draft Reporting & Management Review</div>
+                  <div style="font-weight: 700; color:#0f172a;">Week 6</div><div>Delivery of Final Assurance Audit</div>
+                </div>
               </div>
             </div>
+
 
             <!-- Signatures -->
             <div style="margin-top: 64px; display: grid; grid-template-columns: 1fr 1fr; gap: 48px;">
@@ -3209,26 +3747,34 @@ PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
 
   <script>
     function openPDFPreview() {
-      const synVal = document.getElementById('pc-complexity-reason').innerText;
-      const reqVal = document.getElementById('pc-complexity-req').innerText;
-      document.getElementById('pdf-synopsis').value = synVal;
-      document.getElementById('pdf-req').value = reqVal;
+      // Find the editable areas in the dashboard document
+      const dashSyn = document.querySelector('#sec-synopsis .editable-area');
+      const dashReq = document.querySelector('#sec-scope .editable-area');
+      
+      // Clear comments before syncing if needed, or maintain them
+      // For now, we maintain the global 'comments' array
+      
+      if (dashSyn) document.getElementById('pdf-synopsis').innerHTML = dashSyn.innerHTML;
+      if (dashReq) document.getElementById('pdf-req').innerHTML = dashReq.innerHTML;
 
       const pdfo = document.getElementById('pdf-overlay');
       pdfo.classList.remove('hidden', 'fade-out');
       pdfo.classList.add('fade-in');
+      
+      // Re-init listeners for the new DOM elements
+      initSelectionCommenting();
     }
 
     function closePDFPreview() {
-      // Sync back any changes made in the editor to the complexity card
-      const syn = document.getElementById('pdf-synopsis').value;
-      const req = document.getElementById('pdf-req').value;
+      // Sync back any changes made in the editor to the dashboard document
+      const synHtml = document.getElementById('pdf-synopsis').innerHTML;
+      const reqHtml = document.getElementById('pdf-req').innerHTML;
 
-      const cardSyn = document.getElementById('pc-complexity-reason');
-      const cardReq = document.getElementById('pc-complexity-req');
+      const dashSyn = document.querySelector('#sec-synopsis .editable-area');
+      const dashReq = document.querySelector('#sec-scope .editable-area');
 
-      if (cardSyn) cardSyn.innerText = syn;
-      if (cardReq) cardReq.innerText = req;
+      if (dashSyn) dashSyn.innerHTML = synHtml;
+      if (dashReq) dashReq.innerHTML = reqHtml;
 
       const pdfo = document.getElementById('pdf-overlay');
       pdfo.classList.remove('fade-in');
@@ -3242,80 +3788,104 @@ PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
     let partnerComments = [];
 
     function handleApprove() {
-      // Open the delivery modal
+      // Open the delivery modal for initial dispatch
       const dlvOverlay = document.getElementById('delivery-overlay');
-      dlvOverlay.classList.remove('hidden', 'fade-out');
-      dlvOverlay.classList.add('fade-in');
+      if (dlvOverlay) {
+        dlvOverlay.classList.remove('hidden', 'fade-out');
+        dlvOverlay.classList.add('fade-in');
 
-      // Reset all steps
-      ['dlv-step-1', 'dlv-step-2', 'dlv-step-3', 'dlv-step-4'].forEach((id, i) => {
-        const el = document.getElementById(id);
-        el.style.opacity = i === 0 ? '1' : '0.4';
-        el.style.background = '#f8fafc';
-        el.style.border = '1px solid #e2e8f0';
-      });
-      document.getElementById('dlv-success').style.display = 'none';
-      document.getElementById('dlv-close-btn').style.display = 'none';
+        // Reset all steps
+        ['dlv-step-1', 'dlv-step-2', 'dlv-step-3', 'dlv-step-4'].forEach((id, i) => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.style.opacity = i === 0 ? '1' : '0.4';
+            el.style.background = '#f8fafc';
+            el.style.border = '1px solid #e2e8f0';
+          }
+        });
+        const success = document.getElementById('dlv-success');
+        if (success) success.style.display = 'none';
+        const closeBtn = document.getElementById('dlv-close-btn');
+        if (closeBtn) closeBtn.style.display = 'none';
 
-      // Update notes count text
-      const notesEl = document.getElementById('dlv-notes-count');
-      if (partnerComments.length > 0) {
-        notesEl.innerText = `Bundling ${partnerComments.length} Partner Note${partnerComments.length > 1 ? 's' : ''} for dispatch...`;
-      } else {
-        notesEl.innerText = "No internal notes attached.";
-      }
+        // Update notes count text
+        const notesEl = document.getElementById('dlv-notes-count');
+        if (notesEl) {
+          if (partnerComments.length > 0) {
+            notesEl.innerText = `Bundling ${partnerComments.length} Partner Note${partnerComments.length > 1 ? 's' : ''} for dispatch...`;
+          } else {
+            notesEl.innerText = "No internal notes attached.";
+          }
+        }
 
-      function activateStep(stepNum, iconColor, iconSvg, onDone) {
-        const stepEl = document.getElementById('dlv-step-' + stepNum);
-        const iconEl = document.getElementById('dlv-icon-' + stepNum);
-        stepEl.style.opacity = '1';
-        stepEl.style.border = '1px solid ' + iconColor;
-        stepEl.style.background = '#f0fdf4';
-        iconEl.style.background = iconColor;
-        iconEl.innerHTML = iconSvg;
-        setTimeout(onDone, 1200); // Slightly slower for readability
-      }
+        const activateStep = (stepNum, iconColor, iconSvg, onDone) => {
+          const stepEl = document.getElementById('dlv-step-' + stepNum);
+          const iconEl = document.getElementById('dlv-icon-' + stepNum);
+          if (stepEl) {
+            stepEl.style.opacity = '1';
+            stepEl.style.border = '1px solid ' + iconColor;
+            stepEl.style.background = '#f0fdf4';
+          }
+          if (iconEl) {
+            iconEl.style.background = iconColor;
+            iconEl.innerHTML = iconSvg;
+          }
+          setTimeout(onDone, 1200);
+        };
 
-      const checkSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+        const checkSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
 
-      // Step 1: Package
-      setTimeout(() => {
-        activateStep(1, '#16a34a', checkSvg, () => {
-          // Step 2: Notes
-          activateStep(2, '#7c3aed', checkSvg, () => {
-            // Step 3: Email
-            activateStep(3, '#2563eb', checkSvg, () => {
-              // Step 4: WhatsApp
-              activateStep(4, '#16a34a', checkSvg, () => {
-                // Show success
-                document.getElementById('dlv-success').style.display = 'block';
-                document.getElementById('dlv-close-btn').style.display = 'flex';
-                // Disable action bar buttons
-                const stateDiv = document.getElementById('partner-action-state');
-                if (stateDiv) stateDiv.innerHTML = '';
-                const bar = document.querySelector('#partner-client-data > div[style*="justify-content:flex-end"]');
-                if (bar) { bar.style.opacity = '0.4'; bar.style.pointerEvents = 'none'; }
-
-                // ✅ Update Stepper: Step 6 → Completed, Step 7 → Active
-                const step6 = document.getElementById('step6');
-                const step7 = document.getElementById('step7');
-                if (step6) {
-                  step6.classList.remove('active');
-                  step6.classList.add('completed');
-                  step6.querySelector('.step-icon').innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
-                  const chip6 = step6.querySelector('.kyc-status-chip');
-                  if (chip6) { chip6.innerText = 'DISPATCHED TO CLIENT'; chip6.classList.add('status-completed'); }
-                }
-                if (step7) {
-                  step7.classList.add('active');
-                  const chip7 = step7.querySelector('.kyc-status-chip');
-                  if (chip7) chip7.innerText = 'AWAITING CLIENT DECISION';
-                }
+        // Step 1: Package
+        setTimeout(() => {
+          activateStep(1, '#16a34a', checkSvg, () => {
+            // Step 2: Notes
+            activateStep(2, '#7c3aed', checkSvg, () => {
+              // Step 3: Email
+              activateStep(3, '#2563eb', checkSvg, () => {
+                // Step 4: WhatsApp
+                activateStep(4, '#16a34a', checkSvg, () => {
+                  // Show success UI in the modal
+                  if (success) success.style.display = 'block';
+                  if (closeBtn) closeBtn.style.display = 'flex';
+                  
+                  // Update background state
+                  finalizeStatusUpdate();
+                });
               });
             });
           });
-        });
-      }, 400);
+        }, 800);
+      } else {
+        // Fallback if overlay missing
+        finalizeStatusUpdate();
+      }
+
+      function finalizeStatusUpdate() {
+        // ✅ Update Stepper: Step 6 → Completed, Step 7 → Active
+        const step6 = document.getElementById('step6');
+        const step7 = document.getElementById('step7');
+        if (step6) {
+          step6.classList.remove('active');
+          step6.classList.add('completed');
+          step6.querySelector('.step-icon').innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+          const chip6 = step6.querySelector('.kyc-status-chip');
+          if (chip6) { 
+            chip6.innerText = 'DISPATCHED TO CLIENT'; 
+            chip6.classList.add('status-completed'); 
+          }
+        }
+        if (step7) {
+          step7.classList.add('active');
+          const chip7 = step7.querySelector('.kyc-status-chip');
+          if (chip7) chip7.innerText = 'AWAITING CLIENT DECISION';
+        }
+
+        // Disable action bar buttons
+        const stateDiv = document.getElementById('partner-action-state');
+        if (stateDiv) stateDiv.innerHTML = '';
+        const bar = document.querySelector('#partner-client-data > div[style*="justify-content:flex-end"]');
+        if (bar) { bar.style.opacity = '0.4'; bar.style.pointerEvents = 'none'; }
+      }
     }
 
     function closeDeliveryModal() {
@@ -3329,51 +3899,63 @@ PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
     }
 
     async function toggleInlineEdit() {
-      const area = document.getElementById('inline-proposal-text');
+      const container = document.getElementById('inline-proposal-text');
+      const editableAreas = container.querySelectorAll('.editable-area');
       const btn = document.getElementById('inline-edit-btn');
-      const isReadonly = area.hasAttribute('readonly');
+      const isEditing = btn.innerText.includes('Save');
 
-      if (isReadonly) {
-        area.removeAttribute('readonly');
-        area.style.background = '#ffffff';
-        area.style.borderColor = '#2563eb';
-        area.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.1)';
-        area.focus();
-
-        // Disable temporarily to show "typing" animation
+      if (!isEditing) {
+        // Switch to Edit Mode
+        editableAreas.forEach(area => {
+            area.contentEditable = "true";
+            area.style.background = '#ffffff';
+            area.style.border = '2px solid #2563eb';
+            area.style.boxShadow = '0 0 0 4px rgba(37,99,235,0.1)';
+        });
+        
         btn.disabled = true;
         btn.style.opacity = '0.7';
-        btn.innerHTML = `Editing...`;
+        btn.innerHTML = `<span>Editing...</span>`;
 
-        const revision = `\n\n[ADDED PREMIUM SERVICE MODULE]\n- Expanded scope to include real-time crypto-custody audit requirements.\n- Appointed Senior Auditor for jurisdictional compliance oversight (SGP/UK).\n- Adjusted lead time: +2 business days for technical depth.`;
+        // Simulate a professional revision insertion in the Scope section
+        const targetArea = container.querySelector('#sec-scope .editable-area') || editableAreas[1];
+        const revisionHtml = `
+            <div style="margin-top:16px; padding:12px; background:#f0f9ff; border-left:4px solid #0ea5e9; border-radius:4px;">
+                <div style="font-size:11px; font-weight:800; color:#0369a1; text-transform:uppercase; margin-bottom:4px;">Partner Revision: Premium Service Module</div>
+                <ul style="margin:0; padding-left:18px; font-size:13px; color:#0c4a6e;">
+                    <li>Expanded scope to include real-time crypto-custody audit requirements.</li>
+                    <li>Appointed Senior Auditor for jurisdictional compliance oversight (SGP/UK).</li>
+                    <li>Adjusted lead time: +2 business days for technical depth.</li>
+                </ul>
+            </div>
+        `;
 
-        let i = 0;
-        const tick = setInterval(() => {
-          if (i < revision.length) {
-            area.value += revision[i++];
-            area.scrollTop = area.scrollHeight;
-          } else {
-            clearInterval(tick);
+        // Proper layout preservation vs raw text append
+        setTimeout(() => {
+            if (targetArea) targetArea.insertAdjacentHTML('beforeend', revisionHtml);
             btn.disabled = false;
             btn.style.opacity = '1';
             btn.innerHTML = `
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="margin-right:8px;">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-              Save Proposal Draft
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="margin-right:8px;">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                Save Proposal Changes
             `;
-            btn.style.background = '#059669'; // success green
-          }
-        }, 20); // Fast but visible
+            btn.style.background = '#10b981'; // Success Green
+        }, 1000);
 
       } else {
-        area.setAttribute('readonly', 'true');
-        area.style.background = '#f8fafc';
-        area.style.borderColor = '#e2e8f0';
-        area.style.boxShadow = 'none';
+        // Switch to View Mode / Save
+        editableAreas.forEach(area => {
+            area.contentEditable = "false";
+            area.style.background = '#fcfcfc';
+            area.style.border = '1px dashed #e2e8f0';
+            area.style.boxShadow = 'none';
+        });
+        
         btn.innerHTML = `
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px;">
-            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"></path>
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
             <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
           </svg>
           Edit Proposal
@@ -3391,7 +3973,7 @@ PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
             Proposal draft updated and saved.
           </div>
         `;
-        setTimeout(() => { if (stateArea.innerHTML.includes('saved')) stateArea.innerHTML = ''; }, 3000);
+        setTimeout(() => { if (stateArea && stateArea.innerHTML.includes('saved')) stateArea.innerHTML = ''; }, 3000);
       }
     }
 
@@ -3539,10 +4121,10 @@ PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
         step5.classList.remove('active');
         step5.classList.add('completed');
         step5.querySelector('.step-icon').innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
-        
+
         const chip5 = step5.querySelector('.kyc-status-chip');
         const chip6 = step6.querySelector('.kyc-status-chip');
-        
+
         if (rejected) {
           chip5.innerText = "REJECTED BY PARTNER";
           chip5.style.background = "#fef2f2";
@@ -3650,10 +4232,10 @@ PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
         badgeContainer.style.transform = 'translateY(0)';
       }, 400);
 
-      const msg1 = rejected ? 
-        'Proposal review complete. The document has been rejected by the Partner and returned to the Global Audit Manager for revision.' : 
+      const msg1 = rejected ?
+        'Proposal review complete. The document has been rejected by the Partner and returned to the Global Audit Manager for revision.' :
         'Proposal reviewed and verified. Routing back to the Global Audit Manager for final client dispatch.';
-      
+
       const el1 = document.getElementById('manager-cinematic-text');
       el1.textContent = '';
       let i = 0;
@@ -3705,9 +4287,21 @@ PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
       if (e) e.stopPropagation();
 
       const overlay = document.getElementById('manager-review-overlay');
+      const display = document.getElementById('manager-review-proposal-display');
+      const source = document.getElementById('inline-proposal-text');
 
-      // Sync proposal text
-      document.getElementById('manager-review-proposal-text').value = document.getElementById('inline-proposal-text').value;
+      // Sync rich proposal content (HTML includes highlights and section indicators)
+      if (display && source) {
+          display.innerHTML = source.innerHTML;
+          // Ensure no editable borders appear in manager view
+          const areas = display.querySelectorAll('.editable-area');
+          areas.forEach(a => {
+              a.style.border = 'none';
+              a.style.padding = '0';
+              a.style.background = 'transparent';
+              a.style.boxShadow = 'none';
+          });
+      }
 
       // Render partner comments
       let commentsHtml = '';
@@ -3724,9 +4318,16 @@ PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
         document.getElementById('manager-review-title').innerText = "Audit Offshore Ltd. — Partner approved with notes";
         document.getElementById('manager-review-section-header').innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg> Partner Internal Notes`;
         commentsHtml = partnerComments.map(c => `
-           <div style="background:#fff; border:1px solid #e2e8f0; border-left:4px solid #7c3aed; padding:16px; border-radius:4px; margin-bottom:12px;">
-              <div style="font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; margin-bottom:8px;">${c.timestamp}</div>
-              <div style="font-size:14px; color:#334155; line-height:1.6;">${c.text}</div>
+           <div style="background:#fff; border:1px solid #e2e8f0; border-left:4px solid #7c3aed; padding:16px; border-radius:4px; margin-bottom:12px; cursor: pointer; transition: all 0.2s;" 
+                onmouseover="this.style.borderColor='#7c3aed'" onmouseout="this.style.borderColor='#e2e8f0'"
+                onclick="scrollToManagerHighlight('${c.id}')">
+              <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                 <div style="font-size:11px; font-weight:700; color:#7c3aed; text-transform:uppercase;">${c.isSection ? 'Section Note' : 'Text Annotation'}</div>
+                 <div style="font-size:11px; color:#94a3b8;">${c.timestamp}</div>
+              </div>
+              ${c.isSection ? '' : `<div style="font-size:12px; color:#64748b; font-style:italic; margin-bottom:6px; background:#f8fafc; padding:4px 8px; border-radius:4px;">"${c.selectedText}"</div>`}
+              <div style="font-size:14px; color:#334155; line-height:1.6;">${c.comment}</div>
+              <div style="font-size:10px; color:#94a3b8; margin-top:8px; text-align:right;">Click to view in document &rsaquo;</div>
            </div>
          `).join('');
       } else {
@@ -3739,121 +4340,7 @@ PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
       overlay.classList.remove('hidden');
     }
 
-    // --- Client Dashboard Logic ---
-    function transitionToClientView() {
-      // Hide delivery modal
-      document.getElementById('delivery-overlay').classList.add('hidden');
-      
-      const handover = document.getElementById('client-handover-overlay');
-      handover.classList.remove('hidden');
-      handover.style.display = 'flex';
-      handover.classList.add('show');
 
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          handover.style.opacity = '1';
-        });
-      });
-
-      // Reset components
-      const pb = document.getElementById('client-handover-progress');
-      pb.style.width = '0%';
-      
-      const badge = document.getElementById('client-handover-badge');
-      const badgeText = document.getElementById('client-handover-badge-text');
-      const badgeIconContainer = document.getElementById('client-handover-badge-icon');
-      
-      badge.style.opacity = '0';
-      badge.style.transform = 'translateY(10px)';
-      badge.style.background = "rgba(34,197,94,0.12)";
-      badge.style.borderColor = "rgba(34,197,94,0.3)";
-      
-      badgeText.innerText = "Secure Delivery Initiated";
-      badgeText.style.color = "#22c55e";
-      
-      if(badgeIconContainer) {
-        badgeIconContainer.style.background = "rgba(34,197,94,0.2)";
-        badgeIconContainer.querySelector('svg').setAttribute('stroke', '#22c55e');
-      }
-
-      const el1 = document.getElementById('client-handover-title');
-      const el2 = document.getElementById('client-handover-msg');
-      const hint = document.getElementById('client-handover-click-hint');
-      
-      el1.textContent = '';
-      el2.textContent = '';
-      el2.style.opacity = '0';
-      hint.style.opacity = '0';
-
-      let clickReady = false;
-
-      // Start sequence
-      setTimeout(() => {
-        // Step 1: Progress bar
-        pb.style.width = '100%';
-        
-        // Step 2: Badge arrival
-        setTimeout(() => {
-          badge.style.opacity = '1';
-          badge.style.transform = 'translateY(0)';
-          
-          // Step 3: Typewriter title
-          setTimeout(() => {
-            const msg1 = "Secure engagement documents have been dispatched to the client portal for review.";
-            let i = 0;
-            const type1 = setInterval(() => {
-              el1.textContent += msg1[i++];
-              if (i >= msg1.length) {
-                clearInterval(type1);
-                
-                // Step 4: Subtext fade or type
-                setTimeout(() => {
-                  el2.style.opacity = '1';
-                  const msg2 = "Switching to Client Interface...";
-                  let j = 0;
-                  const type2 = setInterval(() => {
-                    el2.textContent += msg2[j++];
-                    if(j >= msg2.length) {
-                      clearInterval(type2);
-                      
-                      // Step 5: Final hint
-                      setTimeout(() => {
-                        hint.style.opacity = '1';
-                        handover.style.cursor = 'pointer';
-                        clickReady = true;
-                      }, 500);
-                    }
-                  }, 30);
-                }, 600);
-              }
-            }, 25);
-          }, 600);
-        }, 400);
-      }, 300);
-
-      const advance = () => {
-        if (!clickReady) return;
-        handover.removeEventListener('click', advance);
-        handover.style.cursor = 'default';
-        handover.style.opacity = '0';
-        
-        setTimeout(() => {
-          handover.classList.remove('show');
-          handover.classList.add('hidden');
-          handover.style.display = 'none';
-
-          // Data Transfer
-          const proposalText = document.getElementById('inline-proposal-text').value;
-          document.getElementById('client-proposal-text').value = proposalText;
-          
-          // View Switch
-          document.getElementById('dashboard').style.display = 'none';
-          document.getElementById('client-dashboard').classList.remove('hidden');
-        }, 800);
-      };
-
-      handover.addEventListener('click', advance);
-    }
 
     async function toggleClientEdit() {
       const area = document.getElementById('client-proposal-text');
@@ -3913,7 +4400,7 @@ PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
       const input = document.getElementById('client-comment-input');
       const text = input.value.trim();
       if (!text) return;
-      
+
       const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       clientComments.push({ text, timestamp: time });
       input.value = '';
@@ -3926,7 +4413,7 @@ PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
         list.innerHTML = `<div style="color:#94a3b8; font-size:13px; font-style:italic; text-align:center; padding:20px; border:1px dashed #cbd5e1; border-radius:8px;">No comments yet.</div>`;
         return;
       }
-      
+
       list.innerHTML = clientComments.map((c, i) => `
         <div class="fade-in" style="background:#f8fafc; padding:12px; border:1px solid #e2e8f0; border-radius:8px; margin-bottom:12px;">
           <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
@@ -3944,153 +4431,82 @@ PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
     }
 
     function handleClientSuccessAction(status) {
-      // Hide modals
-      document.getElementById('client-reject-overlay').classList.add('hidden');
-      document.getElementById('client-sign-overlay').classList.add('hidden');
-
-      const handover = document.getElementById('client-handover-overlay');
-      handover.classList.remove('hidden');
-      handover.style.display = 'flex';
-      handover.classList.add('show');
-
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          handover.style.opacity = '1';
-        });
+      // Hide all potential overlays
+      const overlays = [
+        'client-reject-overlay', 
+        'client-sign-overlay', 
+        'delivery-overlay', 
+        'onboarding-dispatch-overlay',
+        'manager-review-overlay'
+      ];
+      overlays.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
       });
 
-      // Reset components
-      const pb = document.getElementById('client-handover-progress');
-      pb.style.width = '0%';
+      // Immediately return to manager dashboard
+      document.getElementById('client-dashboard').classList.add('hidden');
       
-      const badge = document.getElementById('client-handover-badge');
-      const badgeText = document.getElementById('client-handover-badge-text');
-      const badgeIconContainer = document.getElementById('client-handover-badge-icon');
-      
-      const isApproved = status === 'Approved';
-
-      // Reset badge styles
-      badge.style.opacity = '0';
-      badge.style.transform = 'translateY(10px)';
-      
-      if (isApproved) {
-        badgeText.innerText = "Client Authorized";
-        badgeText.style.color = "#22c55e";
-        badge.style.background = "rgba(34,197,94,0.12)";
-        badge.style.borderColor = "rgba(34,197,94,0.3)";
-        if(badgeIconContainer) {
-          badgeIconContainer.style.background = "rgba(34,197,94,0.2)";
-          const svg = badgeIconContainer.querySelector('svg');
-          svg.innerHTML = `<polyline points="20 6 9 17 4 12"></polyline>`;
-          svg.setAttribute('stroke', '#22c55e');
-        }
-      } else {
-        badgeText.innerText = "Client Revisions Requested";
-        badgeText.style.color = "#ef4444";
-        badge.style.background = "rgba(239,68,68,0.12)";
-        badge.style.borderColor = "rgba(239,68,68,0.3)";
-        if(badgeIconContainer) {
-          badgeIconContainer.style.background = "rgba(239,68,68,0.2)";
-          const svg = badgeIconContainer.querySelector('svg');
-          svg.innerHTML = `<path d="M18 6L6 18M6 6l12 12"></path>`;
-          svg.setAttribute('stroke', '#ef4444');
-        }
+      const dash = document.getElementById('dashboard');
+      if (dash) {
+        dash.style.display = 'grid';
+        dash.style.opacity = '1';
       }
 
-      const el1 = document.getElementById('client-handover-title');
-      const el2 = document.getElementById('client-handover-msg');
-      const hint = document.getElementById('client-handover-click-hint');
-      
-      el1.textContent = '';
-      el2.textContent = '';
-      el2.style.opacity = '0';
-      hint.style.opacity = '0';
-
-      let clickReady = false;
-
-      // Start sequence
-      setTimeout(() => {
-        pb.style.width = '100%';
-        
-        setTimeout(() => {
-          badge.style.opacity = '1';
-          badge.style.transform = 'translateY(0)';
-          
-          setTimeout(() => {
-            const msg1 = isApproved ? 
-              'Client has successfully signed the proposal. Transmitting final decision logs back to the global audit network.' :
-              `Client decision recorded: ${status}. Propagating updates to the global audit network.`;
-
-            let i = 0;
-            const type1 = setInterval(() => {
-              el1.textContent += msg1[i++];
-              if (i >= msg1.length) {
-                clearInterval(type1);
-                
-                setTimeout(() => {
-                  el2.style.opacity = '1';
-                  const msg2 = 'Switching to Manager Dashboard...';
-                  let j = 0;
-                  const type2 = setInterval(() => {
-                    el2.textContent += msg2[j++];
-                    if(j >= msg2.length) {
-                      clearInterval(type2);
-                      
-                      setTimeout(() => {
-                        hint.style.opacity = '1';
-                        handover.style.cursor = 'pointer';
-                        clickReady = true;
-                      }, 500);
-                    }
-                  }, 30);
-                }, 600);
-              }
-            }, 25);
-          }, 600);
-        }, 400);
-      }, 300);
-
-      const advance = () => {
-        if (!clickReady) return;
-        handover.removeEventListener('click', advance);
-        handover.style.cursor = 'default';
-        handover.style.opacity = '0';
-        
-        setTimeout(() => {
-          handover.classList.remove('show');
-          handover.classList.add('hidden');
-          handover.style.display = 'none';
-
-          document.getElementById('client-dashboard').classList.add('hidden');
-          document.getElementById('dashboard').style.display = 'grid'; // Return to manager grid layout
-          updateManagerDashboardWithClientStatus(status);
-        }, 800);
-      };
-
-      handover.addEventListener('click', advance);
+      updateManagerDashboardWithClientStatus(status);
     }
 
     function updateManagerDashboardWithClientStatus(status) {
       const row = document.getElementById('targetRow');
       const isApproved = status === 'Approved';
-      const step7 = document.getElementById('step7');
+      const isFullySubmitted = status === 'Documents Submitted';
+      
+      // Update ALL steps if fully submitted
+      const allSteps = [1, 2, 3, 4, 5, 6, 7];
+      allSteps.forEach(num => {
+        const stepEl = document.getElementById('step' + num);
+        if (stepEl) {
+          stepEl.classList.remove('active');
+          stepEl.classList.add('completed');
+          const stepIcon = stepEl.querySelector('.step-icon');
+          if (stepIcon) {
+            stepIcon.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+          }
+          const chip = stepEl.querySelector('.kyc-status-chip');
+          if (chip) {
+            if (num < 7) {
+              chip.innerText = "VERIFIED";
+              chip.className = 'kyc-status-chip status-completed';
+            } else {
+              chip.innerText = isFullySubmitted ? "DOCUMENTS INGESTED" : (isApproved ? "CLIENT AUTHORIZED" : "CLIENT REJECTED");
+              chip.className = 'kyc-status-chip status-completed';
+              if (!isApproved && !isFullySubmitted) {
+                chip.style.background = "#fef2f2";
+                chip.style.color = "#ef4444";
+                stepEl.querySelector('p').innerText = "Client has requested revisions to the proposal.";
+              }
+            }
+          }
+        }
+      });
 
-      // Finalize Stepper
-      step7.classList.remove('active');
-      step7.classList.add('completed');
-      step7.querySelector('.step-icon').innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
-      
-      if (isApproved) {
-        step7.querySelector('.kyc-status-chip').innerText = "CLIENT AUTHORIZED";
-        step7.querySelector('.kyc-status-chip').classList.add('status-completed');
-      } else {
-        step7.querySelector('.kyc-status-chip').innerText = "CLIENT REJECTED";
-        step7.querySelector('.kyc-status-chip').style.background = "#fef2f2";
-        step7.querySelector('.kyc-status-chip').style.color = "#ef4444";
-        step7.querySelector('p').innerText = "Client has requested revisions to the proposal.";
-      }
-      
       // Update the table row in manager view
+      let statusBadge = '';
+      if (isFullySubmitted) {
+        statusBadge = `
+          <span style="color:#059669; background:#f0fdf4; padding:4px 10px; border-radius:16px; font-weight:700; font-size:12px; display:inline-flex; align-items:center; gap:6px; border:1px solid #bbf7d0; box-shadow: 0 0 10px rgba(16,185,129,0.1);">
+            <div style="width:6px;height:6px;background:#10b981;border-radius:50%; animation: pulse-glow 2s infinite;"></div>Submission Verified
+          </span>`;
+      } else {
+        statusBadge = isApproved ?
+          `<span style="color:#0369a1; background:#f0f9ff; padding:4px 10px; border-radius:16px; font-weight:600; font-size:12px; display:inline-flex; align-items:center; gap:6px; border:1px solid #bae6fd;">
+            <div style="width:6px;height:6px;background:#0ea5e9;border-radius:50%"></div>Ready for Partner
+          </span>` :
+          `<span style="color:#b91c1c; background:#fef2f2; padding:4px 10px; border-radius:16px; font-weight:600; font-size:12px; display:inline-flex; align-items:center; gap:6px; border:1px solid #fecaca;">
+            <div style="width:6px;height:6px;background:#ef4444;border-radius:50%"></div>Client Rejected
+          </span>`;
+      }
+
       row.innerHTML = `
         <td>
           <div class="entity-cell">
@@ -4103,53 +4519,83 @@ PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
         <td style="color:var(--text-secondary);">+1 (800) 555-1234</td>
         <td>
            <div style="display:flex; align-items:center; gap:12px;">
-             ${isApproved ?
-          `<span style="color:#15803d; background:#f0fdf4; padding:4px 10px; border-radius:16px; font-weight:600; font-size:12px; display:inline-flex; align-items:center; gap:6px; border:1px solid #bbf7d0;">
-               <div style="width:6px;height:6px;background:#10b981;border-radius:50%"></div>Client Signed
-             </span>` :
-          `<span style="color:#b91c1c; background:#fef2f2; padding:4px 10px; border-radius:16px; font-weight:600; font-size:12px; display:inline-flex; align-items:center; gap:6px; border:1px solid #fecaca;">
-               <div style="width:6px;height:6px;background:#ef4444;border-radius:50%"></div>Client Rejected
-             </span>`}
+             ${statusBadge}
            </div>
         </td>
         <td>
            <div style="display:flex; gap:4px;">
-              <div style="width:16px; height:6px; background:#10b981; border-radius:3px;"></div>
-              <div style="width:16px; height:6px; background:#10b981; border-radius:3px;"></div>
-              <div style="width:16px; height:6px; background:#10b981; border-radius:3px;"></div>
-              <div style="width:16px; height:6px; background:#10b981; border-radius:3px;"></div>
-              <div style="width:16px; height:6px; background:#10b981; border-radius:3px;"></div>
-              <div style="width:16px; height:6px; background:#10b981; border-radius:3px;"></div>
-              <div style="width:16px; height:6px; background:#10b981; border-radius:3px;"></div>
+              ${Array(7).fill('<div style="width:16px; height:6px; background:#10b981; border-radius:3px;"></div>').join('')}
            </div>
         </td>
         <td>
-           <button class="btn" style="width:auto; padding:6px 14px; margin:0; font-size:12px; background:#f1f5f9; color:#475569; border:1px solid #e2e8f0; display:flex; align-items:center; gap:6px; border-radius:16px; min-height:0; font-weight:600;" onclick="alert('Viewing archival decision logs for Audit Offshore Ltd.')">
+           <button class="btn" style="width:auto; padding:6px 14px; margin:0; font-size:12px; background:${isFullySubmitted ? '#059669' : '#7c3aed'}; color:white; border:none; display:flex; align-items:center; gap:6px; border-radius:16px; min-height:0; font-weight:600; box-shadow: 0 2px 4px rgba(124,58,237,0.2);" onclick="event.stopPropagation(); this.innerHTML='✓ Locked'; this.style.background='#64748b';">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
               </svg>
-              View
+              ${isFullySubmitted ? 'Files Locked' : 'Send to Partner'}
            </button>
         </td>
       `;
 
-      // ✅ Update Side Panel Footer Actions
+      // Handle Document Ingestion Tracker view update
+      const ingestionRow = document.getElementById('ingestionRow1');
+      if (ingestionRow && isFullySubmitted) {
+        ingestionRow.querySelector('#progress-label-1').innerText = "6/6 Documents Verified";
+        ingestionRow.querySelector('#progress-percent-1').innerText = "100%";
+        ingestionRow.querySelector('#progress-percent-1').style.color = "#059669";
+        
+        const progBars = ingestionRow.querySelector('#progress-bars-1');
+        if (progBars) {
+            progBars.innerHTML = Array(6).fill('<div style="flex:1; height:6px; background:#10b981; border-radius:3px;"></div>').join('');
+        }
+        
+        ingestionRow.querySelector('#progress-name-1').innerHTML = "All documents <strong>Secured & Analyzed</strong> ✓";
+        
+        const validationStatus = ingestionRow.querySelector('td:nth-child(4)');
+        if (validationStatus) {
+            validationStatus.innerHTML = `
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                    <span style="color:#059669; background:#ecfdf5; padding:4px 10px; border-radius:16px; font-weight:600; font-size:12px; display:inline-flex; align-items:center; gap:6px; border:1px solid #a7f3d0; width:fit-content;">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        All Validated
+                    </span>
+                    <span style="font-size:11px; color:#64748b;">Cross-reconciliation complete.</span>
+                </div>
+            `;
+        }
+        
+        const deadlineCell = document.getElementById('deadlineCell1');
+        if (deadlineCell) {
+            deadlineCell.innerHTML = `
+                <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+                    <span style="font-size:12px; font-weight:700; color:#059669;">COMPLETED</span>
+                    <span style="font-size:11px; color:#94a3b8;">Ahead of Schedule</span>
+                </div>
+            `;
+        }
+      }
+
+      // Update Side Panel Footer Actions
       const aiBtn = document.getElementById('side-panel-ai-btn');
       const sendLinkBtn = document.getElementById('side-panel-send-link-btn');
-      
-      if (isApproved) {
+
+      if (isApproved || isFullySubmitted) {
         if (aiBtn) aiBtn.style.display = 'none';
         if (sendLinkBtn) {
+          if (isFullySubmitted) {
+            sendLinkBtn.innerHTML = '✓ All Documents Ingested';
+            sendLinkBtn.style.background = '#64748b';
+            sendLinkBtn.style.pointerEvents = 'none';
+          }
           sendLinkBtn.style.display = 'inline-flex';
           sendLinkBtn.classList.add('fade-in');
         }
       }
 
-      // ✅ Re-open side panel to show updated timeline
+      // Re-open side panel to show updated timeline
       const sidePanel = document.getElementById('sidePanel');
       if (sidePanel) {
-        setTimeout(() => sidePanel.classList.add('open'), 400);
+        sidePanel.classList.add('open');
       }
     }
 
@@ -4199,27 +4645,27 @@ PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
 
     function updateLiveProgress(step) {
       if (step < 1 || step > 6) return;
-      
+
       const percent = Math.round((step / 6) * 100);
       const sectionName = sectionNames[step - 1];
-      
+
       const progressLabel = document.getElementById("progress-label-1");
       const progressPercent = document.getElementById("progress-percent-1");
       const progressName = document.getElementById("progress-name-1");
       const progressBars = document.getElementById("progress-bars-1");
-      
+
       if (progressLabel) progressLabel.innerText = `Section ${step}/6 Active`;
       if (progressPercent) progressPercent.innerText = `${percent}%`;
       if (progressName) progressName.innerHTML = `Currently reviewing: <strong>${sectionName}</strong>`;
-      
+
       if (progressBars) {
-         Array.from(progressBars.children).forEach((bar, index) => {
-           if (index < step) {
-             bar.style.background = "#10b981"; // green
-           } else {
-             bar.style.background = "#e2e8f0"; // grey
-           }
-         });
+        Array.from(progressBars.children).forEach((bar, index) => {
+          if (index < step) {
+            bar.style.background = "#10b981"; // green
+          } else {
+            bar.style.background = "#e2e8f0"; // grey
+          }
+        });
       }
     }
 
@@ -4236,7 +4682,7 @@ PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
       btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Pinged!`;
       btn.style.background = "#dcfce7";
       btn.style.color = "#166534";
-      
+
       setTimeout(() => {
         btn.innerHTML = originalHtml;
         btn.style.background = "#fef3c7";
@@ -4259,14 +4705,100 @@ PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
     if (window.location.search.includes('data=received')) {
       // Small timeout to allow render
       setTimeout(() => {
-        updateIngestionTrackerToComplete();
+        showIngestionCinematicOverlay();
       }, 500);
+    }
+
+    function showIngestionCinematicOverlay() {
+      const overlay = document.getElementById('ingestion-success-overlay');
+      overlay.classList.remove('hidden');
+      overlay.style.display = 'flex';
+      overlay.classList.add('show');
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          overlay.style.opacity = '1';
+        });
+      });
+
+      const pb = document.getElementById('ingestion-progress-bar');
+      pb.style.width = '0%';
+
+      const badge = document.getElementById('ingestion-badge');
+      badge.style.opacity = '0';
+      badge.style.transform = 'translateY(10px)';
+
+      const el1 = document.getElementById('ingestion-cinematic-text');
+      const el2 = document.getElementById('ingestion-cinematic-text-2');
+      const hint = document.getElementById('ingestion-click-hint');
+
+      el1.textContent = '';
+      el2.textContent = '';
+      el2.style.opacity = '0';
+      hint.style.opacity = '0';
+
+      let clickReady = false;
+
+      setTimeout(() => {
+        pb.style.width = '100%';
+
+        setTimeout(() => {
+          badge.style.opacity = '1';
+          badge.style.transform = 'translateY(0)';
+
+          setTimeout(() => {
+            const msg1 = 'Client data ingestion protocol completed. Encrypted financial documents received successfully.';
+            let i = 0;
+            const type1 = setInterval(() => {
+              el1.textContent += msg1[i++];
+              if (i >= msg1.length) {
+                clearInterval(type1);
+
+                setTimeout(() => {
+                  el2.style.opacity = '1';
+                  const msg2 = 'Switching to Document Validation Matrix...';
+                  let j = 0;
+                  const type2 = setInterval(() => {
+                    el2.textContent += msg2[j++];
+                    if (j >= msg2.length) {
+                      clearInterval(type2);
+
+                      setTimeout(() => {
+                        hint.style.opacity = '1';
+                        overlay.style.cursor = 'pointer';
+                        clickReady = true;
+                      }, 500);
+                    }
+                  }, 30);
+                }, 600);
+              }
+            }, 25);
+          }, 600);
+        }, 400);
+      }, 300);
+
+      const advance = () => {
+        if (!clickReady) return;
+        overlay.removeEventListener('click', advance);
+        overlay.style.cursor = 'default';
+        overlay.style.opacity = '0';
+
+        setTimeout(() => {
+          overlay.classList.remove('show');
+          overlay.classList.add('hidden');
+          overlay.style.display = 'none';
+
+          updateIngestionTrackerToComplete();
+        }, 800);
+      };
+
+      overlay.addEventListener('click', advance);
     }
 
     function updateIngestionTrackerToComplete() {
       // Ensure we switch to the ingestion view
       const navItem = document.getElementById('nav-doc-upload');
-      if(navItem) switchDashboardView('view-doc-upload', navItem);
+      if (navItem) switchDashboardView('view-doc-upload', navItem);
 
       const row = document.getElementById('ingestionRow1');
       if (row) {
@@ -4317,8 +4849,14 @@ PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
       }
     }
 
-    function sendOnboardingLink() {
-      const btn = document.getElementById('side-panel-send-link-btn');
+    function sendOnboardingLink(element) {
+      const btn = element || document.getElementById('side-panel-send-link-btn');
+      if (!btn) {
+         window.open('client-portal.html', '_blank');
+         return;
+      }
+      
+      const originalHtml = btn.innerHTML;
       btn.innerHTML = `<span class="spinner" style="margin-right:8px; border-top-color:white; width:12px; height:12px;"></span> Transmitting link...`;
       btn.disabled = true;
       btn.style.opacity = '0.8';
@@ -4332,30 +4870,439 @@ PRE-AUTHORIZED BY: AI COMPLIANCE ENGINE`;
           Link Sent Successfully
         `;
         btn.style.background = '#0d9488';
-        
-        // Show Animation Overlay
-        const overlay = document.getElementById('onboarding-dispatch-overlay');
-        overlay.classList.remove('hidden');
-        overlay.classList.add('fade-in');
+        btn.style.color = '#ffffff';
 
-        // After 2.5 seconds, open the new portal in a new tab, then hide overlay
-        setTimeout(() => {
-          overlay.classList.remove('fade-in');
-          overlay.classList.add('fade-out');
-          
-          // Store reference to the opened window for communication
-          clientPortalWindow = window.open('client-portal.html', '_blank');
+        // Immediately open the standalone client portal (bypassing overlay)
+        window.open('client-portal.html', '_blank');
 
-          setTimeout(() => {
-            overlay.classList.add('hidden');
-            overlay.classList.remove('fade-out');
-          }, 600);
-        }, 2500);
-
-      }, 1500);
+      }, 800); // reduced timeout to be much faster
     }
+
+    // Initialize on page load
+    window.addEventListener('DOMContentLoaded', () => {
+        // Ensure dashboard is visible immediately
+        const dash = document.getElementById('dashboard');
+        if (dash) dash.style.opacity = '1';
+        
+        initSelectionCommenting();
+    });
+
+    // --- Selection Commenting Logic ---
+    let currentSelection = null;
+    let comments = [];
+
+    function initSelectionCommenting() {
+        const ids = ['pdf-synopsis', 'pdf-req', 'pdf-timeline', 'pc-complexity-reason', 'pc-complexity-req', 'inline-proposal-text', 'sec-synopsis', 'sec-scope', 'sec-timeline'];
+        
+        ids.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('mouseup', handleTextSelection);
+            }
+        });
+        
+        // Use event delegation for section clicks
+        document.addEventListener('click', (e) => {
+            const wrapper = e.target.closest('.comment-section-wrapper');
+            if (wrapper && window.getSelection().toString().trim() === "" && !e.target.closest('.comment-highlight') && !e.target.closest('.section-add-comment-btn')) {
+                handleSectionClickEvent(e, wrapper.id);
+            }
+        });
+
+        document.addEventListener('mousedown', (e) => {
+            const popover = document.getElementById('comment-popover');
+            if (popover && !popover.contains(e.target) && !e.target.closest('[contenteditable="true"]') && !e.target.closest('.section-comment-indicator') && !e.target.closest('.section-add-comment-btn')) {
+                hideCommentPopover();
+            }
+        });
+    }
+
+    function handleSectionClickEvent(e, wrapperId) {
+        // Only allow commenting if we are NOT in manager review or client dashboard
+        if (e.target.closest('#manager-review-overlay') || e.target.closest('#client-dashboard')) {
+            return;
+        }
+
+        if (e.stopPropagation) e.stopPropagation();
+        
+        let sectionName = "this section";
+        if (wrapperId.includes('synopsis')) sectionName = "Executive Synopsis";
+        if (wrapperId.includes('scope')) sectionName = "Engagement Scope";
+        if (wrapperId.includes('timeline')) sectionName = "Project Timeline";
+
+        currentSelection = {
+            isSection: true,
+            text: `[Comment on ${sectionName}]`,
+            containerId: wrapperId
+        };
+
+        const x = e.pageX || e.clientX;
+        const y = e.pageY || e.clientY;
+        showCommentPopover(x, y, `General Note: ${sectionName}`);
+    }
+
+    function handleTextSelection(e) {
+        // Only allow commenting if we are NOT in manager review or client dashboard
+        if (e.target.closest('#manager-review-overlay') || e.target.closest('#client-dashboard')) {
+            return;
+        }
+
+        const selection = window.getSelection();
+        const text = selection.toString().trim();
+
+        if (text.length > 0) {
+            currentSelection = {
+                text: text,
+                range: selection.getRangeAt(0),
+                containerId: e.currentTarget.id
+            };
+
+            showCommentPopover(e.pageX, e.pageY, text);
+        }
+    }
+
+    function showCommentPopover(x, y, text) {
+        const popover = document.getElementById('comment-popover');
+        const preview = document.getElementById('selected-text-preview');
+        const input = document.getElementById('popover-comment-input');
+        
+        if (!popover) return;
+        
+        // Clear old input
+        if (input) input.value = '';
+
+        // Show/hide preview for section vs text selection
+        if (preview) {
+            const isSection = text.startsWith('General Note:');
+            if (isSection) {
+                preview.style.display = 'none';
+            } else {
+                preview.style.display = 'block';
+                preview.innerText = `"${text.length > 80 ? text.substring(0, 80) + '...' : text}"`;
+            }
+        }
+
+        popover.style.display = 'flex';
+        
+        // Clamp to viewport so it never goes off screen
+        const popoverW = 300;
+        const popoverH = 200;
+        const maxX = window.innerWidth - popoverW - 16;
+        const maxY = window.innerHeight - popoverH - 16;
+        const boundedX = Math.max(8, Math.min(x, maxX));
+        const boundedY = Math.max(8, Math.min(y - 120, maxY));
+        
+        popover.style.left = `${boundedX}px`;
+        popover.style.top = `${boundedY}px`;
+        
+        // Delay focus so popover renders first
+        setTimeout(() => { if (input) input.focus(); }, 50);
+    }
+
+    function hideCommentPopover() {
+        const popover = document.getElementById('comment-popover');
+        if (popover) popover.style.display = 'none';
+        const input = document.getElementById('popover-comment-input');
+        if (input) input.value = '';
+    }
+
+    function saveSelectionComment() {
+        const commentInput = document.getElementById('popover-comment-input');
+        const commentText = commentInput.value.trim();
+        if (!commentText || !currentSelection) return;
+
+        const commentId = 'comment-' + Date.now();
+        
+        if (currentSelection.isSection) {
+            // Add a visual indicator at the top of the section
+            const container = document.getElementById(currentSelection.containerId);
+            const indicator = document.createElement('div');
+            indicator.className = 'section-comment-indicator';
+            indicator.id = commentId;
+            indicator.innerHTML = `
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                Partner Note: ${commentText.substring(0, 20)}${commentText.length > 20 ? '...' : ''}
+            `;
+            container.prepend(indicator);
+        } else {
+            const span = document.createElement('span');
+            span.className = 'comment-highlight';
+            span.id = commentId;
+            span.innerText = currentSelection.text;
+            
+            try {
+                currentSelection.range.deleteContents();
+                currentSelection.range.insertNode(span);
+            } catch (err) {
+                console.error("Range insert failed", err);
+            }
+        }
+
+        const commentObj = {
+            id: commentId,
+            selectedText: currentSelection.text,
+            comment: commentText,
+            isSection: currentSelection.isSection || false,
+            containerId: currentSelection.containerId,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+
+        comments.push(commentObj);
+        if (typeof partnerComments !== 'undefined') partnerComments.push(commentObj);
+
+        renderCommentList();
+        hideCommentPopover();
+        
+        window.getSelection().removeAllRanges();
+    }
+
+    function renderCommentList() {
+        const list = document.getElementById('pdf-comments-list');
+        if (!list) return;
+        
+        if (comments.length === 0) {
+            list.innerHTML = `<div style="color:#94a3b8; font-size:13px; font-style:italic; padding:16px; border:1px dashed #e2e8f0; border-radius:8px; text-align:center;">Select text in the proposal to add specific review comments.</div>`;
+            return;
+        }
+
+        list.innerHTML = comments.map(c => `
+            <div class="comment-card-item" onclick="scrollToCommentHighlight('${c.id}')">
+                <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                    <span style="font-weight:700; color:#2563eb;">${c.isSection ? 'Section Note' : 'Partner Note'}</span>
+                    <span style="font-size:11px; color:#94a3b8;">${c.timestamp}</span>
+                </div>
+                ${c.isSection ? '' : `<div class="selected-text-preview">"${c.selectedText}"</div>`}
+                <div style="color:#334155; line-height:1.4;">${c.comment}</div>
+            </div>
+        `).join('');
+    }
+
+    function scrollToCommentHighlight(id) {
+        const el = document.getElementById(id);
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            const originalBg = el.style.backgroundColor;
+            el.style.backgroundColor = 'rgba(255, 235, 59, 1)';
+            setTimeout(() => {
+                el.style.backgroundColor = originalBg || 'rgba(255, 245, 157, 0.6)';
+            }, 2000);
+        }
+    }
+
+    function scrollToManagerHighlight(id) {
+        const display = document.getElementById('manager-review-proposal-display');
+        if (!display) return;
+        
+        const el = display.querySelector('#' + id);
+        if (el) {
+            // Find the containing section or wrapper to highlight the whole block
+            const sectionTarget = el.closest('.comment-section-wrapper') || el.closest('section') || el;
+            
+            sectionTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // Capture original state
+            const originalBg = sectionTarget.style.backgroundColor;
+            const originalTransition = sectionTarget.style.transition;
+            
+            // Apply Subtle Context Highlight (Light Indigo)
+            sectionTarget.style.transition = 'background-color 0.4s ease';
+            sectionTarget.style.backgroundColor = '#f5f3ff'; // Light purple/indigo
+            
+            setTimeout(() => {
+                sectionTarget.style.backgroundColor = originalBg;
+                setTimeout(() => {
+                    sectionTarget.style.transition = originalTransition;
+                }, 400);
+            }, 2000); // 2 seconds
+        }
+    }
+
+    function transitionToClientView() {
+        const dash = document.getElementById('dashboard');
+        if (dash) dash.style.display = 'none';
+        
+        const clientDash = document.getElementById('client-dashboard');
+        if (clientDash) clientDash.classList.remove('hidden');
+        
+        prepareClientProposalView();
+    }
+
+    function prepareClientProposalView() {
+        const display = document.getElementById('client-proposal-display');
+        const source = document.getElementById('inline-proposal-text');
+        
+        if (!display || !source) return;
+
+        // Sync the full rich proposal from the partner's editor
+        display.innerHTML = source.innerHTML;
+        display.style.fontFamily = "'Inter', sans-serif";
+
+        // Populate partner comments panel
+        const clientCommentsList = document.getElementById('client-comments-list');
+        if (clientCommentsList) {
+            if (comments.length === 0) {
+                clientCommentsList.innerHTML = `
+                    <div style="color:#94a3b8; font-size:13px; font-style:italic; text-align:center; padding:20px; border:1px dashed #ddd5fe; border-radius:8px; background:#faf5ff;">
+                      No partner notes have been added to this proposal.
+                    </div>`;
+            } else {
+                clientCommentsList.innerHTML = comments.map((c, i) => `
+                    <div onclick="scrollToClientHighlight('${c.id}')" style="background:white; border:1px solid #e9d5ff; border-left:3px solid #7c3aed; border-radius:8px; padding:12px 14px; cursor:pointer; transition:all 0.2s;"
+                      onmouseover="this.style.background='#faf5ff'; this.style.borderColor='#7c3aed';"
+                      onmouseout="this.style.background='white'; this.style.borderColor='#e9d5ff';">
+                      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
+                        <div style="display:flex; align-items:center; gap:6px;">
+                          <div style="width:18px; height:18px; background:#f3f0ff; border-radius:4px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                          </div>
+                          <span style="font-size:11px; font-weight:700; color:#7c3aed;">${c.isSection ? 'Section Note' : 'Partner Note'}</span>
+                        </div>
+                        <span style="font-size:10px; color:#94a3b8;">${c.timestamp}</span>
+                      </div>
+                      ${!c.isSection ? `<div style="font-size:11px; color:#5b21b6; background:#f3f0ff; padding:4px 8px; border-radius:4px; margin-bottom:6px; font-style:italic; line-height:1.4;">"${c.selectedText.length > 50 ? c.selectedText.substring(0,50)+'...' : c.selectedText}"</div>` : ''}
+                      <div style="font-size:12px; color:#334155; line-height:1.5;">${c.comment}</div>
+                      <div style="margin-top:8px; font-size:10px; color:#7c3aed; font-weight:600; display:flex; align-items:center; gap:3px;">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        Click to locate in document
+                      </div>
+                    </div>
+                `).join('');
+            }
+        }
+    }
+
+    function scrollToClientHighlight(id) {
+        const container = document.getElementById('client-proposal-display');
+        if (!container) return;
+        
+        const el = container.querySelector('#' + id);
+        if (el) {
+            // Context-aware targeting: highlight the entire section
+            const sectionTarget = el.closest('.comment-section-wrapper') || el.closest('section') || el;
+            
+            sectionTarget.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+            
+            const originalBg = sectionTarget.style.backgroundColor;
+            const originalTransition = sectionTarget.style.transition;
+            
+            sectionTarget.style.transition = 'background-color 0.4s ease';
+            sectionTarget.style.backgroundColor = '#f5f3ff'; // Simple light indigo
+            
+            setTimeout(() => {
+                sectionTarget.style.backgroundColor = originalBg;
+                setTimeout(() => {
+                    sectionTarget.style.transition = originalTransition;
+                }, 400);
+            }, 2000); // 2 seconds
+        }
+    }
+
+    /* ── Toast Notification ── */
+    function showToast(message) {
+      let toast = document.getElementById('global-toast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'global-toast';
+        toast.className = 'toast';
+        document.body.appendChild(toast);
+      }
+      
+      toast.innerHTML = `
+        <div class="toast-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="4"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <span>${message}</span>
+      `;
+      
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 4500);
+    }
+
+    /* ── Handle redirect from client portal ── */
+    (function handlePortalReturn() {
+      const params = new URLSearchParams(window.location.search);
+      const dataParam = params.get('data');
+      const flowParam = params.get('flow');
+      
+      if (!dataParam && flowParam !== 'documents_submitted') return;
+
+      // Clean the URL so refresh doesn't re-trigger
+      window.history.replaceState({}, '', window.location.pathname);
+
+      // Hide all potential overlays
+      const overlays = [
+        'client-reject-overlay', 
+        'client-sign-overlay', 
+        'delivery-overlay', 
+        'onboarding-dispatch-overlay',
+        'manager-review-overlay',
+        'client-handover-overlay'
+      ];
+      overlays.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+      });
+
+      // Show the main dashboard
+      const dash = document.getElementById('dashboard');
+      if (dash) {
+        dash.style.display = 'grid';
+        dash.style.opacity = '1';
+      }
+
+      // Handle the specific flow
+      if (flowParam === 'documents_submitted') {
+        // Switch to the Document Upload Progress view as requested
+        const docNav = document.getElementById('nav-doc-upload');
+        switchDashboardView('view-doc-upload', docNav);
+        
+        updateManagerDashboardWithClientStatus('Documents Submitted');
+        
+        // Final polish toast
+        setTimeout(() => {
+          if (typeof showToast !== 'undefined') {
+            showToast('Audit Offshore document portfolio has been successfully ingested and verified.');
+          } else {
+            alert('Audit Offshore document portfolio has been successfully ingested and verified.');
+          }
+        }, 800);
+      } else if (dataParam === 'received') {
+        updateManagerDashboardWithClientStatus('Approved');
+      }
+    })();
+
   </script>
+
+  <!-- ===== FLOATING COMMENT POPOVER ===== -->
+  <div id="comment-popover" style="position:fixed; display:none; flex-direction:column; gap:0; width:300px; background:white; border-radius:12px; box-shadow:0 20px 40px -8px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.06); z-index:99999; overflow:hidden;">
+    <!-- Header -->
+    <div style="background:#0f172a; padding:12px 16px; display:flex; align-items:center; justify-content:space-between;">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        <span style="font-size:12px; font-weight:700; color:white;">Add Partner Note</span>
+      </div>
+      <button onclick="hideCommentPopover()" style="background:rgba(255,255,255,0.1); border:none; color:white; cursor:pointer; padding:4px 8px; border-radius:4px; font-size:12px; line-height:1;">✕</button>
+    </div>
+    <!-- Selected text preview -->
+    <div id="selected-text-preview" style="margin:12px 16px 0; padding:8px 12px; background:#fef9ed; border:1px solid #fde68a; border-radius:6px; font-size:12px; color:#92400e; font-style:italic; line-height:1.4; max-height:60px; overflow:hidden; display:none;"></div>
+    <!-- Input -->
+    <div style="padding:12px 16px;">
+      <textarea id="popover-comment-input" placeholder="Type your review note here..." rows="3" style="width:100%; border:1px solid #e2e8f0; border-radius:8px; padding:10px 12px; font-size:13px; font-family:inherit; resize:none; outline:none; line-height:1.5; color:#334155; transition: border-color 0.2s;" 
+        onfocus="this.style.borderColor='#2563eb'; this.style.boxShadow='0 0 0 3px rgba(37,99,235,0.1)';" 
+        onblur="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';"
+        onkeydown="if(event.key==='Enter' && (event.ctrlKey||event.metaKey)) saveSelectionComment();"></textarea>
+      <div style="font-size:10px; color:#94a3b8; margin-top:4px;">Ctrl+Enter to save</div>
+    </div>
+    <!-- Actions -->
+    <div style="display:flex; gap:8px; padding:0 16px 16px;">
+      <button onclick="hideCommentPopover()" style="flex:1; padding:8px; background:#f1f5f9; border:1px solid #e2e8f0; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; color:#64748b; transition:background 0.2s;" onmouseover="this.style.background='#e2e8f0';" onmouseout="this.style.background='#f1f5f9';">Cancel</button>
+      <button onclick="saveSelectionComment()" style="flex:2; padding:8px; background:#2563eb; border:none; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; color:white; display:flex; align-items:center; justify-content:center; gap:6px; transition:background 0.2s;" onmouseover="this.style.background='#1d4ed8';" onmouseout="this.style.background='#2563eb';">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        Add Comment
+      </button>
+    </div>
+  </div>
+
 </body>
 
 </html>
-
