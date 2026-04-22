@@ -77,27 +77,27 @@
     }
 
     .comment-card-item:hover {
-        background: #f8fafc;
-        border-color: #2563eb;
+      background: #f8fafc;
+      border-color: #2563eb;
     }
 
     /* Read-only controls for Manager and Client */
     #manager-review-proposal-display .section-add-comment-btn,
     #client-proposal-display .section-add-comment-btn {
-        display: none !important;
+      display: none !important;
     }
 
     #manager-review-proposal-display .section-comment-indicator,
     #client-proposal-display .section-comment-indicator {
-        pointer-events: none;
-        box-shadow: none;
-        border-color: #e9d5ff;
+      pointer-events: none;
+      box-shadow: none;
+      border-color: #e9d5ff;
     }
 
     #manager-review-proposal-display [contenteditable="true"],
     #client-proposal-display [contenteditable="true"] {
-        pointer-events: none;
-        user-select: text;
+      pointer-events: none;
+      user-select: text;
     }
 
     .comment-card-item .selected-text-preview {
@@ -535,9 +535,11 @@
       position: relative;
       transition: all 0.2s ease;
     }
+
     .comment-highlight:hover {
       background-color: rgba(255, 235, 59, 0.8);
     }
+
     .section-comment-indicator {
       display: inline-flex;
       align-items: center;
@@ -553,9 +555,11 @@
       cursor: pointer;
       transition: all 0.2s;
     }
+
     .section-comment-indicator:hover {
       background: #dbeafe;
     }
+
     .comment-section-wrapper {
       position: relative;
       padding: 12px;
@@ -564,10 +568,12 @@
       border-radius: 12px;
       transition: all 0.2s;
     }
+
     .comment-section-wrapper:hover {
       border-color: rgba(37, 99, 235, 0.1);
       background: rgba(248, 250, 252, 0.4);
     }
+
     .section-add-comment-btn {
       position: absolute;
       right: 12px;
@@ -587,6 +593,7 @@
       gap: 4px;
       z-index: 10;
     }
+
     .comment-section-wrapper:hover .section-add-comment-btn {
       opacity: 1;
     }
@@ -644,9 +651,20 @@
 
     /* Pulse Glow Animation */
     @keyframes pulse-glow {
-      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); transform: scale(1); }
-      70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); transform: scale(1.1); }
-      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); transform: scale(1); }
+      0% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+        transform: scale(1);
+      }
+
+      70% {
+        box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+        transform: scale(1.1);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+        transform: scale(1);
+      }
     }
 
     /* Toast Styles */
@@ -660,18 +678,20 @@
       border-radius: 12px;
       font-size: 14px;
       font-weight: 500;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
       display: flex;
       align-items: center;
       gap: 10px;
       z-index: 10000;
       transform: translateY(100px);
       transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
-      border: 1px solid rgba(255,255,255,0.1);
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
+
     .toast.show {
       transform: translateY(0);
     }
+
     .toast-icon {
       width: 24px;
       height: 24px;
@@ -1155,7 +1175,7 @@
 
   <!-- Synchronous redirect blocker: hides lead-capture overlay instantly when returning from client portal -->
   <script>
-    (function() {
+    (function () {
       var params = new URLSearchParams(window.location.search);
       var flow = params.get('flow');
       var data = params.get('data');
@@ -2166,29 +2186,35 @@
     }
 
     async function executeFlow() {
-      // Immediately fade out the lead form on click — zero artificial delay
+      // Immediately start transition — zero artificial delay
       const intro = document.getElementById('intro-overlay');
       const btn = document.getElementById('submitBtn');
 
       btn.classList.add('loading');
       btn.disabled = true;
 
-      // Fade out intro instantly
-      intro.classList.add('fade-out');
+      // Immediately show cinematic black interstitial ON TOP of the white intro form
+      // (interstitial z-index is 3000, intro is 100)
+      const interstitial = document.getElementById('interstitial');
+      interstitial.style.display = 'flex';
+      
+      // Force repaint to ensure CSS transition works smoothly
+      void interstitial.offsetWidth;
+      interstitial.classList.add('show');
 
-      // Show cinematic black interstitial after CSS fade-out (~300ms)
+      // Do NOT fade out intro-overlay, it acts as a solid white blocker until the black interstitial is fully opaque.
+      // Wait for interstitial fade-in (0.8s) before starting text typewriter, 
+      // but start it slightly earlier (e.g. 400ms) for a snappy feel.
       setTimeout(() => {
+        // Now safely hide the intro form underneath
         intro.style.display = 'none';
-        const interstitial = document.getElementById('interstitial');
-        interstitial.style.display = 'flex';
-        interstitial.classList.add('show');
-
+        
         // Reveal badge immediately
         const badge = document.getElementById('interstitial-badge');
         badge.style.opacity = '1';
         badge.style.transform = 'translateY(0)';
 
-        // Start progress bar immediately
+        // Start progress bar 
         document.getElementById('interstitial-progress').style.width = '100%';
 
         // Typewriter Line 1
@@ -2229,11 +2255,11 @@
           setTimeout(() => {
             interstitial.style.display = 'none';
             runClientKYC();
-          }, 400);
+          }, 400); // Wait for fade out of interstitial
         };
         interstitial.addEventListener('click', advanceToKYC);
 
-      }, 300);
+      }, 500); // 500ms allows the black overlay to become mostly opaque before starting text
     }
 
     async function runClientKYC() {
@@ -2308,25 +2334,17 @@
       submit3.classList.add('loading');
       await new Promise(r => setTimeout(r, 1200));
 
-      // KYC finished — fade out KYC layer
-      kycLayer.classList.remove('fade-in');
-      kycLayer.classList.add('fade-out');
+      // Show cinematic full-screen black overlay ON TOP of the KYC layer
+      const successOv = document.getElementById('kyc-success-overlay');
+      successOv.classList.remove('hidden');
+      successOv.style.display = 'flex';
+      void successOv.offsetWidth; // Force repaint
+      successOv.classList.add('show');
+      successOv.style.opacity = '1';
 
+      // After cinematic overlay fades in (0.8s), safely remove the KYC layer underneath
       setTimeout(() => {
         kycLayer.style.display = 'none';
-
-        // Show cinematic full-screen black overlay
-        const successOv = document.getElementById('kyc-success-overlay');
-        successOv.classList.remove('hidden');
-        successOv.style.display = 'flex';
-        successOv.classList.add('show');
-
-        // Fade in the black screen
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            successOv.style.opacity = '1';
-          });
-        });
 
         // Start progress bar
         setTimeout(() => {
@@ -2634,22 +2652,21 @@
     }
 
     function openPartnerView() {
-      // Hide AI modal and side panel
-      closeAI();
-      document.getElementById('sidePanel').classList.remove('open');
-
-      // Show Handover Overlay
+      // Show Handover Overlay INSTANTLY ON TOP FIRST
       const handoverOv = document.getElementById('partner-handover-overlay');
       handoverOv.classList.remove('hidden');
       handoverOv.style.display = 'flex';
+      void handoverOv.offsetWidth; // Repaint
       handoverOv.classList.add('show');
+      handoverOv.style.opacity = '1';
 
-      // Fade in the black screen
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          handoverOv.style.opacity = '1';
-        });
-      });
+      // After fade-in, safely hide AI modal and side panel without fade-out animation
+      setTimeout(() => {
+        const aiOv = document.getElementById('ai-overlay');
+        aiOv.classList.add('hidden');
+        aiOv.classList.remove('fade-in', 'fade-out');
+        document.getElementById('sidePanel').classList.remove('open');
+      }, 500);
 
       // Start progress bar
       setTimeout(() => {
@@ -2701,16 +2718,17 @@
         if (!partnerClickReady) return;
         handoverOv.removeEventListener('click', advanceToPartner);
         handoverOv.style.cursor = 'default';
+        
+        // Swap dashboards instantly while it's fully opaque black
+        document.getElementById('dashboard').style.display = 'none';
+        const pv = document.getElementById('partner-dashboard');
+        pv.classList.remove('hidden');
+        
         handoverOv.classList.remove('show');
         handoverOv.style.opacity = '0';
         setTimeout(() => {
           handoverOv.style.display = 'none';
           handoverOv.classList.add('hidden');
-
-          // Show partner dashboard
-          const pv = document.getElementById('partner-dashboard');
-          pv.classList.remove('hidden');
-          pv.classList.add('fade-in');
         }, 700);
       };
       handoverOv.addEventListener('click', advanceToPartner);
@@ -3137,7 +3155,8 @@
               </h3>
               <div style="position:relative; flex-grow: 1; display: flex; flex-direction: column;">
                 <div id="inline-proposal-text" contenteditable="false"
-                  style="width:100%; flex-grow: 1; min-height:650px; padding:24px; border:1px solid #e2e8f0; border-radius:12px; font-family:'Inter', sans-serif; font-size:13.5px; line-height:1.7; color:#334155; background:#f1f5f9; overflow-y: auto; outline:none; transition: all 0.2s; box-shadow: inset 0 2px 4px 0 rgba(0,0,0,0.06);"></div>
+                  style="width:100%; flex-grow: 1; min-height:650px; padding:24px; border:1px solid #e2e8f0; border-radius:12px; font-family:'Inter', sans-serif; font-size:13.5px; line-height:1.7; color:#334155; background:#f1f5f9; overflow-y: auto; outline:none; transition: all 0.2s; box-shadow: inset 0 2px 4px 0 rgba(0,0,0,0.06);">
+                </div>
                 <div style="margin-top:16px; display:flex; justify-content:flex-end;">
                   <button id="inline-edit-btn" class="btn" onclick="toggleInlineEdit()"
                     style="width:auto; padding:8px 24px; margin:0; background:#2563eb;">
@@ -3330,14 +3349,16 @@
 
       <div class="form-group full-width">
         <label>Full Legal Name (E-Signature)</label>
-        <input type="text" id="client-signature-input" placeholder="Type your full legal name" oninput="checkDashboardSig()"
+        <input type="text" id="client-signature-input" placeholder="Type your full legal name"
+          oninput="checkDashboardSig()"
           style="font-family: 'Brush Script MT', cursive; font-size: 20px; color: #2563eb;">
       </div>
 
       <div style="display:flex; gap:12px; margin-top:24px;">
         <button class="btn-outline" style="flex:1;"
           onclick="document.getElementById('client-sign-overlay').classList.add('hidden')">Back</button>
-        <button class="btn" id="db-btn-authorize" style="flex:1; background:#10b981; margin:0; opacity:0.5; cursor:not-allowed;"
+        <button class="btn" id="db-btn-authorize"
+          style="flex:1; background:#10b981; margin:0; opacity:0.5; cursor:not-allowed;"
           onclick="authorizeAndSendDashboard(this)" disabled>Authorize & Send</button>
       </div>
     </div>
@@ -3395,19 +3416,25 @@
         <!-- Left: Proposal Document -->
         <div class="client-card" style="padding:0; overflow:hidden;">
           <!-- Doc Header Bar -->
-          <div style="padding:16px 24px; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; background:#0f172a;">
+          <div
+            style="padding:16px 24px; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; background:#0f172a;">
             <div style="display:flex; align-items:center; gap:10px;">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+              </svg>
               <span style="font-weight:700; color:white; font-size:14px;">Audit_Offshore_Proposal_v1.pdf</span>
             </div>
-            <div style="display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.1); padding:4px 12px; border-radius:20px;">
+            <div
+              style="display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.1); padding:4px 12px; border-radius:20px;">
               <div style="width:6px; height:6px; background:#10b981; border-radius:50%;"></div>
               <span style="font-size:11px; color:#94a3b8; font-weight:600;">Partner Reviewed</span>
             </div>
           </div>
 
           <!-- Document Body -->
-          <div id="client-proposal-display" style="padding:48px; background:white; overflow-y:auto; max-height:75vh;" class="scroll-light">
+          <div id="client-proposal-display" style="padding:48px; background:white; overflow-y:auto; max-height:75vh;"
+            class="scroll-light">
             <!-- Populated by prepareClientProposalView() -->
           </div>
 
@@ -3420,11 +3447,14 @@
 
           <!-- Engagement Summary -->
           <div class="client-card" style="padding:20px;">
-            <h3 style="font-size:13px; font-weight:700; margin-bottom:12px; text-transform:uppercase; letter-spacing:0.5px; color:#64748b;">Engagement Summary</h3>
+            <h3
+              style="font-size:13px; font-weight:700; margin-bottom:12px; text-transform:uppercase; letter-spacing:0.5px; color:#64748b;">
+              Engagement Summary</h3>
             <div style="display:flex; flex-direction:column; gap:10px;">
               <div style="display:flex; justify-content:space-between; font-size:13px;">
                 <span style="color:#64748b;">Complexity Score:</span>
-                <span id="client-complexity-badge" style="background:#fef3c7; color:#92400e; padding:2px 8px; border-radius:12px; font-weight:700;">7.8/10</span>
+                <span id="client-complexity-badge"
+                  style="background:#fef3c7; color:#92400e; padding:2px 8px; border-radius:12px; font-weight:700;">7.8/10</span>
               </div>
               <div style="display:flex; justify-content:space-between; font-size:13px;">
                 <span style="color:#64748b;">Timeline:</span>
@@ -3440,30 +3470,44 @@
           <!-- Partner Annotations — Always visible -->
           <div class="client-card" style="padding:20px; border-left:4px solid #7c3aed;">
             <div style="display:flex; align-items:center; gap:8px; margin-bottom:16px;">
-              <div style="width:28px; height:28px; background:#f3f0ff; border-radius:6px; display:flex; align-items:center; justify-content:center;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+              <div
+                style="width:28px; height:28px; background:#f3f0ff; border-radius:6px; display:flex; align-items:center; justify-content:center;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.5">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
               </div>
               <div>
                 <div style="font-size:13px; font-weight:700; color:#0f172a;">Audit Partner Notes</div>
                 <div style="font-size:11px; color:#7c3aed;">Click any note to locate it in the document</div>
               </div>
             </div>
-            <div id="client-comments-list" style="display:flex; flex-direction:column; gap:10px; max-height:360px; overflow-y:auto;" class="scroll-light">
+            <div id="client-comments-list"
+              style="display:flex; flex-direction:column; gap:10px; max-height:360px; overflow-y:auto;"
+              class="scroll-light">
               <!-- Populated by prepareClientProposalView() -->
-              <div style="color:#94a3b8; font-size:13px; font-style:italic; text-align:center; padding:20px; border:1px dashed #ddd5fe; border-radius:8px; background:#faf5ff;">No partner notes on this proposal.</div>
+              <div
+                style="color:#94a3b8; font-size:13px; font-style:italic; text-align:center; padding:20px; border:1px dashed #ddd5fe; border-radius:8px; background:#faf5ff;">
+                No partner notes on this proposal.</div>
             </div>
           </div>
 
           <!-- Client's own comment box -->
           <div class="client-card" style="padding:20px;">
-            <h3 style="font-size:13px; font-weight:700; margin-bottom:12px; text-transform:uppercase; letter-spacing:0.5px; color:#64748b;">Add Your Response</h3>
+            <h3
+              style="font-size:13px; font-weight:700; margin-bottom:12px; text-transform:uppercase; letter-spacing:0.5px; color:#64748b;">
+              Add Your Response</h3>
             <div style="display:flex; flex-direction:column; gap:8px;">
               <textarea id="client-comment-input" placeholder="Type a question or response to the partner..."
                 style="width:100%; padding:10px 12px; border:1px solid #e2e8f0; border-radius:8px; font-size:13px; font-family:inherit; resize:none; outline:none;"
-                rows="2"
-                onfocus="this.style.borderColor='#2563eb';" onblur="this.style.borderColor='#e2e8f0';"></textarea>
-              <button class="btn" style="width:100%; margin:0; padding:10px; font-size:13px; font-weight:600; background:#2563eb; border-radius:8px;" onclick="addClientComment()">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:6px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                rows="2" onfocus="this.style.borderColor='#2563eb';"
+                onblur="this.style.borderColor='#e2e8f0';"></textarea>
+              <button class="btn"
+                style="width:100%; margin:0; padding:10px; font-size:13px; font-weight:600; background:#2563eb; border-radius:8px;"
+                onclick="addClientComment()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                  style="margin-right:6px;">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
                 Submit Response
               </button>
             </div>
@@ -3559,35 +3603,41 @@
       </div>
 
       <!-- Immersive Content Area -->
-      <div class="scroll-light" style="flex-grow: 1; background: #f1f5f9; display: flex; flex-direction: column; overflow-y: auto;">
-        
+      <div class="scroll-light"
+        style="flex-grow: 1; background: #f1f5f9; display: flex; flex-direction: column; overflow-y: auto;">
+
         <!-- Document Sheet Area -->
         <div style="padding: 60px 20px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center;">
-            <!-- Document Info Badge -->
-            <div style="width: 100%; max-width: 850px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding: 0 4px;">
-                <div style="display: flex; align-items: center; gap: 8px; color: #64748b; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                    Proposal Document v1.2
-                </div>
-                <div style="font-size: 11px; color: #94a3b8; font-weight: 500;">Page 1 of 1</div>
+          <!-- Document Info Badge -->
+          <div
+            style="width: 100%; max-width: 850px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding: 0 4px;">
+            <div
+              style="display: flex; align-items: center; gap: 8px; color: #64748b; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+              </svg>
+              Proposal Document v1.2
             </div>
+            <div style="font-size: 11px; color: #94a3b8; font-weight: 500;">Page 1 of 1</div>
+          </div>
 
-            <!-- The Paper Sheet -->
-            <div id="manager-review-proposal-display" 
-                 style="width: 100%; max-width: 850px; background: #fff; padding: 80px 100px; border-radius: 2px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15), 0 0 1px 0 rgba(0,0,0,0.1); border: 1px solid #e2e8f0; position: relative;">
-            </div>
+          <!-- The Paper Sheet -->
+          <div id="manager-review-proposal-display"
+            style="width: 100%; max-width: 850px; background: #fff; padding: 80px 100px; border-radius: 2px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15), 0 0 1px 0 rgba(0,0,0,0.1); border: 1px solid #e2e8f0; position: relative;">
+          </div>
         </div>
 
         <!-- Annotations Shelf -->
         <div style="max-width: 850px; width:100%; margin: 0 auto; padding: 0 20px 60px;">
-            <h3 id="manager-review-section-header"
-              style="font-size:14px; font-weight:800; color:#475569; margin-bottom:16px; display:flex; align-items:center; gap:8px; text-transform:uppercase; letter-spacing:1px;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.5">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-              </svg>
-              Internal Verification Logs
-            </h3>
-            <div id="manager-review-comments" style="display: grid; grid-template-columns: 1fr; gap: 12px;"></div>
+          <h3 id="manager-review-section-header"
+            style="font-size:14px; font-weight:800; color:#475569; margin-bottom:16px; display:flex; align-items:center; gap:8px; text-transform:uppercase; letter-spacing:1px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.5">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            Internal Verification Logs
+          </h3>
+          <div id="manager-review-comments" style="display: grid; grid-template-columns: 1fr; gap: 12px;"></div>
         </div>
       </div>
 
@@ -3671,7 +3721,9 @@
 
             <div class="comment-section-wrapper" id="pdf-wrap-synopsis">
               <button class="section-add-comment-btn" onclick="handleSectionClickEvent(event, 'pdf-wrap-synopsis')">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
                 Add Note
               </button>
               <div>
@@ -3689,7 +3741,9 @@
 
             <div class="comment-section-wrapper" id="pdf-wrap-scope">
               <button class="section-add-comment-btn" onclick="handleSectionClickEvent(event, 'pdf-wrap-scope')">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
                 Add Note
               </button>
               <div>
@@ -3708,17 +3762,26 @@
 
             <div class="comment-section-wrapper" id="pdf-wrap-timeline">
               <button class="section-add-comment-btn" onclick="handleSectionClickEvent(event, 'pdf-wrap-timeline')">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
                 Add Note
               </button>
               <div id="pdf-timeline">
-                <h3 style="font-size: 16px; color: #0f172a; margin-bottom: 12px; font-weight:700;">3. Project Timeline & Milestones</h3>
-                <div style="display: grid; grid-template-columns: 100px 1fr; gap: 12px 24px; border-top: 1px solid #f1f5f9; padding-top: 20px; font-size:14px;">
-                  <div style="font-weight: 700; color:#0f172a;">Week 1-2</div><div>Initial Document Discovery & Systems Access Integration</div>
-                  <div style="font-weight: 700; color:#0f172a;">Week 3</div><div>Technical Infrastructure Review & Penetration Testing</div>
-                  <div style="font-weight: 700; color:#0f172a;">Week 4</div><div>Financial Reconciliation (Dual Currency Ledgers)</div>
-                  <div style="font-weight: 700; color:#0f172a;">Week 5</div><div>Draft Reporting & Management Review</div>
-                  <div style="font-weight: 700; color:#0f172a;">Week 6</div><div>Delivery of Final Assurance Audit</div>
+                <h3 style="font-size: 16px; color: #0f172a; margin-bottom: 12px; font-weight:700;">3. Project Timeline &
+                  Milestones</h3>
+                <div
+                  style="display: grid; grid-template-columns: 100px 1fr; gap: 12px 24px; border-top: 1px solid #f1f5f9; padding-top: 20px; font-size:14px;">
+                  <div style="font-weight: 700; color:#0f172a;">Week 1-2</div>
+                  <div>Initial Document Discovery & Systems Access Integration</div>
+                  <div style="font-weight: 700; color:#0f172a;">Week 3</div>
+                  <div>Technical Infrastructure Review & Penetration Testing</div>
+                  <div style="font-weight: 700; color:#0f172a;">Week 4</div>
+                  <div>Financial Reconciliation (Dual Currency Ledgers)</div>
+                  <div style="font-weight: 700; color:#0f172a;">Week 5</div>
+                  <div>Draft Reporting & Management Review</div>
+                  <div style="font-weight: 700; color:#0f172a;">Week 6</div>
+                  <div>Delivery of Final Assurance Audit</div>
                 </div>
               </div>
             </div>
@@ -3750,17 +3813,17 @@
       // Find the editable areas in the dashboard document
       const dashSyn = document.querySelector('#sec-synopsis .editable-area');
       const dashReq = document.querySelector('#sec-scope .editable-area');
-      
+
       // Clear comments before syncing if needed, or maintain them
       // For now, we maintain the global 'comments' array
-      
+
       if (dashSyn) document.getElementById('pdf-synopsis').innerHTML = dashSyn.innerHTML;
       if (dashReq) document.getElementById('pdf-req').innerHTML = dashReq.innerHTML;
 
       const pdfo = document.getElementById('pdf-overlay');
       pdfo.classList.remove('hidden', 'fade-out');
       pdfo.classList.add('fade-in');
-      
+
       // Re-init listeners for the new DOM elements
       initSelectionCommenting();
     }
@@ -3791,8 +3854,11 @@
       // Open the delivery modal for initial dispatch
       const dlvOverlay = document.getElementById('delivery-overlay');
       if (dlvOverlay) {
-        dlvOverlay.classList.remove('hidden', 'fade-out');
-        dlvOverlay.classList.add('fade-in');
+        dlvOverlay.classList.remove('hidden', 'fade-out', 'fade-in');
+        dlvOverlay.style.display = 'flex';
+        // Remove animation so it pops up instantly, blocking dashboard view
+        dlvOverlay.style.animation = 'none';
+        dlvOverlay.style.opacity = '1';
 
         // Reset all steps
         ['dlv-step-1', 'dlv-step-2', 'dlv-step-3', 'dlv-step-4'].forEach((id, i) => {
@@ -3847,7 +3913,7 @@
                   // Show success UI in the modal
                   if (success) success.style.display = 'block';
                   if (closeBtn) closeBtn.style.display = 'flex';
-                  
+
                   // Update background state
                   finalizeStatusUpdate();
                 });
@@ -3869,9 +3935,9 @@
           step6.classList.add('completed');
           step6.querySelector('.step-icon').innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
           const chip6 = step6.querySelector('.kyc-status-chip');
-          if (chip6) { 
-            chip6.innerText = 'DISPATCHED TO CLIENT'; 
-            chip6.classList.add('status-completed'); 
+          if (chip6) {
+            chip6.innerText = 'DISPATCHED TO CLIENT';
+            chip6.classList.add('status-completed');
           }
         }
         if (step7) {
@@ -3907,12 +3973,12 @@
       if (!isEditing) {
         // Switch to Edit Mode
         editableAreas.forEach(area => {
-            area.contentEditable = "true";
-            area.style.background = '#ffffff';
-            area.style.border = '2px solid #2563eb';
-            area.style.boxShadow = '0 0 0 4px rgba(37,99,235,0.1)';
+          area.contentEditable = "true";
+          area.style.background = '#ffffff';
+          area.style.border = '2px solid #2563eb';
+          area.style.boxShadow = '0 0 0 4px rgba(37,99,235,0.1)';
         });
-        
+
         btn.disabled = true;
         btn.style.opacity = '0.7';
         btn.innerHTML = `<span>Editing...</span>`;
@@ -3932,27 +3998,27 @@
 
         // Proper layout preservation vs raw text append
         setTimeout(() => {
-            if (targetArea) targetArea.insertAdjacentHTML('beforeend', revisionHtml);
-            btn.disabled = false;
-            btn.style.opacity = '1';
-            btn.innerHTML = `
+          if (targetArea) targetArea.insertAdjacentHTML('beforeend', revisionHtml);
+          btn.disabled = false;
+          btn.style.opacity = '1';
+          btn.innerHTML = `
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="margin-right:8px;">
                     <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
                 Save Proposal Changes
             `;
-            btn.style.background = '#10b981'; // Success Green
+          btn.style.background = '#10b981'; // Success Green
         }, 1000);
 
       } else {
         // Switch to View Mode / Save
         editableAreas.forEach(area => {
-            area.contentEditable = "false";
-            area.style.background = '#fcfcfc';
-            area.style.border = '1px dashed #e2e8f0';
-            area.style.boxShadow = 'none';
+          area.contentEditable = "false";
+          area.style.background = '#fcfcfc';
+          area.style.border = '1px dashed #e2e8f0';
+          area.style.boxShadow = 'none';
         });
-        
+
         btn.innerHTML = `
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px;">
             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
@@ -4270,14 +4336,18 @@
         if (!managerClickReady) return;
         handoverOverlay.removeEventListener('click', advanceToManager);
         handoverOverlay.style.cursor = 'default';
+        
+        // Swap dashboards immediately behind the opaque black screen
+        document.getElementById('partner-dashboard').classList.add('hidden');
+        document.getElementById('partner-dashboard').classList.remove('fade-in');
+        document.getElementById('dashboard').style.display = 'grid';
+
         handoverOverlay.classList.remove('show');
         handoverOverlay.style.opacity = '0';
+        
         setTimeout(() => {
           handoverOverlay.style.display = 'none';
           handoverOverlay.classList.add('hidden');
-          // Hide partner dashboard immediately now that it's behind black screen
-          document.getElementById('partner-dashboard').classList.add('hidden');
-          document.getElementById('partner-dashboard').classList.remove('fade-in');
         }, 700);
       };
       handoverOverlay.addEventListener('click', advanceToManager);
@@ -4292,15 +4362,15 @@
 
       // Sync rich proposal content (HTML includes highlights and section indicators)
       if (display && source) {
-          display.innerHTML = source.innerHTML;
-          // Ensure no editable borders appear in manager view
-          const areas = display.querySelectorAll('.editable-area');
-          areas.forEach(a => {
-              a.style.border = 'none';
-              a.style.padding = '0';
-              a.style.background = 'transparent';
-              a.style.boxShadow = 'none';
-          });
+        display.innerHTML = source.innerHTML;
+        // Ensure no editable borders appear in manager view
+        const areas = display.querySelectorAll('.editable-area');
+        areas.forEach(a => {
+          a.style.border = 'none';
+          a.style.padding = '0';
+          a.style.background = 'transparent';
+          a.style.boxShadow = 'none';
+        });
       }
 
       // Render partner comments
@@ -4433,9 +4503,9 @@
     function handleClientSuccessAction(status) {
       // Hide all potential overlays
       const overlays = [
-        'client-reject-overlay', 
-        'client-sign-overlay', 
-        'delivery-overlay', 
+        'client-reject-overlay',
+        'client-sign-overlay',
+        'delivery-overlay',
         'onboarding-dispatch-overlay',
         'manager-review-overlay'
       ];
@@ -4446,7 +4516,7 @@
 
       // Immediately return to manager dashboard
       document.getElementById('client-dashboard').classList.add('hidden');
-      
+
       const dash = document.getElementById('dashboard');
       if (dash) {
         dash.style.display = 'grid';
@@ -4460,7 +4530,7 @@
       const row = document.getElementById('targetRow');
       const isApproved = status === 'Approved';
       const isFullySubmitted = status === 'Documents Submitted';
-      
+
       // Update ALL steps if fully submitted
       const allSteps = [1, 2, 3, 4, 5, 6, 7];
       allSteps.forEach(num => {
@@ -4543,17 +4613,17 @@
         ingestionRow.querySelector('#progress-label-1').innerText = "6/6 Documents Verified";
         ingestionRow.querySelector('#progress-percent-1').innerText = "100%";
         ingestionRow.querySelector('#progress-percent-1').style.color = "#059669";
-        
+
         const progBars = ingestionRow.querySelector('#progress-bars-1');
         if (progBars) {
-            progBars.innerHTML = Array(6).fill('<div style="flex:1; height:6px; background:#10b981; border-radius:3px;"></div>').join('');
+          progBars.innerHTML = Array(6).fill('<div style="flex:1; height:6px; background:#10b981; border-radius:3px;"></div>').join('');
         }
-        
+
         ingestionRow.querySelector('#progress-name-1').innerHTML = "All documents <strong>Secured & Analyzed</strong> ✓";
-        
+
         const validationStatus = ingestionRow.querySelector('td:nth-child(4)');
         if (validationStatus) {
-            validationStatus.innerHTML = `
+          validationStatus.innerHTML = `
                 <div style="display:flex; flex-direction:column; gap:4px;">
                     <span style="color:#059669; background:#ecfdf5; padding:4px 10px; border-radius:16px; font-weight:600; font-size:12px; display:inline-flex; align-items:center; gap:6px; border:1px solid #a7f3d0; width:fit-content;">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -4563,10 +4633,10 @@
                 </div>
             `;
         }
-        
+
         const deadlineCell = document.getElementById('deadlineCell1');
         if (deadlineCell) {
-            deadlineCell.innerHTML = `
+          deadlineCell.innerHTML = `
                 <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
                     <span style="font-size:12px; font-weight:700; color:#059669;">COMPLETED</span>
                     <span style="font-size:11px; color:#94a3b8;">Ahead of Schedule</span>
@@ -4852,10 +4922,10 @@
     function sendOnboardingLink(element) {
       const btn = element || document.getElementById('side-panel-send-link-btn');
       if (!btn) {
-         window.open('client-portal.html', '_blank');
-         return;
+        window.open('client-portal.html', '_blank');
+        return;
       }
-      
+
       const originalHtml = btn.innerHTML;
       btn.innerHTML = `<span class="spinner" style="margin-right:8px; border-top-color:white; width:12px; height:12px;"></span> Transmitting link...`;
       btn.disabled = true;
@@ -4880,11 +4950,11 @@
 
     // Initialize on page load
     window.addEventListener('DOMContentLoaded', () => {
-        // Ensure dashboard is visible immediately
-        const dash = document.getElementById('dashboard');
-        if (dash) dash.style.opacity = '1';
-        
-        initSelectionCommenting();
+      // Ensure dashboard is visible immediately
+      const dash = document.getElementById('dashboard');
+      if (dash) dash.style.opacity = '1';
+
+      initSelectionCommenting();
     });
 
     // --- Selection Commenting Logic ---
@@ -4892,180 +4962,180 @@
     let comments = [];
 
     function initSelectionCommenting() {
-        const ids = ['pdf-synopsis', 'pdf-req', 'pdf-timeline', 'pc-complexity-reason', 'pc-complexity-req', 'inline-proposal-text', 'sec-synopsis', 'sec-scope', 'sec-timeline'];
-        
-        ids.forEach(id => {
-            const el = document.getElementById(id);
-            if (el) {
-                el.addEventListener('mouseup', handleTextSelection);
-            }
-        });
-        
-        // Use event delegation for section clicks
-        document.addEventListener('click', (e) => {
-            const wrapper = e.target.closest('.comment-section-wrapper');
-            if (wrapper && window.getSelection().toString().trim() === "" && !e.target.closest('.comment-highlight') && !e.target.closest('.section-add-comment-btn')) {
-                handleSectionClickEvent(e, wrapper.id);
-            }
-        });
+      const ids = ['pdf-synopsis', 'pdf-req', 'pdf-timeline', 'pc-complexity-reason', 'pc-complexity-req', 'inline-proposal-text', 'sec-synopsis', 'sec-scope', 'sec-timeline'];
 
-        document.addEventListener('mousedown', (e) => {
-            const popover = document.getElementById('comment-popover');
-            if (popover && !popover.contains(e.target) && !e.target.closest('[contenteditable="true"]') && !e.target.closest('.section-comment-indicator') && !e.target.closest('.section-add-comment-btn')) {
-                hideCommentPopover();
-            }
-        });
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.addEventListener('mouseup', handleTextSelection);
+        }
+      });
+
+      // Use event delegation for section clicks
+      document.addEventListener('click', (e) => {
+        const wrapper = e.target.closest('.comment-section-wrapper');
+        if (wrapper && window.getSelection().toString().trim() === "" && !e.target.closest('.comment-highlight') && !e.target.closest('.section-add-comment-btn')) {
+          handleSectionClickEvent(e, wrapper.id);
+        }
+      });
+
+      document.addEventListener('mousedown', (e) => {
+        const popover = document.getElementById('comment-popover');
+        if (popover && !popover.contains(e.target) && !e.target.closest('[contenteditable="true"]') && !e.target.closest('.section-comment-indicator') && !e.target.closest('.section-add-comment-btn')) {
+          hideCommentPopover();
+        }
+      });
     }
 
     function handleSectionClickEvent(e, wrapperId) {
-        // Only allow commenting if we are NOT in manager review or client dashboard
-        if (e.target.closest('#manager-review-overlay') || e.target.closest('#client-dashboard')) {
-            return;
-        }
+      // Only allow commenting if we are NOT in manager review or client dashboard
+      if (e.target.closest('#manager-review-overlay') || e.target.closest('#client-dashboard')) {
+        return;
+      }
 
-        if (e.stopPropagation) e.stopPropagation();
-        
-        let sectionName = "this section";
-        if (wrapperId.includes('synopsis')) sectionName = "Executive Synopsis";
-        if (wrapperId.includes('scope')) sectionName = "Engagement Scope";
-        if (wrapperId.includes('timeline')) sectionName = "Project Timeline";
+      if (e.stopPropagation) e.stopPropagation();
 
-        currentSelection = {
-            isSection: true,
-            text: `[Comment on ${sectionName}]`,
-            containerId: wrapperId
-        };
+      let sectionName = "this section";
+      if (wrapperId.includes('synopsis')) sectionName = "Executive Synopsis";
+      if (wrapperId.includes('scope')) sectionName = "Engagement Scope";
+      if (wrapperId.includes('timeline')) sectionName = "Project Timeline";
 
-        const x = e.pageX || e.clientX;
-        const y = e.pageY || e.clientY;
-        showCommentPopover(x, y, `General Note: ${sectionName}`);
+      currentSelection = {
+        isSection: true,
+        text: `[Comment on ${sectionName}]`,
+        containerId: wrapperId
+      };
+
+      const x = e.pageX || e.clientX;
+      const y = e.pageY || e.clientY;
+      showCommentPopover(x, y, `General Note: ${sectionName}`);
     }
 
     function handleTextSelection(e) {
-        // Only allow commenting if we are NOT in manager review or client dashboard
-        if (e.target.closest('#manager-review-overlay') || e.target.closest('#client-dashboard')) {
-            return;
-        }
+      // Only allow commenting if we are NOT in manager review or client dashboard
+      if (e.target.closest('#manager-review-overlay') || e.target.closest('#client-dashboard')) {
+        return;
+      }
 
-        const selection = window.getSelection();
-        const text = selection.toString().trim();
+      const selection = window.getSelection();
+      const text = selection.toString().trim();
 
-        if (text.length > 0) {
-            currentSelection = {
-                text: text,
-                range: selection.getRangeAt(0),
-                containerId: e.currentTarget.id
-            };
+      if (text.length > 0) {
+        currentSelection = {
+          text: text,
+          range: selection.getRangeAt(0),
+          containerId: e.currentTarget.id
+        };
 
-            showCommentPopover(e.pageX, e.pageY, text);
-        }
+        showCommentPopover(e.pageX, e.pageY, text);
+      }
     }
 
     function showCommentPopover(x, y, text) {
-        const popover = document.getElementById('comment-popover');
-        const preview = document.getElementById('selected-text-preview');
-        const input = document.getElementById('popover-comment-input');
-        
-        if (!popover) return;
-        
-        // Clear old input
-        if (input) input.value = '';
+      const popover = document.getElementById('comment-popover');
+      const preview = document.getElementById('selected-text-preview');
+      const input = document.getElementById('popover-comment-input');
 
-        // Show/hide preview for section vs text selection
-        if (preview) {
-            const isSection = text.startsWith('General Note:');
-            if (isSection) {
-                preview.style.display = 'none';
-            } else {
-                preview.style.display = 'block';
-                preview.innerText = `"${text.length > 80 ? text.substring(0, 80) + '...' : text}"`;
-            }
+      if (!popover) return;
+
+      // Clear old input
+      if (input) input.value = '';
+
+      // Show/hide preview for section vs text selection
+      if (preview) {
+        const isSection = text.startsWith('General Note:');
+        if (isSection) {
+          preview.style.display = 'none';
+        } else {
+          preview.style.display = 'block';
+          preview.innerText = `"${text.length > 80 ? text.substring(0, 80) + '...' : text}"`;
         }
+      }
 
-        popover.style.display = 'flex';
-        
-        // Clamp to viewport so it never goes off screen
-        const popoverW = 300;
-        const popoverH = 200;
-        const maxX = window.innerWidth - popoverW - 16;
-        const maxY = window.innerHeight - popoverH - 16;
-        const boundedX = Math.max(8, Math.min(x, maxX));
-        const boundedY = Math.max(8, Math.min(y - 120, maxY));
-        
-        popover.style.left = `${boundedX}px`;
-        popover.style.top = `${boundedY}px`;
-        
-        // Delay focus so popover renders first
-        setTimeout(() => { if (input) input.focus(); }, 50);
+      popover.style.display = 'flex';
+
+      // Clamp to viewport so it never goes off screen
+      const popoverW = 300;
+      const popoverH = 200;
+      const maxX = window.innerWidth - popoverW - 16;
+      const maxY = window.innerHeight - popoverH - 16;
+      const boundedX = Math.max(8, Math.min(x, maxX));
+      const boundedY = Math.max(8, Math.min(y - 120, maxY));
+
+      popover.style.left = `${boundedX}px`;
+      popover.style.top = `${boundedY}px`;
+
+      // Delay focus so popover renders first
+      setTimeout(() => { if (input) input.focus(); }, 50);
     }
 
     function hideCommentPopover() {
-        const popover = document.getElementById('comment-popover');
-        if (popover) popover.style.display = 'none';
-        const input = document.getElementById('popover-comment-input');
-        if (input) input.value = '';
+      const popover = document.getElementById('comment-popover');
+      if (popover) popover.style.display = 'none';
+      const input = document.getElementById('popover-comment-input');
+      if (input) input.value = '';
     }
 
     function saveSelectionComment() {
-        const commentInput = document.getElementById('popover-comment-input');
-        const commentText = commentInput.value.trim();
-        if (!commentText || !currentSelection) return;
+      const commentInput = document.getElementById('popover-comment-input');
+      const commentText = commentInput.value.trim();
+      if (!commentText || !currentSelection) return;
 
-        const commentId = 'comment-' + Date.now();
-        
-        if (currentSelection.isSection) {
-            // Add a visual indicator at the top of the section
-            const container = document.getElementById(currentSelection.containerId);
-            const indicator = document.createElement('div');
-            indicator.className = 'section-comment-indicator';
-            indicator.id = commentId;
-            indicator.innerHTML = `
+      const commentId = 'comment-' + Date.now();
+
+      if (currentSelection.isSection) {
+        // Add a visual indicator at the top of the section
+        const container = document.getElementById(currentSelection.containerId);
+        const indicator = document.createElement('div');
+        indicator.className = 'section-comment-indicator';
+        indicator.id = commentId;
+        indicator.innerHTML = `
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                 Partner Note: ${commentText.substring(0, 20)}${commentText.length > 20 ? '...' : ''}
             `;
-            container.prepend(indicator);
-        } else {
-            const span = document.createElement('span');
-            span.className = 'comment-highlight';
-            span.id = commentId;
-            span.innerText = currentSelection.text;
-            
-            try {
-                currentSelection.range.deleteContents();
-                currentSelection.range.insertNode(span);
-            } catch (err) {
-                console.error("Range insert failed", err);
-            }
+        container.prepend(indicator);
+      } else {
+        const span = document.createElement('span');
+        span.className = 'comment-highlight';
+        span.id = commentId;
+        span.innerText = currentSelection.text;
+
+        try {
+          currentSelection.range.deleteContents();
+          currentSelection.range.insertNode(span);
+        } catch (err) {
+          console.error("Range insert failed", err);
         }
+      }
 
-        const commentObj = {
-            id: commentId,
-            selectedText: currentSelection.text,
-            comment: commentText,
-            isSection: currentSelection.isSection || false,
-            containerId: currentSelection.containerId,
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        };
+      const commentObj = {
+        id: commentId,
+        selectedText: currentSelection.text,
+        comment: commentText,
+        isSection: currentSelection.isSection || false,
+        containerId: currentSelection.containerId,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
 
-        comments.push(commentObj);
-        if (typeof partnerComments !== 'undefined') partnerComments.push(commentObj);
+      comments.push(commentObj);
+      if (typeof partnerComments !== 'undefined') partnerComments.push(commentObj);
 
-        renderCommentList();
-        hideCommentPopover();
-        
-        window.getSelection().removeAllRanges();
+      renderCommentList();
+      hideCommentPopover();
+
+      window.getSelection().removeAllRanges();
     }
 
     function renderCommentList() {
-        const list = document.getElementById('pdf-comments-list');
-        if (!list) return;
-        
-        if (comments.length === 0) {
-            list.innerHTML = `<div style="color:#94a3b8; font-size:13px; font-style:italic; padding:16px; border:1px dashed #e2e8f0; border-radius:8px; text-align:center;">Select text in the proposal to add specific review comments.</div>`;
-            return;
-        }
+      const list = document.getElementById('pdf-comments-list');
+      if (!list) return;
 
-        list.innerHTML = comments.map(c => `
+      if (comments.length === 0) {
+        list.innerHTML = `<div style="color:#94a3b8; font-size:13px; font-style:italic; padding:16px; border:1px dashed #e2e8f0; border-radius:8px; text-align:center;">Select text in the proposal to add specific review comments.</div>`;
+        return;
+      }
+
+      list.innerHTML = comments.map(c => `
             <div class="comment-card-item" onclick="scrollToCommentHighlight('${c.id}')">
                 <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
                     <span style="font-weight:700; color:#2563eb;">${c.isSection ? 'Section Note' : 'Partner Note'}</span>
@@ -5078,75 +5148,141 @@
     }
 
     function scrollToCommentHighlight(id) {
-        const el = document.getElementById(id);
-        if (el) {
-            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            const originalBg = el.style.backgroundColor;
-            el.style.backgroundColor = 'rgba(255, 235, 59, 1)';
-            setTimeout(() => {
-                el.style.backgroundColor = originalBg || 'rgba(255, 245, 157, 0.6)';
-            }, 2000);
-        }
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const originalBg = el.style.backgroundColor;
+        el.style.backgroundColor = 'rgba(255, 235, 59, 1)';
+        setTimeout(() => {
+          el.style.backgroundColor = originalBg || 'rgba(255, 245, 157, 0.6)';
+        }, 2000);
+      }
     }
 
     function scrollToManagerHighlight(id) {
-        const display = document.getElementById('manager-review-proposal-display');
-        if (!display) return;
-        
-        const el = display.querySelector('#' + id);
-        if (el) {
-            // Find the containing section or wrapper to highlight the whole block
-            const sectionTarget = el.closest('.comment-section-wrapper') || el.closest('section') || el;
-            
-            sectionTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            
-            // Capture original state
-            const originalBg = sectionTarget.style.backgroundColor;
-            const originalTransition = sectionTarget.style.transition;
-            
-            // Apply Subtle Context Highlight (Light Indigo)
-            sectionTarget.style.transition = 'background-color 0.4s ease';
-            sectionTarget.style.backgroundColor = '#f5f3ff'; // Light purple/indigo
-            
-            setTimeout(() => {
-                sectionTarget.style.backgroundColor = originalBg;
-                setTimeout(() => {
-                    sectionTarget.style.transition = originalTransition;
-                }, 400);
-            }, 2000); // 2 seconds
-        }
+      const display = document.getElementById('manager-review-proposal-display');
+      if (!display) return;
+
+      const el = display.querySelector('#' + id);
+      if (el) {
+        // Find the containing section or wrapper to highlight the whole block
+        const sectionTarget = el.closest('.comment-section-wrapper') || el.closest('section') || el;
+
+        sectionTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        // Capture original state
+        const originalBg = sectionTarget.style.backgroundColor;
+        const originalTransition = sectionTarget.style.transition;
+
+        // Apply Subtle Context Highlight (Light Indigo)
+        sectionTarget.style.transition = 'background-color 0.4s ease';
+        sectionTarget.style.backgroundColor = '#f5f3ff'; // Light purple/indigo
+
+        setTimeout(() => {
+          sectionTarget.style.backgroundColor = originalBg;
+          setTimeout(() => {
+            sectionTarget.style.transition = originalTransition;
+          }, 400);
+        }, 2000); // 2 seconds
+      }
     }
 
     function transitionToClientView() {
+      // Show handover overlay first
+      const clientOv = document.getElementById('client-handover-overlay');
+      if (clientOv) {
+        clientOv.classList.remove('hidden');
+        clientOv.style.display = 'flex';
+        void clientOv.offsetWidth; // Repaint
+        clientOv.classList.add('show');
+        clientOv.style.opacity = '1';
+
+        // Close delivery modal behind it without fading to prevent revealing dashboard
+        const dlvOverlay = document.getElementById('delivery-overlay');
+        if (dlvOverlay) {
+          setTimeout(() => {
+            dlvOverlay.style.display = 'none';
+            dlvOverlay.classList.add('hidden');
+          }, 500); // Once cinematic overlay is black
+        }
+
+        setTimeout(() => {
+          document.getElementById('client-handover-progress').style.width = '100%';
+          document.getElementById('client-handover-badge').style.opacity = '1';
+          document.getElementById('client-handover-badge').style.transform = 'translateY(0)';
+          
+          const title = document.getElementById('client-handover-title');
+          title.textContent = '';
+          const msg1 = "Proposal package encrypted and securely delivered. Simulating client opening the link...";
+          let i = 0;
+          let clickReady = false;
+          
+          const t1 = setInterval(() => {
+            title.textContent += msg1[i++];
+            if (i >= msg1.length) {
+              clearInterval(t1);
+              setTimeout(() => {
+                document.getElementById('client-handover-msg').textContent = "Link opened. Transitioning to Client Portal...";
+                document.getElementById('client-handover-click-hint').style.opacity = '1';
+                clientOv.style.cursor = 'pointer';
+                clickReady = true;
+              }, 600);
+            }
+          }, 24);
+
+          const advanceToClient = () => {
+            if (!clickReady) return;
+            clientOv.removeEventListener('click', advanceToClient);
+            clientOv.style.cursor = 'default';
+            
+            // Swap dashboards seamlessly while black
+            const dash = document.getElementById('dashboard');
+            if (dash) dash.style.display = 'none';
+            const clientDash = document.getElementById('client-dashboard');
+            if (clientDash) clientDash.classList.remove('hidden');
+            prepareClientProposalView();
+            
+            clientOv.classList.remove('show');
+            clientOv.style.opacity = '0';
+            setTimeout(() => {
+              clientOv.style.display = 'none';
+              clientOv.classList.add('hidden');
+            }, 400);
+          };
+          clientOv.addEventListener('click', advanceToClient);
+
+        }, 800);
+      } else {
         const dash = document.getElementById('dashboard');
         if (dash) dash.style.display = 'none';
-        
+
         const clientDash = document.getElementById('client-dashboard');
         if (clientDash) clientDash.classList.remove('hidden');
-        
+
         prepareClientProposalView();
+      }
     }
 
     function prepareClientProposalView() {
-        const display = document.getElementById('client-proposal-display');
-        const source = document.getElementById('inline-proposal-text');
-        
-        if (!display || !source) return;
+      const display = document.getElementById('client-proposal-display');
+      const source = document.getElementById('inline-proposal-text');
 
-        // Sync the full rich proposal from the partner's editor
-        display.innerHTML = source.innerHTML;
-        display.style.fontFamily = "'Inter', sans-serif";
+      if (!display || !source) return;
 
-        // Populate partner comments panel
-        const clientCommentsList = document.getElementById('client-comments-list');
-        if (clientCommentsList) {
-            if (comments.length === 0) {
-                clientCommentsList.innerHTML = `
+      // Sync the full rich proposal from the partner's editor
+      display.innerHTML = source.innerHTML;
+      display.style.fontFamily = "'Inter', sans-serif";
+
+      // Populate partner comments panel
+      const clientCommentsList = document.getElementById('client-comments-list');
+      if (clientCommentsList) {
+        if (comments.length === 0) {
+          clientCommentsList.innerHTML = `
                     <div style="color:#94a3b8; font-size:13px; font-style:italic; text-align:center; padding:20px; border:1px dashed #ddd5fe; border-radius:8px; background:#faf5ff;">
                       No partner notes have been added to this proposal.
                     </div>`;
-            } else {
-                clientCommentsList.innerHTML = comments.map((c, i) => `
+        } else {
+          clientCommentsList.innerHTML = comments.map((c, i) => `
                     <div onclick="scrollToClientHighlight('${c.id}')" style="background:white; border:1px solid #e9d5ff; border-left:3px solid #7c3aed; border-radius:8px; padding:12px 14px; cursor:pointer; transition:all 0.2s;"
                       onmouseover="this.style.background='#faf5ff'; this.style.borderColor='#7c3aed';"
                       onmouseout="this.style.background='white'; this.style.borderColor='#e9d5ff';">
@@ -5159,7 +5295,7 @@
                         </div>
                         <span style="font-size:10px; color:#94a3b8;">${c.timestamp}</span>
                       </div>
-                      ${!c.isSection ? `<div style="font-size:11px; color:#5b21b6; background:#f3f0ff; padding:4px 8px; border-radius:4px; margin-bottom:6px; font-style:italic; line-height:1.4;">"${c.selectedText.length > 50 ? c.selectedText.substring(0,50)+'...' : c.selectedText}"</div>` : ''}
+                      ${!c.isSection ? `<div style="font-size:11px; color:#5b21b6; background:#f3f0ff; padding:4px 8px; border-radius:4px; margin-bottom:6px; font-style:italic; line-height:1.4;">"${c.selectedText.length > 50 ? c.selectedText.substring(0, 50) + '...' : c.selectedText}"</div>` : ''}
                       <div style="font-size:12px; color:#334155; line-height:1.5;">${c.comment}</div>
                       <div style="margin-top:8px; font-size:10px; color:#7c3aed; font-weight:600; display:flex; align-items:center; gap:3px;">
                         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
@@ -5167,34 +5303,34 @@
                       </div>
                     </div>
                 `).join('');
-            }
         }
+      }
     }
 
     function scrollToClientHighlight(id) {
-        const container = document.getElementById('client-proposal-display');
-        if (!container) return;
-        
-        const el = container.querySelector('#' + id);
-        if (el) {
-            // Context-aware targeting: highlight the entire section
-            const sectionTarget = el.closest('.comment-section-wrapper') || el.closest('section') || el;
-            
-            sectionTarget.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
-            
-            const originalBg = sectionTarget.style.backgroundColor;
-            const originalTransition = sectionTarget.style.transition;
-            
-            sectionTarget.style.transition = 'background-color 0.4s ease';
-            sectionTarget.style.backgroundColor = '#f5f3ff'; // Simple light indigo
-            
-            setTimeout(() => {
-                sectionTarget.style.backgroundColor = originalBg;
-                setTimeout(() => {
-                    sectionTarget.style.transition = originalTransition;
-                }, 400);
-            }, 2000); // 2 seconds
-        }
+      const container = document.getElementById('client-proposal-display');
+      if (!container) return;
+
+      const el = container.querySelector('#' + id);
+      if (el) {
+        // Context-aware targeting: highlight the entire section
+        const sectionTarget = el.closest('.comment-section-wrapper') || el.closest('section') || el;
+
+        sectionTarget.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+
+        const originalBg = sectionTarget.style.backgroundColor;
+        const originalTransition = sectionTarget.style.transition;
+
+        sectionTarget.style.transition = 'background-color 0.4s ease';
+        sectionTarget.style.backgroundColor = '#f5f3ff'; // Simple light indigo
+
+        setTimeout(() => {
+          sectionTarget.style.backgroundColor = originalBg;
+          setTimeout(() => {
+            sectionTarget.style.transition = originalTransition;
+          }, 400);
+        }, 2000); // 2 seconds
+      }
     }
 
     /* ── Toast Notification ── */
@@ -5206,14 +5342,14 @@
         toast.className = 'toast';
         document.body.appendChild(toast);
       }
-      
+
       toast.innerHTML = `
         <div class="toast-icon">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="4"><polyline points="20 6 9 17 4 12"></polyline></svg>
         </div>
         <span>${message}</span>
       `;
-      
+
       toast.classList.add('show');
       setTimeout(() => toast.classList.remove('show'), 4500);
     }
@@ -5223,7 +5359,7 @@
       const params = new URLSearchParams(window.location.search);
       const dataParam = params.get('data');
       const flowParam = params.get('flow');
-      
+
       if (!dataParam && flowParam !== 'documents_submitted') return;
 
       // Clean the URL so refresh doesn't re-trigger
@@ -5231,9 +5367,9 @@
 
       // Hide all potential overlays
       const overlays = [
-        'client-reject-overlay', 
-        'client-sign-overlay', 
-        'delivery-overlay', 
+        'client-reject-overlay',
+        'client-sign-overlay',
+        'delivery-overlay',
         'onboarding-dispatch-overlay',
         'manager-review-overlay',
         'client-handover-overlay'
@@ -5255,9 +5391,9 @@
         // Switch to the Document Upload Progress view as requested
         const docNav = document.getElementById('nav-doc-upload');
         switchDashboardView('view-doc-upload', docNav);
-        
+
         updateManagerDashboardWithClientStatus('Documents Submitted');
-        
+
         // Final polish toast
         setTimeout(() => {
           if (typeof showToast !== 'undefined') {
@@ -5274,30 +5410,44 @@
   </script>
 
   <!-- ===== FLOATING COMMENT POPOVER ===== -->
-  <div id="comment-popover" style="position:fixed; display:none; flex-direction:column; gap:0; width:300px; background:white; border-radius:12px; box-shadow:0 20px 40px -8px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.06); z-index:99999; overflow:hidden;">
+  <div id="comment-popover"
+    style="position:fixed; display:none; flex-direction:column; gap:0; width:300px; background:white; border-radius:12px; box-shadow:0 20px 40px -8px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.06); z-index:99999; overflow:hidden;">
     <!-- Header -->
-    <div style="background:#0f172a; padding:12px 16px; display:flex; align-items:center; justify-content:space-between;">
+    <div
+      style="background:#0f172a; padding:12px 16px; display:flex; align-items:center; justify-content:space-between;">
       <div style="display:flex; align-items:center; gap:8px;">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.5">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
         <span style="font-size:12px; font-weight:700; color:white;">Add Partner Note</span>
       </div>
-      <button onclick="hideCommentPopover()" style="background:rgba(255,255,255,0.1); border:none; color:white; cursor:pointer; padding:4px 8px; border-radius:4px; font-size:12px; line-height:1;">✕</button>
+      <button onclick="hideCommentPopover()"
+        style="background:rgba(255,255,255,0.1); border:none; color:white; cursor:pointer; padding:4px 8px; border-radius:4px; font-size:12px; line-height:1;">✕</button>
     </div>
     <!-- Selected text preview -->
-    <div id="selected-text-preview" style="margin:12px 16px 0; padding:8px 12px; background:#fef9ed; border:1px solid #fde68a; border-radius:6px; font-size:12px; color:#92400e; font-style:italic; line-height:1.4; max-height:60px; overflow:hidden; display:none;"></div>
+    <div id="selected-text-preview"
+      style="margin:12px 16px 0; padding:8px 12px; background:#fef9ed; border:1px solid #fde68a; border-radius:6px; font-size:12px; color:#92400e; font-style:italic; line-height:1.4; max-height:60px; overflow:hidden; display:none;">
+    </div>
     <!-- Input -->
     <div style="padding:12px 16px;">
-      <textarea id="popover-comment-input" placeholder="Type your review note here..." rows="3" style="width:100%; border:1px solid #e2e8f0; border-radius:8px; padding:10px 12px; font-size:13px; font-family:inherit; resize:none; outline:none; line-height:1.5; color:#334155; transition: border-color 0.2s;" 
-        onfocus="this.style.borderColor='#2563eb'; this.style.boxShadow='0 0 0 3px rgba(37,99,235,0.1)';" 
+      <textarea id="popover-comment-input" placeholder="Type your review note here..." rows="3"
+        style="width:100%; border:1px solid #e2e8f0; border-radius:8px; padding:10px 12px; font-size:13px; font-family:inherit; resize:none; outline:none; line-height:1.5; color:#334155; transition: border-color 0.2s;"
+        onfocus="this.style.borderColor='#2563eb'; this.style.boxShadow='0 0 0 3px rgba(37,99,235,0.1)';"
         onblur="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';"
         onkeydown="if(event.key==='Enter' && (event.ctrlKey||event.metaKey)) saveSelectionComment();"></textarea>
       <div style="font-size:10px; color:#94a3b8; margin-top:4px;">Ctrl+Enter to save</div>
     </div>
     <!-- Actions -->
     <div style="display:flex; gap:8px; padding:0 16px 16px;">
-      <button onclick="hideCommentPopover()" style="flex:1; padding:8px; background:#f1f5f9; border:1px solid #e2e8f0; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; color:#64748b; transition:background 0.2s;" onmouseover="this.style.background='#e2e8f0';" onmouseout="this.style.background='#f1f5f9';">Cancel</button>
-      <button onclick="saveSelectionComment()" style="flex:2; padding:8px; background:#2563eb; border:none; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; color:white; display:flex; align-items:center; justify-content:center; gap:6px; transition:background 0.2s;" onmouseover="this.style.background='#1d4ed8';" onmouseout="this.style.background='#2563eb';">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+      <button onclick="hideCommentPopover()"
+        style="flex:1; padding:8px; background:#f1f5f9; border:1px solid #e2e8f0; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; color:#64748b; transition:background 0.2s;"
+        onmouseover="this.style.background='#e2e8f0';" onmouseout="this.style.background='#f1f5f9';">Cancel</button>
+      <button onclick="saveSelectionComment()"
+        style="flex:2; padding:8px; background:#2563eb; border:none; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; color:white; display:flex; align-items:center; justify-content:center; gap:6px; transition:background 0.2s;"
+        onmouseover="this.style.background='#1d4ed8';" onmouseout="this.style.background='#2563eb';">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
         Add Comment
       </button>
     </div>

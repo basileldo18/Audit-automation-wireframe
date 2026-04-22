@@ -1,0 +1,424 @@
+﻿  <!-- Client Dashboard View -->
+  <div id="client-dashboard" class="hidden" style="position:fixed; inset:0; overflow-y:auto; z-index:8000;">
+    <header class="client-header">
+      <div class="client-logo">
+        <div class="client-logo-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+          </svg>
+        </div>
+        Audit Offshore Ltd. <span style="font-weight:400; color:#94a3b8; margin-left:8px;">| Client Portal</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:16px;">
+        <div style="text-align:right;">
+          <div style="font-size:13px; font-weight:600;">Alex Thompson</div>
+          <div style="font-size:11px; color:#94a3b8;">Authorized Signatory</div>
+        </div>
+        <div class="avatar" style="border:2px solid #3b82f6;"><img src="https://i.pravatar.cc/150?img=12" alt="Client"
+            style="width:100%; height:100%;"></div>
+      </div>
+    </header>
+
+    <div class="client-container">
+      <div style="margin-bottom:32px;">
+        <h1 style="font-size:28px; font-weight:800; color:#0f172a; margin-bottom:8px;">Review Service Proposal</h1>
+        <p style="color:#64748b;">Please review the generated proposal for your upcoming audit engagement. You can
+          request edits or add comments before final approval.</p>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 360px; gap:32px; margin-bottom:100px; align-items:start;">
+        <!-- Left: Proposal Document -->
+        <div class="client-card" style="padding:0; overflow:hidden;">
+          <!-- Doc Header Bar -->
+          <div
+            style="padding:16px 24px; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; background:#0f172a;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+              </svg>
+              <span style="font-weight:700; color:white; font-size:14px;">Audit_Offshore_Proposal_v1.pdf</span>
+            </div>
+            <div
+              style="display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.1); padding:4px 12px; border-radius:20px;">
+              <div style="width:6px; height:6px; background:#10b981; border-radius:50%;"></div>
+              <span style="font-size:11px; color:#94a3b8; font-weight:600;">Partner Reviewed</span>
+            </div>
+          </div>
+
+          <!-- Document Body -->
+          <div id="client-proposal-display" style="padding:48px; background:white; overflow-y:auto; max-height:75vh;"
+            class="scroll-light">
+            <!-- Populated by prepareClientProposalView() -->
+          </div>
+
+          <!-- Hidden legacy textarea kept for JS compatibility -->
+          <textarea id="client-proposal-text" style="display:none;"></textarea>
+        </div>
+
+        <!-- Right: Always-visible Partner Notes + Comments -->
+        <div style="display:flex; flex-direction:column; gap:20px; position:sticky; top:24px;">
+
+          <!-- Engagement Summary -->
+          <div class="client-card" style="padding:20px;">
+            <h3
+              style="font-size:13px; font-weight:700; margin-bottom:12px; text-transform:uppercase; letter-spacing:0.5px; color:#64748b;">
+              Engagement Summary</h3>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <div style="display:flex; justify-content:space-between; font-size:13px;">
+                <span style="color:#64748b;">Complexity Score:</span>
+                <span id="client-complexity-badge"
+                  style="background:#fef3c7; color:#92400e; padding:2px 8px; border-radius:12px; font-weight:700;">7.8/10</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:13px;">
+                <span style="color:#64748b;">Timeline:</span>
+                <span style="font-weight:600;">6 Weeks</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:13px;">
+                <span style="color:#64748b;">Pricing Tier:</span>
+                <span style="font-weight:600;">Premium (Tier 3)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Partner Annotations — Always visible -->
+          <div class="client-card" style="padding:20px; border-left:4px solid #7c3aed;">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:16px;">
+              <div
+                style="width:28px; height:28px; background:#f3f0ff; border-radius:6px; display:flex; align-items:center; justify-content:center;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.5">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+              </div>
+              <div>
+                <div style="font-size:13px; font-weight:700; color:#0f172a;">Audit Partner Notes</div>
+                <div style="font-size:11px; color:#7c3aed;">Click any note to locate it in the document</div>
+              </div>
+            </div>
+            <div id="client-comments-list"
+              style="display:flex; flex-direction:column; gap:10px; max-height:360px; overflow-y:auto;"
+              class="scroll-light">
+              <!-- Populated by prepareClientProposalView() -->
+              <div
+                style="color:#94a3b8; font-size:13px; font-style:italic; text-align:center; padding:20px; border:1px dashed #ddd5fe; border-radius:8px; background:#faf5ff;">
+                No partner notes on this proposal.</div>
+            </div>
+          </div>
+
+          <!-- Client's own comment box -->
+          <div class="client-card" style="padding:20px;">
+            <h3
+              style="font-size:13px; font-weight:700; margin-bottom:12px; text-transform:uppercase; letter-spacing:0.5px; color:#64748b;">
+              Add Your Response</h3>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <textarea id="client-comment-input" placeholder="Type a question or response to the partner..."
+                style="width:100%; padding:10px 12px; border:1px solid #e2e8f0; border-radius:8px; font-size:13px; font-family:inherit; resize:none; outline:none;"
+                rows="2" onfocus="this.style.borderColor='#2563eb';"
+                onblur="this.style.borderColor='#e2e8f0';"></textarea>
+              <button class="btn"
+                style="width:100%; margin:0; padding:10px; font-size:13px; font-weight:600; background:#2563eb; border-radius:8px;"
+                onclick="addClientComment()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                  style="margin-right:6px;">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                Submit Response
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="client-action-bar">
+      <div style="display:flex; align-items:center; gap:12px; color:#64748b; font-size:13px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        </svg>
+        Secured with enterprise encryption
+      </div>
+      <div style="display:flex; gap:16px;">
+        <button class="btn client-btn-reject" style="width:auto; margin:0; padding:12px 28px; font-weight:600;"
+          onclick="openClientRejectModal()">Reject Proposal</button>
+        <button class="btn"
+          style="background:#10b981; width:auto; margin:0; padding:12px 32px; font-weight:700; font-size:15px;"
+          onclick="document.getElementById('client-sign-overlay').classList.remove('hidden')">Approve & E-Sign</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Client Reject Modal -->
+  <div id="client-reject-overlay" class="overlay-container hidden" style="z-index: 10000;">
+    <div class="modal-card" style="max-width: 480px;">
+      <h2 style="font-size: 20px; font-weight: 700; color: #ef4444; margin-bottom: 8px;">Reject Proposal?</h2>
+      <p style="font-size: 14px; color: #64748b; margin-bottom: 24px;">Please state your primary objection or feedback
+        for the audit team to review.</p>
+      <textarea id="client-reject-reason"
+        placeholder="Technical scope for dual-currency reconciliation is insufficient..."
+        style="width:100%; min-height:120px; padding:16px; border:1px solid #e2e8f0; border-radius:12px; font-size:14px; margin-bottom:24px; font-family:inherit;"></textarea>
+      <div style="display:flex; gap:12px;">
+        <button class="btn-outline" style="flex:1;"
+          onclick="document.getElementById('client-reject-overlay').classList.add('hidden')">Back to Review</button>
+        <button class="btn" style="flex:1; background:#ef4444; margin:0;"
+          onclick="handleClientSuccessAction('Rejected')">Confirm Rejection</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Partner Reject Overlay -->
+  <div id="partner-reject-overlay" class="overlay-container hidden" style="z-index: 6000;">
+    <div class="modal-card" style="max-width: 500px; width: 95%; padding: 32px; display: flex; flex-direction: column;">
+      <h2 style="font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">Reject Proposal</h2>
+      <p style="font-size: 13px; color: #64748b; margin-bottom: 24px;">Please provide a reason for rejecting the audit
+        proposal generated by the AI.</p>
+
+      <div style="position:relative; width: 100%;">
+        <textarea id="reject-reason-input" readonly
+          style="width:100%; min-height:120px; padding:16px; border:1px solid #e2e8f0; border-radius:8px; font-family:'Inter', sans-serif; font-size:13.5px; line-height:1.6; color:#334155; background:#f8fafc; resize:none; margin-bottom:24px;"
+          placeholder="Auto-typing reason..."></textarea>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:12px;">
+        <button class="btn"
+          style="background:white; color:#475569; border:1px solid #e2e8f0; width:auto; padding:8px 20px; margin:0;"
+          onclick="document.getElementById('partner-reject-overlay').classList.add('hidden')">Cancel</button>
+        <button id="btn-submit-reject" class="btn"
+          style="background:#ef4444; margin:0; width:auto; padding:8px 20px; display:inline-flex; align-items:center; gap:8px;"
+          onclick="handleReturnToManager(true)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+          Send to Audit Manager
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Manager Review Overlay -->
+  <div id="manager-review-overlay" class="overlay-container hidden" style="z-index: 6000;">
+    <div class="modal-card"
+      style="max-width: 800px; width: 95%; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; padding: 0;">
+      <!-- Header -->
+      <div
+        style="padding: 24px 32px; border-bottom: 1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; background:#f8fafc;">
+        <div>
+          <h2 style="font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 4px;">Final Proposal Review</h2>
+          <p id="manager-review-title" style="font-size: 13px; color: #64748b;">Audit Offshore Ltd. — Partner approved
+            with notes</p>
+        </div>
+        <button class="close-btn" style="background:none; border:none; cursor:pointer; color:#64748b;"
+          onclick="document.getElementById('manager-review-overlay').classList.add('hidden')">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Immersive Content Area -->
+      <div class="scroll-light"
+        style="flex-grow: 1; background: #f1f5f9; display: flex; flex-direction: column; overflow-y: auto;">
+
+        <!-- Document Sheet Area -->
+        <div style="padding: 60px 20px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center;">
+          <!-- Document Info Badge -->
+          <div
+            style="width: 100%; max-width: 850px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding: 0 4px;">
+            <div
+              style="display: flex; align-items: center; gap: 8px; color: #64748b; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+              </svg>
+              Proposal Document v1.2
+            </div>
+            <div style="font-size: 11px; color: #94a3b8; font-weight: 500;">Page 1 of 1</div>
+          </div>
+
+          <!-- The Paper Sheet -->
+          <div id="manager-review-proposal-display"
+            style="width: 100%; max-width: 850px; background: #fff; padding: 80px 100px; border-radius: 2px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15), 0 0 1px 0 rgba(0,0,0,0.1); border: 1px solid #e2e8f0; position: relative;">
+          </div>
+        </div>
+
+        <!-- Annotations Shelf -->
+        <div style="max-width: 850px; width:100%; margin: 0 auto; padding: 0 20px 60px;">
+          <h3 id="manager-review-section-header"
+            style="font-size:14px; font-weight:800; color:#475569; margin-bottom:16px; display:flex; align-items:center; gap:8px; text-transform:uppercase; letter-spacing:1px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.5">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            Internal Verification Logs
+          </h3>
+          <div id="manager-review-comments" style="display: grid; grid-template-columns: 1fr; gap: 12px;"></div>
+        </div>
+      </div>
+
+      <!-- Footer Action -->
+      <div style="padding: 24px 32px; border-top: 1px solid #e2e8f0; background: #f8fafc; text-align: right;">
+        <button class="btn"
+          style="background:#10b981; margin:0; width:auto; padding:10px 28px; display:inline-flex; align-items:center; gap:8px;"
+          onclick="document.getElementById('manager-review-overlay').classList.add('hidden'); handleApprove();">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+          Approve & Send to Client
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PDF Viewer Overlay -->
+  <!-- Proposal Editor Overlay -->
+  <div id="pdf-overlay" class="overlay-container hidden" style="z-index: 4000;">
+    <div class="modal-card"
+      style="max-width: 900px; width: 95%; height: 90vh; padding: 0; display: flex; flex-direction: column; overflow: hidden; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);">
+
+      <!-- Editor Toolbar -->
+      <div
+        style="background: #0f172a; padding: 16px 28px; display: flex; justify-content: space-between; align-items: center; color: white;">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <div style="background:rgba(255,255,255,0.1); padding:8px; border-radius:8px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+              <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+          </div>
+          <div>
+            <span style="font-size: 15px; font-weight: 600; display:block;">Proposal Editor</span>
+            <span style="font-size: 11px; color: #94a3b8; text-transform:uppercase; letter-spacing:0.5px;">Customizing
+              Audit_Offshore_Proposal_v1.pdf</span>
+          </div>
+          <span id="pdf-edit-badge"
+            style="display:none; background:#f59e0b; color:#000; font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; letter-spacing:0.5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">AI
+            ASSISTED EDITING...</span>
+        </div>
+        <div style="display: flex; align-items:center; gap: 20px;">
+          <div id="save-status" style="font-size:12px; color:#94a3b8; display:flex; align-items:center; gap:6px;">
+            <div style="width:6px; height:6px; background:#10b981; border-radius:50%;"></div> Draft Saved
+          </div>
+          <button id="pdf-close-btn" class="btn" style="background:#2563eb; margin:0; width:auto; padding:8px 24px;"
+            onclick="closePDFPreview()">Finish & Review</button>
+        </div>
+      </div>
+
+      <!-- Scrollable Editor Area -->
+      <div
+        style="flex: 1; background: #f8fafc; overflow-y: auto; padding: 40px; display: flex; justify-content: center;"
+        class="scroll-light">
+        <div
+          style="background: white; width: 100%; max-width: 750px; min-height: 1000px; padding: 64px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid #f1f5f9;">
+
+          <!-- Document Header -->
+          <div
+            style="border-bottom: 3px solid #0f172a; padding-bottom: 32px; margin-bottom: 40px; display: flex; justify-content: space-between; align-items:flex-end;">
+            <div>
+              <h1
+                style="font-size: 32px; color: #0f172a; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">
+                Service Proposal</h1>
+              <p style="color: #64748b; font-size: 15px; margin-top: 6px; font-weight:500;">Tailored Compliance
+                Engagement</p>
+            </div>
+            <div style="text-align: right; color: #475569; font-size: 13px; line-height: 1.8;">
+              <strong style="color:#0f172a;">Prepared For:</strong><br>
+              Audit Offshore Ltd.<br>
+              <span style="color:#94a3b8;">Ref: PR-2026-X884</span><br>
+              Date: October 24, 2026
+            </div>
+          </div>
+
+          <!-- Editable Body Content -->
+          <div
+            style="font-size: 15px; color: #334155; line-height: 1.7; display: flex; flex-direction: column; gap: 32px;">
+
+            <div class="comment-section-wrapper" id="pdf-wrap-synopsis">
+              <button class="section-add-comment-btn" onclick="handleSectionClickEvent(event, 'pdf-wrap-synopsis')">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                Add Note
+              </button>
+              <div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                  <h3 style="font-size: 16px; color: #0f172a; font-weight:700;">1. Executive Synopsis</h3>
+                  <span style="font-size:11px; color:#94a3b8; text-transform:uppercase;">Editable Section</span>
+                </div>
+                <div id="pdf-synopsis" contenteditable="true"
+                  style="width:100%; min-height:120px; padding:16px; border:1px solid #e2e8f0; border-radius:8px; font-family:inherit; font-size:14px; line-height:1.6; color:#475569; background:#fcfcfc; transition: border-color 0.2s, box-shadow 0.2s; overflow-y: auto;"
+                  oninput="document.getElementById('save-status').innerHTML='<span style=\'color:#f59e0b\'>Saving...</span>'; setTimeout(() => document.getElementById('save-status').innerHTML='<div style=\'width:6px; height:6px; background:#10b981; border-radius:50%;\'></div> Draft Saved', 800);"
+                  onfocus="this.style.borderColor='#2563eb'; this.style.boxShadow='0 0 0 3px rgba(37,99,235,0.1)';"
+                  onblur="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';"></div>
+              </div>
+            </div>
+
+            <div class="comment-section-wrapper" id="pdf-wrap-scope">
+              <button class="section-add-comment-btn" onclick="handleSectionClickEvent(event, 'pdf-wrap-scope')">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                Add Note
+              </button>
+              <div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                  <h3 style="font-size: 16px; color: #0f172a; font-weight:700;">2. Engagement Scope & Pricing
+                    Justification</h3>
+                  <span style="font-size:11px; color:#94a3b8; text-transform:uppercase;">Editable Section</span>
+                </div>
+                <div id="pdf-req" contenteditable="true"
+                  style="width:100%; min-height:140px; padding:16px; border:1px solid #e2e8f0; border-radius:8px; font-family:inherit; font-size:14px; line-height:1.6; color:#475569; background:#fcfcfc; transition: border-color 0.2s, box-shadow 0.2s; overflow-y: auto;"
+                  oninput="document.getElementById('save-status').innerHTML='<span style=\'color:#f59e0b\'>Saving...</span>'; setTimeout(() => document.getElementById('save-status').innerHTML='<div style=\'width:6px; height:6px; background:#10b981; border-radius:50%;\'></div> Draft Saved', 800);"
+                  onfocus="this.style.borderColor='#2563eb'; this.style.boxShadow='0 0 0 3px rgba(37,99,235,0.1)';"
+                  onblur="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';"></div>
+              </div>
+            </div>
+
+            <div class="comment-section-wrapper" id="pdf-wrap-timeline">
+              <button class="section-add-comment-btn" onclick="handleSectionClickEvent(event, 'pdf-wrap-timeline')">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                Add Note
+              </button>
+              <div id="pdf-timeline">
+                <h3 style="font-size: 16px; color: #0f172a; margin-bottom: 12px; font-weight:700;">3. Project Timeline &
+                  Milestones</h3>
+                <div
+                  style="display: grid; grid-template-columns: 100px 1fr; gap: 12px 24px; border-top: 1px solid #f1f5f9; padding-top: 20px; font-size:14px;">
+                  <div style="font-weight: 700; color:#0f172a;">Week 1-2</div>
+                  <div>Initial Document Discovery & Systems Access Integration</div>
+                  <div style="font-weight: 700; color:#0f172a;">Week 3</div>
+                  <div>Technical Infrastructure Review & Penetration Testing</div>
+                  <div style="font-weight: 700; color:#0f172a;">Week 4</div>
+                  <div>Financial Reconciliation (Dual Currency Ledgers)</div>
+                  <div style="font-weight: 700; color:#0f172a;">Week 5</div>
+                  <div>Draft Reporting & Management Review</div>
+                  <div style="font-weight: 700; color:#0f172a;">Week 6</div>
+                  <div>Delivery of Final Assurance Audit</div>
+                </div>
+              </div>
+            </div>
+
+
+            <!-- Signatures -->
+            <div style="margin-top: 64px; display: grid; grid-template-columns: 1fr 1fr; gap: 48px;">
+              <div>
+                <div
+                  style="border-bottom: 2px solid #0f172a; margin-bottom: 12px; height: 50px; display:flex; align-items:center; justify-content:center; color:#2563eb; font-weight:600; font-size:13px; text-transform:uppercase; letter-spacing:1px; background:rgba(37,99,235,0.03);">
+                  Electronic Seal Applied</div>
+                <div style="font-size: 12px; color: #64748b; font-weight:600;">Managing Partner / Director</div>
+              </div>
+              <div>
+                <div
+                  style="border-bottom: 2px solid #0f172a; margin-bottom: 12px; height: 50px; color:#16a34a; font-family:'Brush Script MT', cursive; font-size:26px; text-align:center;">
+                  e-Signature Required</div>
+                <div style="font-size: 12px; color: #64748b; font-weight:600;">Client Authorized Signatory</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+

@@ -1,0 +1,71 @@
+﻿  <!-- Phase 2: Client-side KYC Questionnaire -->
+  <div id="kyc-overlay" class="overlay-container hidden" style="background:var(--bg-body);">
+    <div class="modal-card"
+      style="max-width: 600px; padding: 40px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.1); background: white;">
+      <div
+        style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px; border-bottom:1px solid var(--border-color); padding-bottom:16px;">
+        <div>
+          <h2 style="font-size:20px; font-weight:600; color:var(--text-main);">Secure KYC Questionnaire</h2>
+          <p style="font-size:13px; color:var(--text-secondary);">Audit Offshore Ltd. Corporate Due Diligence</p>
+        </div>
+        <div class="step-dots-container">
+          <div class="step-dot active" id="dot1"></div>
+          <div class="step-dot" id="dot2"></div>
+          <div class="step-dot" id="dot3"></div>
+        </div>
+      </div>
+
+      <div id="k-step-1">
+        <h3 style="font-size: 15px; margin-bottom: 16px; color:var(--text-main);">Step 1: Entity Structure</h3>
+        <div class="form-grid">
+          <div class="form-group full-width"><label>Legal Entity Type</label>
+            <div style="position:relative"><input type="text" id="k_entity" readonly></div>
+          </div>
+          <div class="form-group"><label>Country of Incorporation</label>
+            <div style="position:relative"><input type="text" id="k_country" readonly></div>
+          </div>
+          <div class="form-group"><label>Registration Number</label>
+            <div style="position:relative"><input type="text" id="k_reg" readonly></div>
+          </div>
+        </div>
+        <button class="btn" id="k-btn-1">Next: Business Activity</button>
+      </div>
+
+      <div id="k-step-2" style="display:none;">
+        <h3 style="font-size: 15px; margin-bottom: 16px; color:var(--text-main);">Step 2: Business Activity</h3>
+        <div class="form-grid">
+          <div class="form-group full-width"><label>Primary Industry</label>
+            <div style="position:relative"><input type="text" id="k_industry" readonly></div>
+          </div>
+          <div class="form-group"><label>Sub-sector</label>
+            <div style="position:relative"><input type="text" id="k_subs" readonly></div>
+          </div>
+          <div class="form-group"><label>Employee Count</label>
+            <div style="position:relative"><input type="text" id="k_emp" readonly></div>
+          </div>
+          <div class="form-group full-width"><label>Description of Operations</label>
+            <div style="position:relative"><input type="text" id="k_ops" readonly></div>
+          </div>
+        </div>
+        <button class="btn" id="k-btn-2">Next: Financials</button>
+      </div>
+
+      <div id="k-step-3" style="display:none;">
+        <h3 style="font-size: 15px; margin-bottom: 16px; color:var(--text-main);">Step 3: Financial Profile</h3>
+        <div class="form-grid">
+          <div class="form-group"><label>Est. Annual Revenue</label>
+            <div style="position:relative"><input type="text" id="k_rev" readonly></div>
+          </div>
+          <div class="form-group"><label>Operating Currency</label>
+            <div style="position:relative"><input type="text" id="k_curr" readonly></div>
+          </div>
+          <div class="form-group full-width"><label>Primary Banking Institution</label>
+            <div style="position:relative"><input type="text" id="k_bank" readonly></div>
+          </div>
+        </div>
+        <button class="btn" id="k-btn-3" style="background:var(--success)"><span class="spinner"></span> <span
+            class="text">Submit Documents Securely</span></button>
+      </div>
+
+    </div>
+  </div>

@@ -1,0 +1,218 @@
+  <!-- Proposal Delivery Modal -->
+  <div id="delivery-overlay" class="overlay-container hidden" style="z-index: 5000;">
+    <div class="modal-card" style="max-width: 480px; padding: 36px;">
+      <!-- Header -->
+      <div style="text-align:center; margin-bottom: 28px;">
+        <div id="delivery-icon"
+          style="width:56px; height:56px; border-radius:50%; background:#f0fdf4; display:flex; align-items:center; justify-content:center; margin: 0 auto 16px;">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </div>
+        <h2 style="font-size:20px; font-weight:700; color:#0f172a; margin-bottom:6px;">Delivering Proposal to Client
+        </h2>
+        <p style="font-size:14px; color:#475569; line-height:1.5;">Proposal for <strong>Audit Offshore Ltd.</strong> is
+          being securely packaged and dispatched.</p>
+      </div>
+
+      <!-- Step List -->
+      <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:28px;">
+        <div id="dlv-step-1"
+          style="display:flex; align-items:center; gap:12px; padding:12px 16px; border-radius:8px; background:#f8fafc; border:1px solid #e2e8f0;">
+          <div id="dlv-icon-1"
+            style="width:32px;height:32px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </div>
+          <div>
+            <div style="font-size:13px; font-weight:600; color:#0f172a;">Packaging Proposal PDF</div>
+            <div style="font-size:12px; color:#64748b;">Attaching Audit_Offshore_Proposal_v1.pdf</div>
+          </div>
+        </div>
+
+        <div id="dlv-step-2"
+          style="display:flex; align-items:center; gap:12px; padding:12px 16px; border-radius:8px; background:#f8fafc; border:1px solid #e2e8f0; opacity:0.4; transition:opacity 0.5s;">
+          <div id="dlv-icon-2"
+            style="width:32px;height:32px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+          </div>
+          <div>
+            <div style="font-size:13px; font-weight:600; color:#0f172a;">Attaching Partner Review Notes</div>
+            <div id="dlv-notes-count" style="font-size:12px; color:#64748b;">Bundling annotations for client...</div>
+          </div>
+        </div>
+
+        <div id="dlv-step-3"
+          style="display:flex; align-items:center; gap:12px; padding:12px 16px; border-radius:8px; background:#f8fafc; border:1px solid #e2e8f0; opacity:0.4; transition:opacity 0.5s;">
+          <div id="dlv-icon-3"
+            style="width:32px;height:32px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+          </div>
+          <div>
+            <div style="font-size:13px; font-weight:600; color:#0f172a;">Sending via Email</div>
+            <div style="font-size:12px; color:#64748b;">contact@auditoffshore.co.uk</div>
+          </div>
+        </div>
+
+        <div id="dlv-step-4"
+          style="display:flex; align-items:center; gap:12px; padding:12px 16px; border-radius:8px; background:#f8fafc; border:1px solid #e2e8f0; opacity:0.4; transition:opacity 0.5s;">
+          <div id="dlv-icon-4"
+            style="width:32px;height:32px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2">
+              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 1 1-7.6-11.7 8.38 8.38 0 0 1 3.8.9L21 3.5l-1 5.5z">
+              </path>
+            </svg>
+          </div>
+          <div>
+            <div style="font-size:13px; font-weight:600; color:#0f172a;">Delivering via WhatsApp</div>
+            <div style="font-size:12px; color:#64748b;">+44 7911 123456 · Proposal link generated</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Final Success State (hidden by default) -->
+      <div id="dlv-success"
+        style="display:none; background:#f0fdf4; border:2px solid #16a34a; border-radius:10px; padding:20px; text-align:center; margin-bottom:24px;">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"
+          style="margin-bottom:10px;">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+        <div style="font-size:16px; font-weight:700; color:#15803d; margin-bottom:6px;">Proposal Successfully Sent!
+        </div>
+        <div style="font-size:13px; color:#16a34a; line-height:1.5;">Audit Offshore Ltd. has been notified via
+          <strong>Email</strong> and <strong>WhatsApp</strong>. Awaiting client e-signature.
+        </div>
+      </div>
+
+      <!-- Close Button -->
+      <button id="dlv-close-btn" class="btn" style="display:none; background:#2563eb; margin:0;"
+        onclick="transitionToClientView()">Send Proposal Link</button>
+    </div>
+  </div>
+
+  <!-- Client Handover Overlay -->
+  <div id="client-handover-overlay" class="cinematic-overlay hidden" style="z-index: 9000;">
+    <!-- Branding -->
+    <div class="cinematic-brand">
+      <div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+        </svg>
+      </div>
+      <span>Audit Offshore &mdash; Secure Workflow</span>
+    </div>
+
+    <!-- Status badge -->
+    <div id="client-handover-badge" class="cinematic-badge">
+      <div id="client-handover-badge-icon" class="cinematic-badge-icon">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+      <span id="client-handover-badge-text">Transitioning Session</span>
+    </div>
+
+    <!-- Primary typewriter text -->
+    <div style="max-width:640px; text-align:center; margin-bottom:24px;">
+      <p id="client-handover-title" class="cinematic-text-main"></p>
+    </div>
+
+    <!-- Secondary text -->
+    <div style="max-width:440px; text-align:center; min-height:28px;">
+      <p id="client-handover-msg" class="cinematic-text-sub"></p>
+    </div>
+
+    <!-- Progress line -->
+    <div class="cinematic-progress-container">
+      <div id="client-handover-progress" class="cinematic-progress-bar"></div>
+    </div>
+
+    <!-- Click to continue hint -->
+    <div id="client-handover-click-hint" class="cinematic-click-hint">Click anywhere to continue &rsaquo;</div>
+  </div>
+
+  <!-- Client Approve/Sign Modal -->
+  <div id="client-sign-overlay" class="overlay-container hidden" style="z-index: 11000;">
+    <div class="modal-card" style="max-width: 500px; padding: 36px;">
+      <h2 style="font-size: 20px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">Approve & E-Sign</h2>
+      <p style="font-size: 14px; color: #64748b; margin-bottom: 24px;">Please add any final notes and provide your
+        electronic signature to authorize this engagement.</p>
+
+      <div class="form-group full-width">
+        <label>Final Approval Note (Optional)</label>
+        <textarea id="client-approve-comment"
+          placeholder="Everything looks good. Proceeding with the technical audit next week..."
+          style="width:100%; min-height:80px; padding:12px; border:1px solid #e2e8f0; border-radius:8px; font-size:13px; font-family:inherit; resize:none; margin-bottom:16px;"></textarea>
+      </div>
+
+      <div class="form-group full-width">
+        <label>Full Legal Name (E-Signature)</label>
+        <input type="text" id="client-signature-input" placeholder="Type your full legal name"
+          oninput="checkDashboardSig()"
+          style="font-family: 'Brush Script MT', cursive; font-size: 20px; color: #2563eb;">
+      </div>
+
+      <div style="display:flex; gap:12px; margin-top:24px;">
+        <button class="btn-outline" style="flex:1;"
+          onclick="document.getElementById('client-sign-overlay').classList.add('hidden')">Back</button>
+        <button class="btn" id="db-btn-authorize"
+          style="flex:1; background:#10b981; margin:0; opacity:0.5; cursor:not-allowed;"
+          onclick="authorizeAndSendDashboard(this)" disabled>Authorize & Send</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Manager Return Cinematic Overlay -->
+  <div id="manager-return-cinematic-overlay" class="cinematic-overlay hidden" style="z-index: 12000;">
+    <!-- Branding -->
+    <div class="cinematic-brand">
+      <div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+        </svg>
+      </div>
+      <span>Audit Offshore &mdash; Secure Verification</span>
+    </div>
+
+    <!-- Status badge -->
+    <div id="manager-return-badge" class="cinematic-badge">
+      <div id="manager-return-badge-icon" class="cinematic-badge-icon">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+      <span id="manager-return-badge-text">Processing Authorization</span>
+    </div>
+
+    <!-- Primary typewriter text -->
+    <div style="max-width:640px; text-align:center; margin-bottom:24px;">
+      <p id="manager-return-title" class="cinematic-text-main"></p>
+    </div>
+
+    <!-- Secondary text -->
+    <div style="max-width:440px; text-align:center; min-height:28px;">
+      <p id="manager-return-msg" class="cinematic-text-sub"></p>
+    </div>
+
+    <!-- Progress line -->
+    <div class="cinematic-progress-container">
+      <div id="manager-return-progress" class="cinematic-progress-bar"></div>
+    </div>
+
+    <!-- Click to continue hint -->
+    <div id="manager-return-click-hint" class="cinematic-click-hint">Click anywhere to return to Manager View &rsaquo;</div>
+  </div>
+
+  
